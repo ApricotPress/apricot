@@ -37,7 +37,7 @@ public class App(
         State = AppState.Initialized;
     }
 
-    public void Run()
+    public virtual void Run()
     {
         if (State != AppState.Initialized)
         {
