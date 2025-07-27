@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>preview</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+
+    <PropertyGroup>
+        <NativeLibsDir>$(ProjectDir)..\..\Deps\</NativeLibsDir>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="($(RuntimeIdentifier) == '' and $([MSBuild]::IsOSPlatform('Linux'))) or $(RuntimeIdentifier) == 'linux-x64'">
+        <IsLinux>true</IsLinux>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="($(RuntimeIdentifier) == '' and $([MSBuild]::IsOSPlatform('Windows'))) or $(RuntimeIdentifier) == 'win-x64'">
+        <IsWindows>true</IsWindows>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="($(RuntimeIdentifier) == '' and $([MSBuild]::IsOSPlatform('OSX'))) or $(RuntimeIdentifier) == 'osx-x64'">
+        <IsMacOS>true</IsMacOS>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Include="$(NativeLibsDir)win-x64\**" Visible="false">
+            <CopyToOutputDirectory Condition="'$(IsWindows)' == 'true'">PreserveNewest</CopyToOutputDirectory>
+            <PackagePath>runtimes\win-x64\native</PackagePath>
+            <Pack>True</Pack>
+            <Link>%(Filename)%(Extension)</Link>
+        </Content>
+        <Content Include="$(NativeLibsDir)linux-x64\**" Visible="false">
+            <CopyToOutputDirectory Condition="'$(IsLinux)' == 'true'">PreserveNewest</CopyToOutputDirectory>
+            <PackagePath>runtimes\linux-x64\native</PackagePath>
+            <Pack>True</Pack>
+            <Link>%(Filename)%(Extension)</Link>
+        </Content>
+        <Content Include="$(NativeLibsDir)osx\**" Visible="false">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <PackagePath>runtimes\osx\native</PackagePath>
+            <Pack>True</Pack>
+            <Link>%(Filename)%(Extension)</Link>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Apricot\Apricot.csproj"/>
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,16 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Apricot": "Debug",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "DefaultWindowOptions": {
+    "Width": 800,
+    "Height": 300,
+    "Title": "Apricot Jam",
+    "Flags": "Resizable"
+  }
+}

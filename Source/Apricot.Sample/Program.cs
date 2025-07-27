@@ -1,0 +1,39 @@
+﻿using Apricot;
+using Apricot.Scheduling;
+using Apricot.Sdl;
+using Apricot.Sdl.Windows;
+using Apricot.Subsystems;
+using Apricot.Windows;
+
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+var builder = Host.CreateApplicationBuilder(args);
+builder.Services.AddLogging();
+builder.Services.AddSingleton<App>();
+builder.Services.AddSingleton<ISubsystem, SdlSubsystem>();
+builder.Services.AddSingleton<IScheduler, DefaultScheduler>();
+builder.Services.AddSingleton<IWindowsManager, SdlWindowsManager>();
+builder.Services.AddHostedService<AppRunner>();
+
+builder.Configuration.AddJsonFile("gameSettings.json", true, true);
+builder.Configuration.AddEnvironmentVariables("APRICOT_");
+builder.Configuration.AddCommandLine(args);
+
+builder.Services.Configure<DefaultWindowOptions>(builder.Configuration.GetSection(nameof(DefaultWindowOptions)));
+
+var host = builder.Build();
+host.Run();
+
+class AppRunner(App app) : IHostedService
+{
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        app.Run();
+        
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+}

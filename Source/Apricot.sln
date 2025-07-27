@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apricot", "Apricot\Apricot.csproj", "{B3CE390F-8B9D-46E4-A4AF-77BB1DF017AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apricot.Sample", "Apricot.Sample\Apricot.Sample.csproj", "{E5254DB1-9EF4-4D1B-ACEB-A58CC47D3B69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apricot.Sdl", "Apricot.Sdl\Apricot.Sdl.csproj", "{0D93DFFB-445C-4C65-B829-9D88F2C70BC0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B3CE390F-8B9D-46E4-A4AF-77BB1DF017AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3CE390F-8B9D-46E4-A4AF-77BB1DF017AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3CE390F-8B9D-46E4-A4AF-77BB1DF017AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3CE390F-8B9D-46E4-A4AF-77BB1DF017AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5254DB1-9EF4-4D1B-ACEB-A58CC47D3B69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5254DB1-9EF4-4D1B-ACEB-A58CC47D3B69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5254DB1-9EF4-4D1B-ACEB-A58CC47D3B69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5254DB1-9EF4-4D1B-ACEB-A58CC47D3B69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D93DFFB-445C-4C65-B829-9D88F2C70BC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D93DFFB-445C-4C65-B829-9D88F2C70BC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D93DFFB-445C-4C65-B829-9D88F2C70BC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D93DFFB-445C-4C65-B829-9D88F2C70BC0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
