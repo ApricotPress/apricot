@@ -13,6 +13,8 @@ public class App(
     IServiceProvider services
 )
 {
+    private readonly ISubsystem[] _subsystems = subsystems.ToArray();
+    
     public AppState State { get; private set; } = AppState.Uninitialized;
 
     public void Init()
@@ -55,7 +57,7 @@ public class App(
     {
         scheduler.RunScheduled();
 
-        foreach (var subsystem in subsystems)
+        foreach (var subsystem in _subsystems)
         {
             subsystem.Tick();
         }
