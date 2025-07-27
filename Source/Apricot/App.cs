@@ -10,7 +10,7 @@ public class App(
     IWindowsManager windows,
     IScheduler scheduler,
     IEnumerable<ISubsystem> subsystems,
-    IServiceProvider services // todo: handle their addition
+    IServiceProvider services
 )
 {
     public AppState State { get; private set; } = AppState.Uninitialized;

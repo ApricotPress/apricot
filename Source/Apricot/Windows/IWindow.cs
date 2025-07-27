@@ -2,11 +2,13 @@ namespace Apricot.Windows;
 
 public interface IWindow : IDisposable
 {
-    public string Title { get; set; }
+    event Action? OnResize;
+    
+    string Title { get; set; }
 
-    public int Width { get; set; }
+    int Width { get; set; }
 
-    public int Height { get; set; }
+    int Height { get; set; }
     
     bool IsFullscreen { get; set; }
     

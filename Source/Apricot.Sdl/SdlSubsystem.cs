@@ -1,12 +1,15 @@
 using Apricot.Subsystems;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using static SDL3.SDL;
 
 namespace Apricot.Sdl;
 
-public class SdlSubsystem(ILogger<SdlSubsystem> logger) : ISubsystem
+// todo: check whether listerners are updated on hot reload
+public class SdlSubsystem(ILogger<SdlSubsystem> logger, IEnumerable<ISdlEventListener> sdlEventListeners) : ISubsystem
 {
     private App? _app;
+    private ISdlEventListener[] _listeners = sdlEventListeners.ToArray();
     
     public void Initialize(App app)
     {
@@ -24,6 +27,13 @@ public class SdlSubsystem(ILogger<SdlSubsystem> logger) : ISubsystem
 
     public void Tick()
     {
-        SDL_PollEvent(out var evt);
+        // todo: check whether this can be de-facto while (true) loop        
+        while (SDL_PollEvent(out var evt))
+        {
+            foreach (var listener in _listeners)
+            {
+                listener.OnSdlEvent(evt);
+            }
+        }
     }
 }

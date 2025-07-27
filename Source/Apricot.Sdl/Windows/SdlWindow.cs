@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Apricot.Windows;
 using Microsoft.Extensions.Logging;
 using static SDL3.SDL;
@@ -6,6 +7,8 @@ namespace Apricot.Sdl.Windows;
 
 public class SdlWindow(IntPtr handle, ILogger<SdlWindow> logger) : IWindow
 {
+    public uint Id { get; } = SDL_GetWindowID(handle);
+    
     public string Title
     {
         get => SDL_GetWindowTitle(handle);
@@ -94,6 +97,8 @@ public class SdlWindow(IntPtr handle, ILogger<SdlWindow> logger) : IWindow
         }
     }
 
+    public event Action? OnResize;
+
     public void Dispose()
     {
         Dispose(true);
@@ -106,4 +111,22 @@ public class SdlWindow(IntPtr handle, ILogger<SdlWindow> logger) : IWindow
     }
     
     private bool HasWindowFlag(SDL_WindowFlags flag) => SDL_GetWindowFlags(handle).HasFlag(flag);
+
+    internal void OnSdlEvent(SDL_WindowEvent windowEvent)
+    {
+        Debug.Assert(windowEvent.windowID == Id);
+
+        // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+        switch (windowEvent.type)
+        {
+            case SDL_EventType.SDL_EVENT_WINDOW_RESIZED:
+                logger.LogTrace("Window ({Handle}) is resized to {W}x{H}", handle, windowEvent.data1, windowEvent.data2);
+                OnResize?.Invoke();
+                break;
+            
+            default:
+                logger.LogTrace("Unhandled window event of type {Type}", windowEvent.type);
+                break;
+        }
+    }
 }

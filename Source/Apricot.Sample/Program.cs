@@ -12,9 +12,14 @@ using Microsoft.Extensions.Hosting;
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddLogging();
 builder.Services.AddSingleton<App>();
+
+// move all that to sdl proj
 builder.Services.AddSingleton<ISubsystem, SdlSubsystem>();
 builder.Services.AddSingleton<IScheduler, DefaultScheduler>();
-builder.Services.AddSingleton<IWindowsManager, SdlWindowsManager>();
+builder.Services.AddSingleton<SdlWindowsManager>()
+    .AddSingleton<IWindowsManager>(s => s.GetRequiredService<SdlWindowsManager>())
+    .AddSingleton<ISdlEventListener>(s => s.GetRequiredService<SdlWindowsManager>());
+
 builder.Services.AddHostedService<AppRunner>();
 
 builder.Configuration.AddJsonFile("gameSettings.json", true, true);

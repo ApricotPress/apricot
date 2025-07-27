@@ -11,12 +11,62 @@ public class SdlWindowsManager(
     ILogger<SdlWindowsManager> logger,
     IOptionsMonitor<DefaultWindowOptions> defaultWindowOptionsMonitor,
     ILoggerFactory loggerFactory
-) : IWindowsManager, IDisposable
+) : IWindowsManager, ISdlEventListener, IDisposable
 {
-    private IWindow? _defaultWindow;
+    private SdlWindow? _defaultWindow;
     private IDisposable? _defaultWindowOptionsChange;
 
-    public IWindow Create(string title, int width, int height, WindowCreationFlags flags)
+    private readonly Dictionary<uint, SdlWindow> _windows = [];
+
+    IWindow IWindowsManager.Create(string title, int width, int height, WindowCreationFlags flags) =>
+        Create(title, width, height, flags);
+
+    public IWindow GetOrCreateDefaultWindow()
+    {
+        if (_defaultWindow is not null) return _defaultWindow;
+
+        logger.LogInformation("Default window was requested but not created. Creating it and subscribing for options");
+
+        var currentOptions = defaultWindowOptionsMonitor.CurrentValue;
+
+        _defaultWindow = Create(
+            currentOptions.Title,
+            currentOptions.Width,
+            currentOptions.Height,
+            currentOptions.Flags
+        );
+
+        // todo: cries from closures
+        _defaultWindowOptionsChange = defaultWindowOptionsMonitor.OnChange(OnDefaultWindowOptionsChanged);
+
+        return _defaultWindow;
+    }
+
+    public void OnSdlEvent(SDL.SDL_Event evt)
+    {
+        if ((evt.type & 0x200) != 0x200) return; // all window events are inside 0x200
+
+        var windowEvent = evt.window;
+        var window = _windows[evt.window.windowID];
+
+        window.OnSdlEvent(windowEvent);
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposing) return;
+
+        _defaultWindowOptionsChange?.Dispose();
+        _defaultWindow?.Dispose();
+    }
+
+    protected virtual SdlWindow Create(string title, int width, int height, WindowCreationFlags flags)
     {
         using var _ = logger.BeginScope(nameof(Create));
         logger.LogInformation("Creating window with title {Title} ({W}x{H}:{Flags})", title, width, height, flags);
@@ -45,49 +95,17 @@ public class SdlWindowsManager(
             SdlException.ThrowFromLatest(nameof(SDL.SDL_CreateWindow));
         }
 
-        return new SdlWindow(windowHandle, loggerFactory.CreateLogger<SdlWindow>());
-    }
+        var window = new SdlWindow(windowHandle, loggerFactory.CreateLogger<SdlWindow>());
+        _windows[window.Id] = window;
 
-    public IWindow GetOrCreateDefaultWindow()
-    {
-        if (_defaultWindow is not null) return _defaultWindow;
-
-        logger.LogInformation("Default window was requested but not created. Creating it and subscribing for options");
-
-        var currentOptions = defaultWindowOptionsMonitor.CurrentValue;
-
-        _defaultWindow = Create(
-            currentOptions.Title,
-            currentOptions.Width,
-            currentOptions.Height,
-            currentOptions.Flags
-        );
-        
-        // todo: cries from closures
-        _defaultWindowOptionsChange = defaultWindowOptionsMonitor.OnChange(OnDefaultWindowOptionsChanged);
-
-        return _defaultWindow;
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!disposing) return;
-
-        _defaultWindowOptionsChange?.Dispose();
-        _defaultWindow?.Dispose();
+        return window;
     }
 
     private void OnDefaultWindowOptionsChanged(DefaultWindowOptions options)
     {
         scheduler.ScheduleOnMainThread(() => OnDefaultWindowOptionsChangedUnsafe(options));
     }
-    
+
     private void OnDefaultWindowOptionsChangedUnsafe(DefaultWindowOptions options)
     {
         if (_defaultWindow is null) return;

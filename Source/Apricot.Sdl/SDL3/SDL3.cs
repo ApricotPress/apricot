@@ -7,7 +7,7 @@ using System.Text;
 
 namespace SDL3;
 
-internal static unsafe partial class SDL
+public static unsafe partial class SDL
 {
 	// Custom marshaller for SDL-owned strings returned by SDL.
 	[CustomMarshaller(typeof(string), MarshalMode.ManagedToUnmanagedOut, typeof(SDLOwnedStringMarshaller))]
