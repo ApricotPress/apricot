@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Apricot.Events;
 using Apricot.Scheduling;
 using Apricot.Windows;
@@ -14,6 +15,9 @@ public class App(
 )
 {
     private readonly ISubsystem[] _subsystems = subsystems.ToArray();
+
+    [field: AllowNull, MaybeNull]
+    private Func<Task> RunScheduledAction => field ??= () => schedulers.Frame.RunScheduledAsync();
 
     public AppState State { get; private set; } = AppState.Uninitialized;
 
@@ -66,7 +70,7 @@ public class App(
             subsystem.ScheduleFrame();
         }
 
-        _ = Task.Run(() => schedulers.Frame.RunScheduledAsync());
+        _ = Task.Run(RunScheduledAction);
 
         while (schedulers.MainThread.HasPending)
         {
