@@ -2,9 +2,9 @@ namespace Apricot.Scheduling;
 
 public interface IMainThreadScheduler
 {
-    void Schedule(Action action);
+    void Schedule(Action? action);
 
-    Task ScheduleAsync(Action action);
+    Task ScheduleAsync(Action? action);
     
     bool HasPending { get; }
     

@@ -12,6 +12,7 @@ public class SdlSubsystem(
 ) : ISubsystem
 {
     private readonly ISdlEventListener[] _listeners = sdlEventListeners.ToArray();
+    private Action? ReadEventsAction => field ??= ReadEvents;
 
     public void Initialize(App app)
     {
@@ -25,7 +26,7 @@ public class SdlSubsystem(
         logger.LogInformation("SDL version is {Version}", SDL_GetVersion());
     }
 
-    public void ScheduleFrame() => schedulers.MainThread.Schedule(ReadEvents);
+    public void ScheduleFrame() => schedulers.MainThread.Schedule(ReadEventsAction);
 
     private void ReadEvents()
     {

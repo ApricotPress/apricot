@@ -4,14 +4,14 @@ namespace Apricot.Scheduling;
 
 public class MainThreadScheduler : IMainThreadScheduler
 {
-    private readonly ConcurrentQueue<Action> _queue = [];
+    private readonly ConcurrentQueue<Action?> _queue = [];
 
-    public void Schedule(Action action)
+    public void Schedule(Action? action)
     {
         _queue.Enqueue(action);
     }
 
-    public Task ScheduleAsync(Action action)
+    public Task ScheduleAsync(Action? action)
     {
         var taskCompletionSource = new TaskCompletionSource();
         
@@ -19,7 +19,7 @@ public class MainThreadScheduler : IMainThreadScheduler
         {
             try
             {
-                action();
+                action?.Invoke();
                 
                 taskCompletionSource.SetResult();
             }
