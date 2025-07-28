@@ -15,8 +15,15 @@ public partial class FpsSubsystem(ILogger<FpsSubsystem> logger) : ISubsystem
     public void BeforeFrame()
     {
         _framesCount++;
-        var elapsedTime = (DateTime.Now - _startTime).TotalSeconds;
-        LogFps(logger, (float)(_framesCount / elapsedTime));
+        
+        if (_framesCount >= 400)
+        {
+            var elapsedTime = (DateTime.Now - _startTime).TotalSeconds;
+            LogFps(logger, (float)(_framesCount / elapsedTime));
+
+            _framesCount = 0;
+            _startTime = DateTime.Now;
+        }
     }
 
     [LoggerMessage(

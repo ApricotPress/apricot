@@ -30,25 +30,26 @@ public class SdlSubsystem(
     }
 
     private IntPtr _windowRenderer;
-    
+
     public void BeforeFrame()
     {
         schedulers.MainThread.Schedule(ReadEventsAction);
 
         if (_windowRenderer == IntPtr.Zero)
         {
-            _windowRenderer = SDL_CreateRenderer(((SdlWindow)windowsManager.GetOrCreateDefaultWindow()).Handle, SDL_GetRenderDriver(0));
+            _windowRenderer = SDL_CreateRenderer(((SdlWindow)windowsManager.GetOrCreateDefaultWindow()).Handle,
+                SDL_GetRenderDriver(0));
             if (_windowRenderer == IntPtr.Zero)
             {
                 SdlException.ThrowFromLatest(nameof(SDL_GetRenderer));
             }
         }
-        
+
         var now = SDL_GetTicks() / 1000f;
         var red = 0.5f + 0.5f * MathF.Sin(now);
         var green = 0.5f + 0.5f * MathF.Sin(now + MathF.PI * 2 / 3);
         var blue = 0.5f + 0.5f * MathF.Sin(now + MathF.PI * 4 / 3);
-        
+
         SDL_SetRenderDrawColorFloat(_windowRenderer, red, green, blue, 1f);
         SDL_RenderClear(_windowRenderer);
         SDL_RenderPresent(_windowRenderer);
