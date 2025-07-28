@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 public sealed class DumbConsoleLoggerProvider : ILoggerProvider
 {
-    public sealed class JsLogger(string category) : ILogger
+    private sealed class DumbConsoleLogger(string category) : ILogger
     {
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
             Func<TState, Exception?, string> formatter)
@@ -28,7 +28,7 @@ public sealed class DumbConsoleLoggerProvider : ILoggerProvider
         public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null!;
     }
 
-    public ILogger CreateLogger(string categoryName) => new JsLogger(categoryName);
+    public ILogger CreateLogger(string categoryName) => new DumbConsoleLogger(categoryName);
 
     public void Dispose() { }
 }
