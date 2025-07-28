@@ -14,7 +14,7 @@ public class SdlSubsystem(
 {
     private readonly ISdlEventListener[] _listeners = sdlEventListeners.ToArray();
 
-    public void Initialize(App app)
+    public void Initialize(Jar jar)
     {
         logger.LogInformation("Initializing SDL");
 

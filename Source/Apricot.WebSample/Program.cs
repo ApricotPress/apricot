@@ -30,7 +30,7 @@ public sealed class DumbConsoleLoggerProvider : ILoggerProvider
 
 public partial class Program
 {
-    private static App? _app;
+    private static Jar? _jar;
     private static IHost? _host;
 
     [JSImport("setMainLoop", "main.js")]
@@ -44,21 +44,21 @@ public partial class Program
             .AddSingleton<ILoggerProvider, DumbConsoleLoggerProvider>()
             .AddSdl()
             .AddStupidFpsCounter()
-            .AddApricot<App>(addHostedQuit: false, builder.Configuration);
+            .AddApricot<Jar>(addHostedQuit: false, builder.Configuration);
 
         builder.Configuration.AddJsonFile("gameSettings.json", true, true);
         builder.Configuration.AddEnvironmentVariables("APRICOT_");
         builder.Configuration.AddCommandLine(args);
 
         _host = builder.Build();
-        _app = _host.Services.GetRequiredService<App>();
+        _jar = _host.Services.GetRequiredService<Jar>();
 
         _ = _host.RunAsync();
-        _app.Init();
+        _jar.Init();
 
         SetMainLoop(MainLoop);
     }
 
     [JSExport]
-    private static void MainLoop() => _app?.Tick();
+    private static void MainLoop() => _jar?.Tick();
 }

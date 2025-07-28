@@ -11,7 +11,7 @@ public partial class StupidFpsCounterSubsystem(
     private DateTime _startTime;
     private ulong _framesCount;
 
-    public void Initialize(App app)
+    public void Initialize(Jar jar)
     {
         _startTime = DateTime.Now;
     }

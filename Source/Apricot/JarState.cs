@@ -1,6 +1,6 @@
 namespace Apricot;
 
-public enum AppState
+public enum JarState
 {
     Uninitialized = 0,
     Initializing,

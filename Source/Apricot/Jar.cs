@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Apricot.Events;
 using Apricot.Scheduling;
 using Apricot.Windows;
@@ -6,8 +5,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Apricot;
 
-public class App(
-    ILogger<App> logger,
+public class Jar(
+    ILogger<Jar> logger,
     IWindowsManager windows,
     IMainThreadScheduler scheduler,
     IEnumerable<ISubsystem> subsystems,
@@ -16,39 +15,39 @@ public class App(
 {
     private readonly ISubsystem[] _subsystems = subsystems.ToArray();
 
-    public AppState State { get; private set; } = AppState.Uninitialized;
+    public JarState State { get; private set; } = JarState.Uninitialized;
 
     public void Init()
     {
-        if (State != AppState.Uninitialized)
+        if (State != JarState.Uninitialized)
         {
-            throw new InvalidOperationException("App is already initialized or initializing");
+            throw new InvalidOperationException("Jar is already initialized or initializing");
         }
 
         using var _ = logger.BeginScope(nameof(Init));
 
-        State = AppState.Initializing;
+        State = JarState.Initializing;
 
-        services.CastCallback<IAppLifecycleListener>(x => x.OnBeforeInitialization());
+        services.CastCallback<IJarLifecycleListener>(x => x.OnBeforeInitialization());
 
         DoInitialization();
 
-        services.CastCallback<IAppLifecycleListener>(x => x.OnAfterInitialization());
+        services.CastCallback<IJarLifecycleListener>(x => x.OnAfterInitialization());
 
-        State = AppState.Initialized;
+        State = JarState.Initialized;
     }
 
     public virtual void Run()
     {
-        if (State != AppState.Initialized)
+        if (State != JarState.Initialized)
         {
-            logger.LogInformation($"App is not initialized. Automatically initializing from {nameof(Run)}");
+            logger.LogInformation($"Jar is not initialized. Automatically initializing from {nameof(Run)}");
             Init();
         }
 
         PrepareToRun();
 
-        while (State == AppState.Running)
+        while (State == JarState.Running)
         {
             Tick();
         }
@@ -58,8 +57,8 @@ public class App(
 
     public virtual void PrepareToRun()
     {
-        logger.LogInformation("Running the app now");
-        State = AppState.Running;
+        logger.LogInformation("Running the jar now");
+        State = JarState.Running;
     }
 
     public virtual void Tick()
@@ -80,10 +79,10 @@ public class App(
         logger.BeginScope(nameof(Quit));
 
         logger.LogInformation("Quit was requested");
-        State = AppState.Exiting;
+        State = JarState.Exiting;
 
         // todo: rethink quit lifecycle...
-        services.CastCallback<IAppLifecycleListener>(x => x.OnBeforeQuit());
+        services.CastCallback<IJarLifecycleListener>(x => x.OnBeforeQuit());
 
         scheduler.Schedule(() =>
             {

@@ -1,6 +1,6 @@
 namespace Apricot.Events;
 
-public interface IAppLifecycleListener
+public interface IJarLifecycleListener
 {
     void OnBeforeInitialization() { }
 

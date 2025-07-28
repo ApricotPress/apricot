@@ -2,7 +2,7 @@ namespace Apricot;
 
 public interface ISubsystem
 {
-    void Initialize(App app);
+    void Initialize(Jar jar);
 
     void BeforeFrame();
     

@@ -12,15 +12,15 @@ builder.Services
     .AddLogging()
     .AddSdl()
     .AddStupidFpsCounter()
-    .AddApricot<App>(addHostedQuit: true, builder.Configuration);
+    .AddApricot<Jar>(addHostedQuit: true, builder.Configuration);
 
 builder.Configuration.AddJsonFile("gameSettings.json", true, true);
 builder.Configuration.AddEnvironmentVariables("APRICOT_");
 builder.Configuration.AddCommandLine(args);
 
 var host = builder.Build();
-var app = host.Services.GetRequiredService<App>();
+var jar = host.Services.GetRequiredService<Jar>();
 
 _ = host.RunAsync();
 
-app.Run();
+jar.Run();

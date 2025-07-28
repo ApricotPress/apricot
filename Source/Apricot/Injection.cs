@@ -9,26 +9,26 @@ namespace Apricot;
 
 public static class Injection
 {
-    internal class HostedQuit<TApp>(TApp app) : IHostedService where TApp : App
+    internal class HostedQuit<TJar>(TJar jar) : IHostedService where TJar : Jar
     {
         public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            app.Quit();
+            jar.Quit();
 
             return Task.CompletedTask;
         }
     }
 
-    public static IServiceCollection AddApricot<TApp>(
+    public static IServiceCollection AddApricot<TJar>(
         this IServiceCollection services,
         bool addHostedQuit = false,
         IConfiguration? rootConfiguration = null
-    ) where TApp : App => services
+    ) where TJar : Jar => services
         .AddSingleton<IMainThreadScheduler, MainThreadScheduler>()
-        .AddSingleton<TApp>()
-        .DoIf(addHostedQuit, s => s.AddHostedService<HostedQuit<TApp>>())
+        .AddSingleton<TJar>()
+        .DoIf(addHostedQuit, s => s.AddHostedService<HostedQuit<TJar>>())
         .DoIf(rootConfiguration is not null, s => s
             .Configure<DefaultWindowOptions>(rootConfiguration!.GetSection(nameof(DefaultWindowOptions)))
         );

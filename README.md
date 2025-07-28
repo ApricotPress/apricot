@@ -9,6 +9,9 @@ of simple 2d games for game jams. Core concepts I want to follow during developm
 
 As of writing this nothing of this is supported as I am getting started, but let's see where it would take me
 
+# Etymology
+Apricot is a good fruit to make jam and put it into jar
+
 # Dependencies
 Project is development with .NET 9 and C# 13
 
