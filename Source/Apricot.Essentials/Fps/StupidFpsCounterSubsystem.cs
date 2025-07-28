@@ -26,12 +26,12 @@ public partial class StupidFpsCounterSubsystem(
         if (_framesCount < options.CurrentValue.MeasureFramesCount) return;
 
         var elapsedTime = (DateTime.Now - _startTime).TotalSeconds;
-        LogFps(logger, (float)(_framesCount / elapsedTime), _framesCount);
+        LogFps(logger, (_framesCount / elapsedTime), _framesCount);
 
         _framesCount = 0;
         _startTime = DateTime.Now;
     }
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Avg FPS: {Fps:0.00} in {Frames} frames")]
-    public static partial void LogFps(ILogger logger, float fps, ulong frames);
+    public static partial void LogFps(ILogger logger, double fps, ulong frames);
 }
