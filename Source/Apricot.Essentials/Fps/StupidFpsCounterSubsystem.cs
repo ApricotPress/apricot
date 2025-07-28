@@ -3,6 +3,9 @@ using Microsoft.Extensions.Options;
 
 namespace Apricot.Essentials.Fps;
 
+/// <summary>
+/// A very tupid subsystem to print average FPS to logs.
+/// </summary>
 public partial class StupidFpsCounterSubsystem(
     IOptionsMonitor<FpsCounterOptions> options,
     ILogger<StupidFpsCounterSubsystem> logger
@@ -11,7 +14,7 @@ public partial class StupidFpsCounterSubsystem(
     private DateTime _startTime;
     private ulong _framesCount;
 
-    public void Initialize(Jar jar)
+    public void Initialize()
     {
         _startTime = DateTime.Now;
     }

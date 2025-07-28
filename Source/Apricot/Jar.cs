@@ -5,6 +5,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Apricot;
 
+/// <summary>
+/// Main class of Apricot. Holds all jam and rules application lifecycle.
+/// </summary>
 public class Jar(
     ILogger<Jar> logger,
     IWindowsManager windows,
@@ -15,8 +18,15 @@ public class Jar(
 {
     private readonly ISubsystem[] _subsystems = subsystems.ToArray();
 
+    /// <summary>
+    /// Current state of jar indication what's going inside of it.
+    /// </summary>
     public JarState State { get; private set; } = JarState.Uninitialized;
 
+    /// <summary>
+    /// Called to initialize subsystems and create a main window. 
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown if Jar is already initialized.</exception>
     public void Init()
     {
         if (State != JarState.Uninitialized)
@@ -37,6 +47,9 @@ public class Jar(
         State = JarState.Initialized;
     }
 
+    /// <summary>
+    /// Runs main application loop. Automatically initializes jar if it is not done before.
+    /// </summary>
     public virtual void Run()
     {
         if (State != JarState.Initialized)
@@ -56,12 +69,18 @@ public class Jar(
         AfterRun();
     }
 
+    /// <summary>
+    /// Called from <see cref="Run"/> right before starting actual app loop.
+    /// </summary>
     public virtual void PrepareToRun()
     {
         logger.LogInformation("Running the jar now");
         State = JarState.Running;
     }
 
+    /// <summary>
+    /// Called from <see cref="Run"/> after stopping app loop.
+    /// </summary>
     public virtual void AfterRun()
     {
         logger.LogInformation("Finalising jar life cycle");
@@ -80,6 +99,11 @@ public class Jar(
         }
     }
 
+    /// <summary>
+    /// One application loop tick. Calls all systems <see cref="ISubsystem.BeforeFrame"/> to schedule or simply execute
+    /// their main thread jobs. Then processes the queue and calls <see cref="ISubsystem.AfterFrame"/> for each
+    /// subsystem.
+    /// </summary>
     public virtual void Tick()
     {
         foreach (var subsystem in _subsystems)
@@ -91,21 +115,32 @@ public class Jar(
         {
             scheduler.DoPending();
         }
+        
+        foreach (var subsystem in _subsystems)
+        {
+            subsystem.AfterFrame();
+        }
     }
 
+    /// <summary>
+    /// Requests quit by setting <see cref="State"/> to <see cref="JarState.Exiting"/>. After that <see cref="Run"/>
+    /// should stop execution of app loop.
+    /// </summary>
     public void Quit()
     {
-        logger.BeginScope(nameof(Quit));
-
         logger.LogInformation("Quit was requested");
         State = JarState.Exiting;
     }
 
+    /// <summary>
+    /// Does actual initialization and called from <see cref="Init"/> after and before all lifecycle callbacks. Should
+    /// create main window and subscribe for its closing.
+    /// </summary>
     protected virtual void DoInitialization()
     {
         foreach (var subsystem in subsystems)
         {
-            subsystem.Initialize(this);
+            subsystem.Initialize();
         }
 
         var mainWindow = windows.GetOrCreateDefaultWindow();

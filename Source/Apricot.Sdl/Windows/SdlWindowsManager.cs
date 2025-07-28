@@ -11,7 +11,7 @@ namespace Apricot.Sdl.Windows;
 public sealed class SdlWindowsManager(
     IMainThreadScheduler scheduler,
     ILogger<SdlWindowsManager> logger,
-    IOptionsMonitor<DefaultWindowOptions> defaultWindowOptionsMonitor,
+    IOptionsMonitor<MainWindowOptions> defaultWindowOptionsMonitor,
     ILoggerFactory loggerFactory
 ) : IWindowsManager, ISdlEventListener, IDisposable
 {
@@ -108,10 +108,10 @@ public sealed class SdlWindowsManager(
         }
     }
 
-    private void OnDefaultWindowOptionsChanged(DefaultWindowOptions options) =>
+    private void OnDefaultWindowOptionsChanged(MainWindowOptions options) =>
         scheduler.Schedule(() => OnDefaultWindowOptionsChangedUnsafe(options));
 
-    private void OnDefaultWindowOptionsChangedUnsafe(DefaultWindowOptions options)
+    private void OnDefaultWindowOptionsChangedUnsafe(MainWindowOptions options)
     {
         if (_defaultWindow is null) return;
 

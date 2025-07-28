@@ -21,6 +21,19 @@ public static class Injection
         }
     }
 
+    /// <summary>
+    /// Adds all default apricot services to collection and binds configuration if root <see cref="IConfiguration"/>
+    /// provided. 
+    /// </summary>
+    /// <param name="services">Services collections.</param>
+    /// <param name="addHostedQuit">
+    /// Would add <see cref="HostedQuit{TJar}"/> whose only job is to call quit when app gracefully quitting.
+    /// </param>
+    /// <param name="rootConfiguration">
+    /// Configuration section where all default options can be stored. Ignored if null
+    /// </param>
+    /// <typeparam name="TJar">Base class of jar.</typeparam>
+    /// <returns>Modified service collection.</returns>
     public static IServiceCollection AddApricot<TJar>(
         this IServiceCollection services,
         bool addHostedQuit = false,
@@ -30,6 +43,6 @@ public static class Injection
         .AddSingleton<TJar>()
         .DoIf(addHostedQuit, s => s.AddHostedService<HostedQuit<TJar>>())
         .DoIf(rootConfiguration is not null, s => s
-            .Configure<DefaultWindowOptions>(rootConfiguration!.GetSection(nameof(DefaultWindowOptions)))
+            .Configure<MainWindowOptions>(rootConfiguration!.GetSection(nameof(MainWindowOptions)))
         );
 }
