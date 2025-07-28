@@ -10,14 +10,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apricot.WebSample", "Aprico
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deps", "Deps", "{DA702639-AB52-4FF2-A4FE-382E53C4D758}"
 	ProjectSection(SolutionItems) = preProject
-		..\Deps\.DS_Store = ..\Deps\.DS_Store
-		..\Deps\osx\.DS_Store = ..\Deps\osx\.DS_Store
 		..\Deps\osx\libSDL3.0.dylib = ..\Deps\osx\libSDL3.0.dylib
 		..\Deps\osx\libSDL3.dylib = ..\Deps\osx\libSDL3.dylib
 		..\Deps\wasm\SDL3.a = ..\Deps\wasm\SDL3.a
-		..\Deps\win-x64\.DS_Store = ..\Deps\win-x64\.DS_Store
 		..\Deps\win-x64\SDL3.dll = ..\Deps\win-x64\SDL3.dll
-		..\Deps\linux-x64\.DS_Store = ..\Deps\linux-x64\.DS_Store
 		..\Deps\linux-x64\libSDL3.so.0 = ..\Deps\linux-x64\libSDL3.so.0
 		..\Deps\linux-x64\libSDL3.so = ..\Deps\linux-x64\libSDL3.so
 		..\Deps\linux-x64\libSDL3.so.0.2.14 = ..\Deps\linux-x64\libSDL3.so.0.2.14
