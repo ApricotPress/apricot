@@ -1,4 +1,5 @@
 ﻿using Apricot;
+using Apricot.Sample;
 using Apricot.Scheduling;
 using Apricot.Sdl;
 using Apricot.Sdl.Windows;
@@ -13,6 +14,7 @@ builder.Services.AddSingleton<App>();
 
 // move all that to sdl proj
 builder.Services.AddSingleton<ISubsystem, SdlSubsystem>();
+builder.Services.AddSingleton<ISubsystem, FpsSubsystem>();
 builder.Services.AddKeyedSingleton<IScheduler, Scheduler>(SchedulersResolver.FrameSchedulerName);
 builder.Services.AddSingleton<IMainThreadScheduler, MainThreadScheduler>();
 builder.Services.AddSingleton<SchedulersResolver>();
