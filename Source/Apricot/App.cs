@@ -67,7 +67,7 @@ public class App(
     {
         foreach (var subsystem in _subsystems)
         {
-            subsystem.ScheduleFrame();
+            subsystem.BeforeFrame();
         }
 
         _ = Task.Run(RunScheduledAction);

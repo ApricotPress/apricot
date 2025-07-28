@@ -26,7 +26,7 @@ public class SdlSubsystem(
         logger.LogInformation("SDL version is {Version}", SDL_GetVersion());
     }
 
-    public void ScheduleFrame() => schedulers.MainThread.Schedule(ReadEventsAction);
+    public void BeforeFrame() => schedulers.MainThread.Schedule(ReadEventsAction);
 
     private void ReadEvents()
     {
