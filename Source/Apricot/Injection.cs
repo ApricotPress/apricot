@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Apricot.Scheduling;
 using Apricot.Utils;
 using Apricot.Windows;
@@ -34,7 +35,9 @@ public static class Injection
     /// </param>
     /// <typeparam name="TJar">Base class of jar.</typeparam>
     /// <returns>Modified service collection.</returns>
-    public static IServiceCollection AddApricot<TJar>(
+    public static IServiceCollection AddApricot<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TJar
+    >(
         this IServiceCollection services,
         bool addHostedQuit = false,
         IConfiguration? rootConfiguration = null
