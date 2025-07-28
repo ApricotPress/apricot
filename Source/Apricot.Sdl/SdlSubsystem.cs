@@ -1,4 +1,3 @@
-using Apricot.Scheduling;
 using Apricot.Sdl.Windows;
 using Apricot.Windows;
 using Microsoft.Extensions.Logging;
@@ -6,16 +5,14 @@ using static SDL3.SDL;
 
 namespace Apricot.Sdl;
 
-// todo: check whether listerners are updated on hot reload
+// todo: check whether listeners are updated on hot reload
 public class SdlSubsystem(
-    SchedulersResolver schedulers,
     ILogger<SdlSubsystem> logger,
     IWindowsManager windowsManager,
     IEnumerable<ISdlEventListener> sdlEventListeners
 ) : ISubsystem
 {
     private readonly ISdlEventListener[] _listeners = sdlEventListeners.ToArray();
-    private Action? ReadEventsAction => field ??= ReadEvents;
 
     public void Initialize(App app)
     {
@@ -33,7 +30,7 @@ public class SdlSubsystem(
 
     public void BeforeFrame()
     {
-        schedulers.MainThread.Schedule(ReadEventsAction);
+        ReadEvents();
 
         if (_windowRenderer == IntPtr.Zero)
         {

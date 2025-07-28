@@ -9,15 +9,12 @@ namespace Apricot;
 public class App(
     ILogger<App> logger,
     IWindowsManager windows,
-    SchedulersResolver schedulers,
+    IMainThreadScheduler scheduler,
     IEnumerable<ISubsystem> subsystems,
     IServiceProvider services
 )
 {
     private readonly ISubsystem[] _subsystems = subsystems.ToArray();
-
-    [field: AllowNull, MaybeNull]
-    private Func<Task> RunScheduledAction => field ??= () => schedulers.Frame.RunScheduledAsync();
 
     public AppState State { get; private set; } = AppState.Uninitialized;
 
@@ -49,8 +46,7 @@ public class App(
             Init();
         }
 
-        logger.LogInformation("Running the app now");
-        State = AppState.Running;
+        PrepareToRun();
 
         while (State == AppState.Running)
         {
@@ -58,9 +54,12 @@ public class App(
         }
 
         logger.LogInformation("Ending game loop as State is now {State}", State);
-        logger.LogInformation("Running all left tasks");
+    }
 
-        schedulers.Frame.RunScheduledAsync().GetAwaiter().GetResult();
+    public virtual void PrepareToRun()
+    {
+        logger.LogInformation("Running the app now");
+        State = AppState.Running;
     }
 
     public virtual void Tick()
@@ -69,12 +68,10 @@ public class App(
         {
             subsystem.BeforeFrame();
         }
-
-        _ = Task.Run(RunScheduledAction);
-
-        while (schedulers.MainThread.HasPending)
+        
+        while (scheduler.HasPending)
         {
-            schedulers.MainThread.DoPending();
+            scheduler.DoPending();
         }
     }
 
@@ -88,7 +85,7 @@ public class App(
         // todo: rethink quit lifecycle...
         services.CastCallback<IAppLifecycleListener>(x => x.OnBeforeQuit());
 
-        schedulers.MainThread.Schedule(() =>
+        scheduler.Schedule(() =>
             {
                 foreach (var window in windows.Windows)
                 {

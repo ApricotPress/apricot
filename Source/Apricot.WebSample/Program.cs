@@ -1,15 +1,10 @@
 using System;
 using System.Runtime.InteropServices.JavaScript;
-using System.Threading.Tasks;
 using Apricot;
 using Apricot.Sample;
-using Apricot.Scheduling;
 using Apricot.Sdl;
-using Apricot.Sdl.Windows;
-using Apricot.Windows;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -44,27 +39,16 @@ public partial class Program
     public static void Main(string[] args)
     {
         var builder = Host.CreateApplicationBuilder(args);
-        builder.Services.AddLogging(static builder => builder.SetMinimumLevel(LogLevel.Information));
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, DumbConsoleLoggerProvider>());
-        builder.Services.AddSingleton<App>();
-
-        // move all that to sdl proj
-        builder.Services.AddSingleton<ISubsystem, SdlSubsystem>();
-        builder.Services.AddSingleton<ISubsystem, StupidFpsCounterSubsystem>();
-        builder.Services.AddKeyedSingleton<IScheduler, Scheduler>(SchedulersResolver.FrameSchedulerName);
-        builder.Services.AddSingleton<IMainThreadScheduler, MainThreadScheduler>();
-        builder.Services.AddSingleton<SchedulersResolver>();
-        builder.Services.AddSingleton<SdlWindowsManager>()
-            .AddSingleton<IWindowsManager>(s => s.GetRequiredService<SdlWindowsManager>())
-            .AddSingleton<ISdlEventListener>(s => s.GetRequiredService<SdlWindowsManager>());
+        builder.Services
+            .AddLogging(static builder => builder.SetMinimumLevel(LogLevel.Information))
+            .AddSingleton<ILoggerProvider, DumbConsoleLoggerProvider>()
+            .AddSdl()
+            .AddStupidFpsCounter()
+            .AddApricot<App>(addHostedQuit: false, builder.Configuration);
 
         builder.Configuration.AddJsonFile("gameSettings.json", true, true);
         builder.Configuration.AddEnvironmentVariables("APRICOT_");
         builder.Configuration.AddCommandLine(args);
-
-        builder.Services.Configure<DefaultWindowOptions>(
-            builder.Configuration.GetSection(nameof(DefaultWindowOptions))
-        );
 
         _host = builder.Build();
         _app = _host.Services.GetRequiredService<App>();
@@ -73,8 +57,6 @@ public partial class Program
         _app.Init();
 
         SetMainLoop(MainLoop);
-
-        Console.WriteLine("Hello, wasm");
     }
 
     [JSExport]

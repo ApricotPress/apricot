@@ -8,8 +8,8 @@ using SDL3;
 namespace Apricot.Sdl.Windows;
 
 // todo: most of that class could be moved to abstract base class
-public class SdlWindowsManager(
-    SchedulersResolver schedulers,
+public sealed class SdlWindowsManager(
+    IMainThreadScheduler scheduler,
     ILogger<SdlWindowsManager> logger,
     IOptionsMonitor<DefaultWindowOptions> defaultWindowOptionsMonitor,
     ILoggerFactory loggerFactory
@@ -62,7 +62,7 @@ public class SdlWindowsManager(
         GC.SuppressFinalize(this);
     }
 
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (!disposing) return;
 
@@ -73,7 +73,7 @@ public class SdlWindowsManager(
         }
     }
 
-    protected virtual SdlWindow Create(string title, int width, int height, WindowCreationFlags flags)
+    private SdlWindow Create(string title, int width, int height, WindowCreationFlags flags)
     {
         var window = new SdlWindow(title, width, height, flags, loggerFactory.CreateLogger<SdlWindow>());
         _windows[window.Id] = window;
@@ -99,7 +99,7 @@ public class SdlWindowsManager(
     }
 
     private void OnDefaultWindowOptionsChanged(DefaultWindowOptions options) =>
-        schedulers.MainThread.Schedule(() => OnDefaultWindowOptionsChangedUnsafe(options));
+        scheduler.Schedule(() => OnDefaultWindowOptionsChangedUnsafe(options));
 
     private void OnDefaultWindowOptionsChangedUnsafe(DefaultWindowOptions options)
     {
