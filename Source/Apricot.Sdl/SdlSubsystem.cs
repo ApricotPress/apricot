@@ -25,7 +25,7 @@ public class SdlSubsystem(ILogger<SdlSubsystem> logger, IEnumerable<ISdlEventLis
         logger.LogInformation("SDL version is {Version}", SDL_GetVersion());
     }
 
-    public void Tick()
+    public void BeforeTick()
     {
         // todo: check whether this can be de-facto while (true) loop        
         while (SDL_PollEvent(out var evt))

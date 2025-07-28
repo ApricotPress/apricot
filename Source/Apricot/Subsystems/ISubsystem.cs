@@ -4,5 +4,7 @@ public interface ISubsystem
 {
     void Initialize(App app);
     
-    void Tick();
+    void BeforeTick() { }
+    
+    void AfterTick() { }
 }

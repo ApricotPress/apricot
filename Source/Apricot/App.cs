@@ -45,6 +45,7 @@ public class App(
             Init();
         }
 
+        logger.LogInformation("Running the app now");
         State = AppState.Running;
 
         while (State == AppState.Running)
@@ -59,7 +60,12 @@ public class App(
 
         foreach (var subsystem in _subsystems)
         {
-            subsystem.Tick();
+            subsystem.BeforeTick();
+        }
+
+        foreach (var subsystem in _subsystems)
+        {
+            subsystem.AfterTick();
         }
     }
 
