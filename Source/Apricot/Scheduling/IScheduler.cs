@@ -2,7 +2,9 @@ namespace Apricot.Scheduling;
 
 public interface IScheduler
 {
-    void ScheduleOnMainThread(Action action);
+    JobHandle Schedule(IJob job, JobGroupId groupDependency);
 
-    void RunScheduled();
+    JobHandle Schedule(IJob job, JobHandle? dependency = null);
+
+    Task RunScheduledAsync(CancellationToken cts = default);
 }

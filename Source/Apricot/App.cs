@@ -8,7 +8,7 @@ namespace Apricot;
 public class App(
     ILogger<App> logger,
     IWindowsManager windows,
-    IScheduler scheduler,
+    SchedulersResolver schedulers,
     IEnumerable<ISubsystem> subsystems,
     IServiceProvider services
 )
@@ -55,21 +55,22 @@ public class App(
 
         logger.LogInformation("Ending game loop as State is now {State}", State);
         logger.LogInformation("Running all left tasks");
-        scheduler.RunScheduled();
+
+        schedulers.Frame.RunScheduledAsync().GetAwaiter().GetResult();
     }
 
     public virtual void Tick()
     {
-        scheduler.RunScheduled();
-
         foreach (var subsystem in _subsystems)
         {
-            subsystem.BeforeTick();
+            subsystem.ScheduleFrame();
         }
 
-        foreach (var subsystem in _subsystems)
+        _ = Task.Run(() => schedulers.Frame.RunScheduledAsync());
+
+        while (schedulers.MainThread.HasPending)
         {
-            subsystem.AfterTick();
+            schedulers.MainThread.DoPending();
         }
     }
 
@@ -83,7 +84,7 @@ public class App(
         // todo: rethink quit lifecycle...
         services.CastCallback<IAppLifecycleListener>(x => x.OnBeforeQuit());
 
-        scheduler.ScheduleOnMainThread(() =>
+        schedulers.MainThread.Schedule(() =>
             {
                 foreach (var window in windows.Windows)
                 {
@@ -107,7 +108,6 @@ public class App(
 
         var mainWindow = windows.GetOrCreateDefaultWindow();
         mainWindow.OnClose += OnMainWindowClosed;
-
     }
 
     private void OnMainWindowClosed(IWindow mainWindow)

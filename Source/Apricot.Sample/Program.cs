@@ -13,7 +13,9 @@ builder.Services.AddSingleton<App>();
 
 // move all that to sdl proj
 builder.Services.AddSingleton<ISubsystem, SdlSubsystem>();
-builder.Services.AddSingleton<IScheduler, DefaultScheduler>();
+builder.Services.AddKeyedSingleton<IScheduler, Scheduler>(SchedulersResolver.FrameSchedulerName);
+builder.Services.AddSingleton<IMainThreadScheduler, MainThreadScheduler>();
+builder.Services.AddSingleton<SchedulersResolver>();
 builder.Services.AddSingleton<SdlWindowsManager>()
     .AddSingleton<IWindowsManager>(s => s.GetRequiredService<SdlWindowsManager>())
     .AddSingleton<ISdlEventListener>(s => s.GetRequiredService<SdlWindowsManager>());
@@ -40,7 +42,7 @@ class AppRunner(App app) : IHostedService
     public Task StopAsync(CancellationToken cancellationToken)
     {
         app.Quit();
-        
+
         return Task.CompletedTask;
     }
 }

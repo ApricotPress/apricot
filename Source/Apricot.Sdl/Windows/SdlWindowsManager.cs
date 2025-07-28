@@ -9,7 +9,7 @@ namespace Apricot.Sdl.Windows;
 
 // todo: most of that class could be moved to abstract base class
 public class SdlWindowsManager(
-    IScheduler scheduler,
+    SchedulersResolver schedulers,
     ILogger<SdlWindowsManager> logger,
     IOptionsMonitor<DefaultWindowOptions> defaultWindowOptionsMonitor,
     ILoggerFactory loggerFactory
@@ -87,7 +87,7 @@ public class SdlWindowsManager(
     {
         var sdlWindow = ((SdlWindow)window).Id;
         var removed = _windows.Remove(sdlWindow);
-        
+
         Debug.Assert(removed, "Window was removed from dictionary");
 
         window.OnClose -= OnWindowClosed;
@@ -98,10 +98,8 @@ public class SdlWindowsManager(
         }
     }
 
-    private void OnDefaultWindowOptionsChanged(DefaultWindowOptions options)
-    {
-        scheduler.ScheduleOnMainThread(() => OnDefaultWindowOptionsChangedUnsafe(options));
-    }
+    private void OnDefaultWindowOptionsChanged(DefaultWindowOptions options) =>
+        schedulers.MainThread.Schedule(() => OnDefaultWindowOptionsChangedUnsafe(options));
 
     private void OnDefaultWindowOptionsChangedUnsafe(DefaultWindowOptions options)
     {
