@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deps", "Deps", "{DA702639-A
 		..\Deps\linux-x64\libSDL3.so.0.2.14 = ..\Deps\linux-x64\libSDL3.so.0.2.14
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apricot.Utils", "Apricot.Utils\Apricot.Utils.csproj", "{07385487-CEB6-4A38-A28B-A9D0A22F7B05}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apricot.Essentials", "Apricot.Essentials\Apricot.Essentials.csproj", "{07385487-CEB6-4A38-A28B-A9D0A22F7B05}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Paperwork", "Paperwork", "{E9C5E293-D9FA-4F11-A61D-33EA716E91FD}"
 	ProjectSection(SolutionItems) = preProject

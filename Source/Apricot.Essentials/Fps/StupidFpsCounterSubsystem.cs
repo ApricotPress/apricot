@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Apricot.Sample;
+namespace Apricot.Essentials.Fps;
 
 public partial class StupidFpsCounterSubsystem(
     IOptionsMonitor<FpsCounterOptions> options,

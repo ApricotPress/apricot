@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices.JavaScript;
 using Apricot;
-using Apricot.Sample;
+using Apricot.Essentials.Fps;
 using Apricot.Sdl;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

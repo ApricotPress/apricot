@@ -11,7 +11,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Apricot.Sdl\Apricot.Sdl.csproj"/>
-        <ProjectReference Include="..\Apricot.Utils\Apricot.Utils.csproj" />
+        <ProjectReference Include="..\Apricot.Essentials\Apricot.Essentials.csproj" />
         <ProjectReference Include="..\Apricot\Apricot.csproj"/>
     </ItemGroup>
 

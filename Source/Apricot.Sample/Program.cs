@@ -1,7 +1,6 @@
 ﻿using Apricot;
-using Apricot.Sample;
+using Apricot.Essentials.Fps;
 using Apricot.Sdl;
-using Apricot.Windows;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

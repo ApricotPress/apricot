@@ -1,4 +1,4 @@
-namespace Apricot.Sample;
+namespace Apricot.Essentials.Fps;
 
 public class FpsCounterOptions
 {

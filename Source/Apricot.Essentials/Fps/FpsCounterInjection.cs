@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Apricot.Sample;
+namespace Apricot.Essentials.Fps;
 
 public static class FpsCounterInjection
 {
