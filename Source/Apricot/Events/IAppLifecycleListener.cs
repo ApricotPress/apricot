@@ -1,4 +1,4 @@
-namespace Apricot.Scheduling;
+namespace Apricot.Events;
 
 public interface IAppLifecycleListener
 {

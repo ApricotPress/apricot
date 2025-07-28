@@ -1,4 +1,4 @@
-namespace Apricot.Subsystems;
+namespace Apricot;
 
 public interface ISubsystem
 {

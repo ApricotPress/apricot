@@ -2,7 +2,6 @@
 using Apricot.Scheduling;
 using Apricot.Sdl;
 using Apricot.Sdl.Windows;
-using Apricot.Subsystems;
 using Apricot.Windows;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

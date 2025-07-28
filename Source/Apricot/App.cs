@@ -1,5 +1,5 @@
+using Apricot.Events;
 using Apricot.Scheduling;
-using Apricot.Subsystems;
 using Apricot.Windows;
 using Microsoft.Extensions.Logging;
 

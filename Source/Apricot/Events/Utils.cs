@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Apricot.Scheduling;
+namespace Apricot.Events;
 
 public static class Utils
 {
