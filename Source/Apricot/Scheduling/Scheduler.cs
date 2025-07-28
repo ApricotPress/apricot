@@ -9,7 +9,6 @@ public class Scheduler(ILogger<Scheduler> logger) : IScheduler
     private readonly ConcurrentQueue<JobHandle> _jobQueue = new();
     private readonly ConcurrentQueue<JobHandle> _runningQueue = new();
     private readonly Dictionary<JobGroupId, JobHandle> _groupHandles = new();
-    private readonly SemaphoreSlim _semaphore = new(0);
 
     public JobHandle Schedule(IJob job, JobGroupId groupDependency) => Schedule(job, GetGroupHandle(groupDependency));
 
@@ -17,10 +16,9 @@ public class Scheduler(ILogger<Scheduler> logger) : IScheduler
     {
         var handle = new JobHandle(job, dependency);
 
-        Debug.Assert(!CheckCycles(handle, []), "Job has no cycles");
+        Debug.Assert(!CheckCycles(handle, []), "Job has cycles");
 
         _jobQueue.Enqueue(handle);
-        _semaphore.Release();
 
         return handle;
     }
@@ -29,28 +27,31 @@ public class Scheduler(ILogger<Scheduler> logger) : IScheduler
     {
         while (_jobQueue.TryDequeue(out var handle))
         {
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    if (handle.Dependency is not null)
-                        await handle.Dependency.AsTask();
+            _ = ExecuteHandleAsync(handle, cts)
+                .ContinueWith(static _ => { }, TaskScheduler.Current);
 
-                    await handle.Job.ExecuteAsync();
-                    handle.CompletionSource.SetResult(true);
-                }
-                catch (Exception ex)
-                {
-                    handle.CompletionSource.SetException(ex);
-                }
-                
-                _runningQueue.Enqueue(handle);
-            }, cts);
+            _runningQueue.Enqueue(handle);
         }
 
         while (_runningQueue.TryDequeue(out var handle))
         {
             await handle.AsTask();
+        }
+    }
+
+    private static async Task ExecuteHandleAsync(JobHandle handle, CancellationToken cts)
+    {
+        try
+        {
+            if (handle.Dependency is not null)
+                await handle.Dependency.AsTask().ConfigureAwait(false);
+
+            await handle.Job.ExecuteAsync().ConfigureAwait(false);
+            handle.CompletionSource.SetResult(true);
+        }
+        catch (Exception ex)
+        {
+            handle.CompletionSource.SetException(ex);
         }
     }
 
