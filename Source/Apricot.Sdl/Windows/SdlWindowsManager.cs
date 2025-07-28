@@ -6,6 +6,7 @@ using SDL3;
 
 namespace Apricot.Sdl.Windows;
 
+// todo: most of that class could be moved to abstract base class
 public class SdlWindowsManager(
     IScheduler scheduler,
     ILogger<SdlWindowsManager> logger,
