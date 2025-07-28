@@ -51,9 +51,19 @@ public sealed class SdlWindowsManager(
         if ((evt.type & 0x200) != 0x200) return; // all window events are inside 0x200
 
         var windowEvent = evt.window;
-        var window = _windows[evt.window.windowID];
 
-        window.OnSdlEvent(windowEvent);
+        if (_windows.TryGetValue(evt.window.windowID, out var window))
+        {
+            window.OnSdlEvent(windowEvent);
+        }
+        else
+        {
+            logger.LogWarning(
+                "Received window event {Event} on missing window with id {Id}",
+                evt.window.type,
+                evt.window.windowID
+            );
+        }
     }
 
     public void Dispose()
