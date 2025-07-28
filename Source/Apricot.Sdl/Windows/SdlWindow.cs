@@ -101,7 +101,9 @@ public class SdlWindow : IWindow
         }
     }
 
-    public event Action? OnResize;
+    public event Action<IWindow>? OnResize;
+
+    public event Action<IWindow>? OnClose;
 
     public SdlWindow(string title, int width, int height, WindowCreationFlags flags, ILogger<SdlWindow> logger)
     {
@@ -143,6 +145,14 @@ public class SdlWindow : IWindow
         logger.LogInformation("Created window with handle {Handle} and {Id}", Handle, Id);
     }
 
+    public void Close()
+    {
+        Logger.LogInformation("Closing window {Handle}", Handle);
+        
+        SDL_DestroyWindow(Handle);
+        Handle = IntPtr.Zero;
+    }
+
     public void Dispose()
     {
         Dispose(true);
@@ -151,7 +161,10 @@ public class SdlWindow : IWindow
 
     protected virtual void Dispose(bool disposing)
     {
-        SDL_DestroyWindow(Handle);
+        if (Handle != IntPtr.Zero)
+        {
+            SDL_DestroyWindow(Handle);
+        }
     }
 
     private bool HasWindowFlag(SDL_WindowFlags flag) => SDL_GetWindowFlags(Handle).HasFlag(flag);
@@ -166,7 +179,17 @@ public class SdlWindow : IWindow
             case SDL_EventType.SDL_EVENT_WINDOW_RESIZED:
                 Logger.LogTrace("Window ({Handle}) is resized to {W}x{H}", Handle, windowEvent.data1,
                     windowEvent.data2);
-                OnResize?.Invoke();
+                OnResize?.Invoke(this);
+                break;
+            
+            case SDL_EventType.SDL_EVENT_WINDOW_DESTROYED:
+                Logger.LogTrace("Window ({Handle}) is destroyed", Handle);
+                OnClose?.Invoke(this);
+                break;
+            
+            case SDL_EventType.SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+                Logger.LogTrace("Window ({Handle}) was asked to be closed", Handle);
+                Close();
                 break;
 
             default:

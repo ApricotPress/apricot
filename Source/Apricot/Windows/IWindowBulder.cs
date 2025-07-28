@@ -5,4 +5,6 @@ public interface IWindowsManager
     IWindow Create(string title, int width, int height, WindowCreationFlags flags);
 
     IWindow GetOrCreateDefaultWindow();
+    
+    IEnumerable<IWindow> Windows { get; }
 }

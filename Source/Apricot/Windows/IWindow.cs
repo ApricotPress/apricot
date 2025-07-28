@@ -2,7 +2,9 @@ namespace Apricot.Windows;
 
 public interface IWindow : IDisposable
 {
-    event Action? OnResize;
+    event Action<IWindow>? OnResize;
+    
+    event Action<IWindow>? OnClose;
     
     string Title { get; set; }
 
@@ -15,4 +17,6 @@ public interface IWindow : IDisposable
     bool IsResizable { get; set; }
     
     bool IsAlwaysOnTop { get; set; }
+    
+    void Close();
 }

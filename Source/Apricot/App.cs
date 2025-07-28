@@ -14,7 +14,7 @@ public class App(
 )
 {
     private readonly ISubsystem[] _subsystems = subsystems.ToArray();
-    
+
     public AppState State { get; private set; } = AppState.Uninitialized;
 
     public void Init()
@@ -52,6 +52,10 @@ public class App(
         {
             Tick();
         }
+
+        logger.LogInformation("Ending game loop as State is now {State}", State);
+        logger.LogInformation("Running all left tasks");
+        scheduler.RunScheduled();
     }
 
     public virtual void Tick()
@@ -69,6 +73,31 @@ public class App(
         }
     }
 
+    public void Quit()
+    {
+        logger.BeginScope(nameof(Quit));
+
+        logger.LogInformation("Quit was requested");
+        State = AppState.Exiting;
+
+        // todo: rethink quit lifecycle...
+        services.CastCallback<IAppLifecycleListener>(x => x.OnBeforeQuit());
+
+        scheduler.ScheduleOnMainThread(() =>
+            {
+                foreach (var window in windows.Windows)
+                {
+                    window.Close();
+                }
+            }
+        );
+
+        foreach (var subsystem in subsystems)
+        {
+            subsystem.Quit();
+        }
+    }
+
     protected virtual void DoInitialization()
     {
         foreach (var subsystem in subsystems)
@@ -76,6 +105,14 @@ public class App(
             subsystem.Initialize(this);
         }
 
-        windows.GetOrCreateDefaultWindow();
+        var mainWindow = windows.GetOrCreateDefaultWindow();
+        mainWindow.OnClose += OnMainWindowClosed;
+
+    }
+
+    private void OnMainWindowClosed(IWindow mainWindow)
+    {
+        mainWindow.OnClose -= OnMainWindowClosed;
+        Quit();
     }
 }

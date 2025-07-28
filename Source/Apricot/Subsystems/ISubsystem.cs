@@ -7,4 +7,6 @@ public interface ISubsystem
     void BeforeTick() { }
     
     void AfterTick() { }
+    
+    void Quit() { }
 }

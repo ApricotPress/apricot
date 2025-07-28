@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Apricot.Scheduling;
 using Apricot.Windows;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,8 @@ public class SdlWindowsManager(
     private IDisposable? _defaultWindowOptionsChange;
 
     private readonly Dictionary<uint, SdlWindow> _windows = [];
+
+    public IEnumerable<IWindow> Windows => _windows.Values;
 
     IWindow IWindowsManager.Create(string title, int width, int height, WindowCreationFlags flags) =>
         Create(title, width, height, flags);
@@ -75,7 +78,24 @@ public class SdlWindowsManager(
         var window = new SdlWindow(title, width, height, flags, loggerFactory.CreateLogger<SdlWindow>());
         _windows[window.Id] = window;
 
+        window.OnClose += OnWindowClosed;
+
         return window;
+    }
+
+    private void OnWindowClosed(IWindow window)
+    {
+        var sdlWindow = ((SdlWindow)window).Id;
+        var removed = _windows.Remove(sdlWindow);
+        
+        Debug.Assert(removed, "Window was removed from dictionary");
+
+        window.OnClose -= OnWindowClosed;
+
+        if (window == _defaultWindow)
+        {
+            _defaultWindow = null;
+        }
     }
 
     private void OnDefaultWindowOptionsChanged(DefaultWindowOptions options)
