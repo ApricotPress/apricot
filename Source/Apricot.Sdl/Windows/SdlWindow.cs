@@ -132,23 +132,25 @@ public class SdlWindow : IWindow
         }
 
         logger.LogDebug("Constructed SDL flags: {Flags}", sdlFlags);
-        
-        Handle = SDL_CreateWindow(title, width, height, sdlFlags);
 
-        if (Handle == IntPtr.Zero)
+        // SDL_CreateWindow does not work with web assembly so we create renderer which later be acquired via 
+        // SDL_GetRenderer. Why? I don't know. Maybe I've compiled SDL somehow faulty
+        //
+        // If I try - it gives Uncaught RuntimeError: null function or function signature mismatch
+        if (!SDL_CreateWindowAndRenderer(title, width, height, sdlFlags, out Handle, out var _))
         {
             SdlException.ThrowFromLatest(nameof(SDL_CreateWindow));
         }
-        
+
         Id = SDL_GetWindowID(Handle);
-        
+
         logger.LogInformation("Created window with handle {Handle} and {Id}", Handle, Id);
     }
 
     public void Close()
     {
         Logger.LogInformation("Closing window {Handle}", Handle);
-        
+
         SDL_DestroyWindow(Handle);
         Handle = IntPtr.Zero;
     }
@@ -181,12 +183,12 @@ public class SdlWindow : IWindow
                     windowEvent.data2);
                 OnResize?.Invoke(this);
                 break;
-            
+
             case SDL_EventType.SDL_EVENT_WINDOW_DESTROYED:
                 Logger.LogTrace("Window ({Handle}) is destroyed", Handle);
                 OnClose?.Invoke(this);
                 break;
-            
+
             case SDL_EventType.SDL_EVENT_WINDOW_CLOSE_REQUESTED:
                 Logger.LogTrace("Window ({Handle}) was asked to be closed", Handle);
                 Close();

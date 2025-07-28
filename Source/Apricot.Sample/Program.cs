@@ -14,7 +14,7 @@ builder.Services.AddSingleton<App>();
 
 // move all that to sdl proj
 builder.Services.AddSingleton<ISubsystem, SdlSubsystem>();
-builder.Services.AddSingleton<ISubsystem, FpsSubsystem>();
+builder.Services.AddSingleton<ISubsystem, StupidFpsCounterSubsystem>();
 builder.Services.AddKeyedSingleton<IScheduler, Scheduler>(SchedulersResolver.FrameSchedulerName);
 builder.Services.AddSingleton<IMainThreadScheduler, MainThreadScheduler>();
 builder.Services.AddSingleton<SchedulersResolver>();

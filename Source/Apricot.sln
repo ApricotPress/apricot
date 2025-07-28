@@ -6,6 +6,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apricot.Sample", "Apricot.S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apricot.Sdl", "Apricot.Sdl\Apricot.Sdl.csproj", "{0D93DFFB-445C-4C65-B829-9D88F2C70BC0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apricot.WebSample", "Apricot.WebSample\Apricot.WebSample.csproj", "{D363F1C9-41BA-4F60-9088-C62CE826CC75}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deps", "Deps", "{DA702639-AB52-4FF2-A4FE-382E53C4D758}"
+	ProjectSection(SolutionItems) = preProject
+		..\Deps\.DS_Store = ..\Deps\.DS_Store
+		..\Deps\osx\.DS_Store = ..\Deps\osx\.DS_Store
+		..\Deps\osx\libSDL3.0.dylib = ..\Deps\osx\libSDL3.0.dylib
+		..\Deps\osx\libSDL3.dylib = ..\Deps\osx\libSDL3.dylib
+		..\Deps\wasm\SDL3.a = ..\Deps\wasm\SDL3.a
+		..\Deps\win-x64\.DS_Store = ..\Deps\win-x64\.DS_Store
+		..\Deps\win-x64\SDL3.dll = ..\Deps\win-x64\SDL3.dll
+		..\Deps\linux-x64\.DS_Store = ..\Deps\linux-x64\.DS_Store
+		..\Deps\linux-x64\libSDL3.so.0 = ..\Deps\linux-x64\libSDL3.so.0
+		..\Deps\linux-x64\libSDL3.so = ..\Deps\linux-x64\libSDL3.so
+		..\Deps\linux-x64\libSDL3.so.0.2.14 = ..\Deps\linux-x64\libSDL3.so.0.2.14
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apricot.Utils", "Apricot.Utils\Apricot.Utils.csproj", "{07385487-CEB6-4A38-A28B-A9D0A22F7B05}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +43,13 @@ Global
 		{0D93DFFB-445C-4C65-B829-9D88F2C70BC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D93DFFB-445C-4C65-B829-9D88F2C70BC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D93DFFB-445C-4C65-B829-9D88F2C70BC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D363F1C9-41BA-4F60-9088-C62CE826CC75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D363F1C9-41BA-4F60-9088-C62CE826CC75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D363F1C9-41BA-4F60-9088-C62CE826CC75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D363F1C9-41BA-4F60-9088-C62CE826CC75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07385487-CEB6-4A38-A28B-A9D0A22F7B05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07385487-CEB6-4A38-A28B-A9D0A22F7B05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07385487-CEB6-4A38-A28B-A9D0A22F7B05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07385487-CEB6-4A38-A28B-A9D0A22F7B05}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

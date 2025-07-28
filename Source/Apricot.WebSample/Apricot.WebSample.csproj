@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Nullable>enable</Nullable>
+        <EmccExtraLDFlags>-sFULL_ES3=1 -sOFFSCREEN_FRAMEBUFFER=1 -lGL -sTRACE_WEBGL_CALLS=0 -sASSERTIONS=2</EmccExtraLDFlags>
+        <WasmBuildNative>true</WasmBuildNative>
+        <WasmNativeStrip>false</WasmNativeStrip>
+
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Apricot.Sdl\Apricot.Sdl.csproj"/>
+        <ProjectReference Include="..\Apricot.Utils\Apricot.Utils.csproj" />
+        <ProjectReference Include="..\Apricot\Apricot.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.7"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <NativeFileReference Include="..\..\Deps\wasm\SDL3.a">
+            <Visible>false</Visible>
+        </NativeFileReference>
+
+
+        <EmccExportedFunction Include="setMainLoop">
+            <Visible>false</Visible>
+        </EmccExportedFunction>
+
+        <EmccExportedRuntimeMethod Include="SDL">
+            <Visible>false</Visible>
+        </EmccExportedRuntimeMethod>
+
+        <EmccExportedRuntimeMethod Include="GL">
+            <Visible>false</Visible>
+        </EmccExportedRuntimeMethod>
+    </ItemGroup>
+
+</Project>

@@ -37,8 +37,7 @@ public class SdlSubsystem(
 
         if (_windowRenderer == IntPtr.Zero)
         {
-            _windowRenderer = SDL_CreateRenderer(((SdlWindow)windowsManager.GetOrCreateDefaultWindow()).Handle,
-                SDL_GetRenderDriver(0));
+            _windowRenderer = SDL_GetRenderer(((SdlWindow)windowsManager.GetOrCreateDefaultWindow()).Handle);
             if (_windowRenderer == IntPtr.Zero)
             {
                 SdlException.ThrowFromLatest(nameof(SDL_GetRenderer));
