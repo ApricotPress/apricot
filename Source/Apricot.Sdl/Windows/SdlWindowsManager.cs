@@ -63,39 +63,15 @@ public class SdlWindowsManager(
         if (!disposing) return;
 
         _defaultWindowOptionsChange?.Dispose();
-        _defaultWindow?.Dispose();
+        foreach (var window in _windows.Values)
+        {
+            window.Dispose();
+        }
     }
 
     protected virtual SdlWindow Create(string title, int width, int height, WindowCreationFlags flags)
     {
-        using var _ = logger.BeginScope(nameof(Create));
-        logger.LogInformation("Creating window with title {Title} ({W}x{H}:{Flags})", title, width, height, flags);
-
-        var sdlFlags = SDL.SDL_WindowFlags.SDL_WINDOW_HIGH_PIXEL_DENSITY;
-
-        if (flags.HasFlag(WindowCreationFlags.Fullscreen))
-        {
-            sdlFlags |= SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN;
-        }
-
-        if (flags.HasFlag(WindowCreationFlags.Resizable))
-        {
-            // todo: it would not follow actual required size
-            // see: https://wiki.libsdl.org/SDL3/SDL_WindowFlags#remarks
-            sdlFlags |= SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE;
-        }
-
-        if (flags.HasFlag(WindowCreationFlags.AlwaysOnTop))
-        {
-            sdlFlags |= SDL.SDL_WindowFlags.SDL_WINDOW_ALWAYS_ON_TOP;
-        }
-
-        if (!SDL.SDL_CreateWindowAndRenderer(title, width, height, sdlFlags, out IntPtr windowHandle, out var _))
-        {
-            SdlException.ThrowFromLatest(nameof(SDL.SDL_CreateWindow));
-        }
-
-        var window = new SdlWindow(windowHandle, loggerFactory.CreateLogger<SdlWindow>());
+        var window = new SdlWindow(title, width, height, flags, loggerFactory.CreateLogger<SdlWindow>());
         _windows[window.Id] = window;
 
         return window;
