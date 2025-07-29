@@ -1,5 +1,5 @@
 using Apricot.Events;
-using Apricot.Scheduling;
+using Apricot.Jobs;
 using Apricot.Windows;
 using Microsoft.Extensions.Logging;
 
@@ -11,7 +11,7 @@ namespace Apricot;
 public class Jar(
     ILogger<Jar> logger,
     IWindowsManager windows,
-    IMainThreadScheduler scheduler,
+    IScheduler scheduler,
     IEnumerable<ISubsystem> subsystems,
     IServiceProvider services
 )
@@ -93,6 +93,9 @@ public class Jar(
         }
 
         logger.LogInformation("Calling quit on all subsystems");
+
+        scheduler.StopBackground();
+
         foreach (var subsystem in subsystems)
         {
             subsystem.Quit();
@@ -111,11 +114,8 @@ public class Jar(
             subsystem.BeforeFrame();
         }
 
-        while (scheduler.HasPending)
-        {
-            scheduler.DoPending();
-        }
-        
+        scheduler.RunMainThread();
+
         foreach (var subsystem in _subsystems)
         {
             subsystem.AfterFrame();
@@ -138,6 +138,8 @@ public class Jar(
     /// </summary>
     protected virtual void DoInitialization()
     {
+        scheduler.StartBackground();
+
         foreach (var subsystem in subsystems)
         {
             subsystem.Initialize();

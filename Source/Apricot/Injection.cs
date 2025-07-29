@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using Apricot.Scheduling;
+using Apricot.Jobs;
 using Apricot.Utils;
 using Apricot.Windows;
 using Microsoft.Extensions.Configuration;
@@ -42,7 +42,7 @@ public static class Injection
         bool addHostedQuit = false,
         IConfiguration? rootConfiguration = null
     ) where TJar : Jar => services
-        .AddSingleton<IMainThreadScheduler, MainThreadScheduler>()
+        .AddSingleton<IScheduler>(s => new Scheduler(Environment.ProcessorCount - 1))
         .AddSingleton<TJar>()
         .DoIf(addHostedQuit, s => s.AddHostedService<HostedQuit<TJar>>())
         .DoIf(rootConfiguration is not null, s => s

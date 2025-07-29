@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using Apricot.Scheduling;
+ using Apricot.Jobs;
 using Apricot.Windows;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -9,7 +9,7 @@ namespace Apricot.Sdl.Windows;
 
 // todo: most of that class could be moved to abstract base class
 public sealed class SdlWindowsManager(
-    IMainThreadScheduler scheduler,
+    IScheduler scheduler,
     ILogger<SdlWindowsManager> logger,
     IOptionsMonitor<MainWindowOptions> defaultWindowOptionsMonitor,
     ILoggerFactory loggerFactory
@@ -109,7 +109,7 @@ public sealed class SdlWindowsManager(
     }
 
     private void OnDefaultWindowOptionsChanged(MainWindowOptions options) =>
-        scheduler.Schedule(() => OnDefaultWindowOptionsChangedUnsafe(options));
+        scheduler.Schedule(() => OnDefaultWindowOptionsChangedUnsafe(options), true);
 
     private void OnDefaultWindowOptionsChangedUnsafe(MainWindowOptions options)
     {

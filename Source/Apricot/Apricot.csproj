@@ -16,4 +16,8 @@
       <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.7" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Apricot.Jobs\Apricot.Jobs.csproj" />
+    </ItemGroup>
+
 </Project>

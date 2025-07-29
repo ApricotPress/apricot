@@ -9,13 +9,13 @@ public interface ISubsystem
 
     /// <summary>
     /// Called from main thread by <see cref="Jar.Tick"/> before processing
-    /// <see cref="Apricot.Scheduling.IMainThreadScheduler"/> queue.
+    /// <see cref="Apricot.Jobs.IScheduler"/> main thread queue.
     /// </summary>
     void BeforeFrame() { }
 
     /// <summary>
     /// Called from main thread by <see cref="Jar.Tick"/> after finishing processing
-    /// <see cref="Apricot.Scheduling.IMainThreadScheduler"/> queue.
+    /// <see cref="Apricot.Jobs.IScheduler"/> main thread queue.
     /// </summary>
     void AfterFrame() { }
 
