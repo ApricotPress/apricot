@@ -147,6 +147,8 @@ public class SdlWindow : IWindow
         logger.LogInformation("Created window with handle {Handle} and {Id}", Handle, Id);
     }
 
+    ~SdlWindow() => Dispose(false);
+
     public void Close()
     {
         Logger.LogInformation("Closing window {Handle}", Handle);
