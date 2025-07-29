@@ -8,14 +8,14 @@ using Microsoft.Extensions.Hosting;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services
-    .AddLogging()
     .AddSdl()
     .AddStupidFpsCounter()
     .AddApricot<Jar>(addHostedQuit: true, builder.Configuration);
 
-builder.Configuration.AddJsonFile("gameSettings.json", true, true);
-builder.Configuration.AddEnvironmentVariables("APRICOT_");
-builder.Configuration.AddCommandLine(args);
+builder.Configuration
+    .AddJsonFile("gameSettings.json", true, true)
+    .AddEnvironmentVariables("APRICOT_")
+    .AddCommandLine(args);
 
 var host = builder.Build();
 var jar = host.Services.GetRequiredService<Jar>();
