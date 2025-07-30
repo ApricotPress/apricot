@@ -109,16 +109,24 @@ public class Jar(
     /// </summary>
     public virtual void Tick()
     {
-        foreach (var subsystem in _subsystems)
+        try
         {
-            subsystem.BeforeFrame();
+            foreach (var subsystem in _subsystems)
+            {
+                subsystem.BeforeFrame();
+            }
+
+            scheduler.RunMainThread();
+
+            foreach (var subsystem in _subsystems)
+            {
+                subsystem.AfterFrame();
+            }
         }
-
-        scheduler.RunMainThread();
-
-        foreach (var subsystem in _subsystems)
+        catch (Exception e)
         {
-            subsystem.AfterFrame();
+            logger.LogError(e, "Unhandled exception during tick");
+            throw;
         }
     }
 
