@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.InteropServices.JavaScript;
 using Apricot;
-using Apricot.Essentials.Fps;
 using Apricot.Sdl;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +19,7 @@ public sealed class DumbConsoleLoggerProvider : ILoggerProvider
         }
 
         public bool IsEnabled(LogLevel logLevel) => true;
-        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null!;
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull => null!;
     }
 
     public ILogger CreateLogger(string categoryName) => new DumbConsoleLogger(categoryName);
@@ -43,7 +42,6 @@ public partial class Program
             .AddLogging(static builder => builder.SetMinimumLevel(LogLevel.Information))
             .AddSingleton<ILoggerProvider, DumbConsoleLoggerProvider>()
             .AddSdl()
-            .AddStupidFpsCounter()
             .AddApricot<Jar>(addHostedQuit: false, builder.Configuration);
 
         builder.Configuration.AddJsonFile("gameSettings.json", true, true);

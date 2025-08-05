@@ -1,5 +1,5 @@
-using Apricot.Sdl.Windows;
-using Apricot.Windows;
+using Apricot.Events;
+using Apricot.Lifecycle;
 using Microsoft.Extensions.Logging;
 using static SDL3.SDL;
 
@@ -8,13 +8,12 @@ namespace Apricot.Sdl;
 // todo: check whether listeners are updated on hot reload
 public class SdlSubsystem(
     ILogger<SdlSubsystem> logger,
-    IWindowsManager windowsManager,
     IEnumerable<ISdlEventListener> sdlEventListeners
-) : ISubsystem
+) : IEventPoller, IJarLifecycleListener
 {
     private readonly ISdlEventListener[] _listeners = sdlEventListeners.ToArray();
 
-    public void Initialize()
+    public void OnBeforeInitialization()
     {
         logger.LogInformation("Initializing SDL");
 
@@ -23,33 +22,11 @@ public class SdlSubsystem(
             SdlException.ThrowFromLatest(nameof(SDL_Init));
         }
 
-        logger.LogInformation("SDL version is {Version}", SDL_GetVersion());
+        logger.LogInformation("SDL version: {Version}", SDL_GetVersion());
+        logger.LogInformation("Audio driver: {AudioDriver}", SDL_GetCurrentAudioDriver());
     }
 
-    private IntPtr _windowRenderer;
-
-    public void BeforeFrame()
-    {
-        ReadEvents();
-
-        if (_windowRenderer == IntPtr.Zero)
-        {
-            _windowRenderer = SDL_GetRenderer(((SdlWindow)windowsManager.GetOrCreateDefaultWindow()).Handle);
-            if (_windowRenderer == IntPtr.Zero)
-            {
-                SdlException.ThrowFromLatest(nameof(SDL_GetRenderer));
-            }
-        }
-
-        var now = SDL_GetTicks() / 1000f;
-        var red = 0.5f + 0.5f * MathF.Sin(now);
-        var green = 0.5f + 0.5f * MathF.Sin(now + MathF.PI * 2 / 3);
-        var blue = 0.5f + 0.5f * MathF.Sin(now + MathF.PI * 4 / 3);
-
-        SDL_SetRenderDrawColorFloat(_windowRenderer, red, green, blue, 1f);
-        SDL_RenderClear(_windowRenderer);
-        SDL_RenderPresent(_windowRenderer);
-    }
+    public void Tick() => ReadEvents();
 
     private void ReadEvents()
     {
@@ -62,4 +39,5 @@ public class SdlSubsystem(
             }
         }
     }
+
 }

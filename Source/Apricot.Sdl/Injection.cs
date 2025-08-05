@@ -1,3 +1,5 @@
+using Apricot.Events;
+using Apricot.Lifecycle;
 using Apricot.Sdl.Windows;
 using Apricot.Windows;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,5 +12,7 @@ public static class Injection
         .AddSingleton<SdlWindowsManager>()
         .AddSingleton<IWindowsManager>(s => s.GetRequiredService<SdlWindowsManager>())
         .AddSingleton<ISdlEventListener>(s => s.GetRequiredService<SdlWindowsManager>())
-        .AddSingleton<ISubsystem, SdlSubsystem>();
+        .AddSingleton<SdlSubsystem>()
+        .AddSingleton<IJarLifecycleListener>(s => s.GetRequiredService<SdlSubsystem>())
+        .AddSingleton<IEventPoller>(s => s.GetRequiredService<SdlSubsystem>());
 }

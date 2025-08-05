@@ -1,4 +1,5 @@
 using Apricot.Events;
+using Apricot.Lifecycle;
 using Apricot.Jobs;
 using Apricot.Windows;
 using Microsoft.Extensions.Logging;
@@ -10,13 +11,12 @@ namespace Apricot;
 /// </summary>
 public class Jar(
     ILogger<Jar> logger,
+    IGameLoopProvider gameLoopProvider,
     IWindowsManager windows,
     IScheduler scheduler,
-    IEnumerable<ISubsystem> subsystems,
-    IServiceProvider services
-)
+    IEnumerable<IJarLifecycleListener> lifecycleListeners)
 {
-    private readonly ISubsystem[] _subsystems = subsystems.ToArray();
+    private readonly IJarLifecycleListener[] _lifecycleListeners = lifecycleListeners.ToArray();
 
     /// <summary>
     /// Current state of jar indication what's going inside of it.
@@ -26,6 +26,8 @@ public class Jar(
     /// <summary>
     /// Called to initialize subsystems and create a main window. 
     /// </summary>
+    /// <seealso cref="IJarLifecycleListener.OnBeforeInitialization"/>
+    /// <seealso cref="IJarLifecycleListener.OnAfterInitialization"/>
     /// <exception cref="InvalidOperationException">Thrown if Jar is already initialized.</exception>
     public void Init()
     {
@@ -38,11 +40,17 @@ public class Jar(
 
         State = JarState.Initializing;
 
-        services.CastCallback<IJarLifecycleListener>(x => x.OnBeforeInitialization());
+        foreach (var listener in _lifecycleListeners)
+        {
+            listener.OnBeforeInitialization();
+        }
 
         DoInitialization();
 
-        services.CastCallback<IJarLifecycleListener>(x => x.OnAfterInitialization());
+        foreach (var listener in _lifecycleListeners)
+        {
+            listener.OnAfterInitialization();
+        }
 
         State = JarState.Initialized;
     }
@@ -84,7 +92,11 @@ public class Jar(
     public virtual void AfterRun()
     {
         logger.LogInformation("Finalising jar life cycle");
-        services.CastCallback<IJarLifecycleListener>(x => x.OnBeforeQuit());
+
+        foreach (var listener in _lifecycleListeners)
+        {
+            listener.OnBeforeQuit();
+        }
 
         logger.LogInformation("Closing all windows");
         foreach (var window in windows.Windows)
@@ -92,36 +104,20 @@ public class Jar(
             window.Close();
         }
 
-        logger.LogInformation("Calling quit on all subsystems");
+        logger.LogInformation("Stopping all background tasks");
 
         scheduler.StopBackground();
-
-        foreach (var subsystem in subsystems)
-        {
-            subsystem.Quit();
-        }
     }
 
     /// <summary>
-    /// One application loop tick. Calls all systems <see cref="ISubsystem.BeforeFrame"/> to schedule or simply execute
-    /// their main thread jobs. Then processes the queue and calls <see cref="ISubsystem.AfterFrame"/> for each
-    /// subsystem.
+    /// One application loop tick.
     /// </summary>
+    /// <seealso cref="GameLoop"/>
     public virtual void Tick()
     {
         try
         {
-            foreach (var subsystem in _subsystems)
-            {
-                subsystem.BeforeFrame();
-            }
-
-            scheduler.RunMainThread();
-
-            foreach (var subsystem in _subsystems)
-            {
-                subsystem.AfterFrame();
-            }
+            ExecuteGameLoop(gameLoopProvider.GetGameLoop());
         }
         catch (Exception e)
         {
@@ -142,16 +138,11 @@ public class Jar(
 
     /// <summary>
     /// Does actual initialization and called from <see cref="Init"/> after and before all lifecycle callbacks. Should
-    /// create main window and subscribe for its closing.
+    /// create main window and subscribe for its close event.
     /// </summary>
     protected virtual void DoInitialization()
     {
         scheduler.StartBackground();
-
-        foreach (var subsystem in subsystems)
-        {
-            subsystem.Initialize();
-        }
 
         var mainWindow = windows.GetOrCreateDefaultWindow();
         mainWindow.OnClose += OnMainWindowClosed;
@@ -163,5 +154,17 @@ public class Jar(
 
         mainWindow.OnClose -= OnMainWindowClosed;
         Quit();
+    }
+
+    private void ExecuteGameLoop(GameLoop loop)
+    {
+        using var _ = logger.BeginScope(loop.Identifier);
+
+        foreach (var child in loop.ChildGameLoops)
+        {
+            ExecuteGameLoop(child);
+        }
+        
+        loop.Handler?.Tick();
     }
 }

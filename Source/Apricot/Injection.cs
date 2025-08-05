@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Apricot.Jobs;
+using Apricot.Lifecycle;
+using Apricot.Timing;
 using Apricot.Utils;
 using Apricot.Windows;
 using Microsoft.Extensions.Configuration;
@@ -44,6 +46,9 @@ public static class Injection
     ) where TJar : Jar => services
         .AddSingleton<IScheduler>(s => new Scheduler(Environment.ProcessorCount - 1))
         .AddSingleton<TJar>()
+        .AddSingleton<ITimeController, TimeController>()
+        .AddSingleton<ITime, StopwatchTime>()
+        .AddSingleton<IGameLoopProvider, DefaultGameLoopProvider>()
         .DoIf(addHostedQuit, s => s.AddHostedService<HostedQuit<TJar>>())
         .DoIf(rootConfiguration is not null, s => s
             .Configure<MainWindowOptions>(rootConfiguration!.GetSection(nameof(MainWindowOptions)))

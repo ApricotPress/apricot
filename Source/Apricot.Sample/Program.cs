@@ -1,5 +1,5 @@
 ﻿using Apricot;
-using Apricot.Essentials.Fps;
+using Apricot.Essentials;
 using Apricot.Sdl;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,10 +7,11 @@ using Microsoft.Extensions.Hosting;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services
+builder
+    .Services
+    .AddApricot<Jar>(addHostedQuit: true, builder.Configuration)
     .AddSdl()
-    .AddStupidFpsCounter()
-    .AddApricot<Jar>(addHostedQuit: true, builder.Configuration);
+    .AddSandbox();
 
 builder.Configuration
     .AddJsonFile("gameSettings.json", true, true)

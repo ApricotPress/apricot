@@ -1,4 +1,4 @@
-namespace Apricot.Events;
+namespace Apricot;
 
 /// <summary>
 /// Listens to lifecycle of jar.
@@ -6,15 +6,14 @@ namespace Apricot.Events;
 public interface IJarLifecycleListener
 {
     /// <summary>
-    /// Called from main thread before subsystems initialization is started and main
+    /// Called from main thread before actual jar initialization and main
     /// <see cref="Apricot.Windows.IWindow"/> is created.
     /// </summary>
     /// <seealso cref="Apricot.Jar.Init"/>
     void OnBeforeInitialization() { }
 
-
     /// <summary>
-    /// Called from main thread after all subsystems finished their initialization and main
+    /// Called from main thread after actual jar initialization and main
     /// <see cref="Apricot.Windows.IWindow"/> is created.
     /// </summary>
     /// <seealso cref="Apricot.Jar.Init"/>
