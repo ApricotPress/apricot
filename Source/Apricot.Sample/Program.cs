@@ -11,6 +11,7 @@ builder
     .Services
     .AddApricot<Jar>(addHostedQuit: true, builder.Configuration)
     .AddSdl()
+    .AddSdlGraphics()
     .AddSandbox();
 
 builder.Configuration

@@ -1,4 +1,4 @@
-using Apricot.Events;
+using Apricot.Graphics;
 using Apricot.Lifecycle;
 using Apricot.Jobs;
 using Apricot.Windows;
@@ -14,6 +14,7 @@ public class Jar(
     IGameLoopProvider gameLoopProvider,
     IWindowsManager windows,
     IScheduler scheduler,
+    IGraphics graphics,
     IEnumerable<IJarLifecycleListener> lifecycleListeners)
 {
     private readonly IJarLifecycleListener[] _lifecycleListeners = lifecycleListeners.ToArray();
@@ -142,6 +143,8 @@ public class Jar(
     /// </summary>
     protected virtual void DoInitialization()
     {
+        graphics.Initialize();
+
         scheduler.StartBackground();
 
         var mainWindow = windows.GetOrCreateDefaultWindow();
@@ -164,7 +167,7 @@ public class Jar(
         {
             ExecuteGameLoop(child);
         }
-        
+
         loop.Handler?.Tick();
     }
 }

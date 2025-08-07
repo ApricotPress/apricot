@@ -14,4 +14,7 @@ public static class Ids
 
 
     public const string Render = nameof(Render);
+    public const string PreRender = nameof(PreRender);
+    public const string GenericDrawHandlers = nameof(GenericDrawHandlers);
+    public const string PresentGraphics = nameof(PresentGraphics);
 }

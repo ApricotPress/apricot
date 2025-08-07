@@ -1,5 +1,4 @@
 using Apricot.Events;
-using Apricot.Lifecycle;
 using Microsoft.Extensions.Logging;
 using static SDL3.SDL;
 
@@ -26,9 +25,7 @@ public class SdlSubsystem(
         logger.LogInformation("Audio driver: {AudioDriver}", SDL_GetCurrentAudioDriver());
     }
 
-    public void Tick() => ReadEvents();
-
-    private void ReadEvents()
+    public void Poll()
     {
         // todo: check whether this can be de-facto while (true) loop        
         while (SDL_PollEvent(out var evt))
@@ -39,5 +36,4 @@ public class SdlSubsystem(
             }
         }
     }
-
 }

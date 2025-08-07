@@ -157,6 +157,8 @@ public class SdlWindow : IWindow
         Handle = IntPtr.Zero;
     }
 
+    public override string ToString() => $"SdlWindow <{Handle}, {Id}>";
+
     public void Dispose()
     {
         Dispose(true);
