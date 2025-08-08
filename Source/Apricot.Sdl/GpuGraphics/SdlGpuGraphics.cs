@@ -58,18 +58,26 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 
     public void SetVsync(IWindow window, bool vsync)
     {
-        if (!_windowTargets.TryGetValue(window, out var sdlWindow))
+        if (!_windowTargets.TryGetValue(window, out var windowHandle))
         {
             throw new InvalidOperationException(
                 $"Window {window} is not a valid render target and therefore graphics device can't control its VSync"
             );
         }
-        
+
+        var supportsMailbox = SDL.SDL_WindowSupportsGPUPresentMode(
+            GpuDeviceHandle,
+            windowHandle.Window.Handle,
+            SDL.SDL_GPUPresentMode.SDL_GPU_PRESENTMODE_MAILBOX
+        );
+
         SDL.SDL_SetGPUSwapchainParameters(
             GpuDeviceHandle,
-            sdlWindow.Window.Handle,
+            windowHandle.Window.Handle,
             swapchain_composition: SDL.SDL_GPUSwapchainComposition.SDL_GPU_SWAPCHAINCOMPOSITION_SDR,
-            present_mode: SDL.SDL_GPUPresentMode.SDL_GPU_PRESENTMODE_IMMEDIATE
+            present_mode: supportsMailbox
+                ? SDL.SDL_GPUPresentMode.SDL_GPU_PRESENTMODE_MAILBOX
+                : SDL.SDL_GPUPresentMode.SDL_GPU_PRESENTMODE_IMMEDIATE
         );
     }
 
