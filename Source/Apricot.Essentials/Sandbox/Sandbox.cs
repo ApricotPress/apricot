@@ -1,6 +1,8 @@
+using System.Numerics;
 using Apricot.Graphics;
 using Apricot.Lifecycle.TickHandlers;
 using Apricot.Timing;
+using ImGuiNET;
 using Microsoft.Extensions.Logging;
 
 namespace Apricot.Essentials.Sandbox;
@@ -30,7 +32,10 @@ public class Sandbox(
     {
         var t = time.Time % 10f / 10f;
         var color = Color.FromHsv(t, 1, 0.5f);
-        
+
         graphics.Clear(color);
+        
+        ImGui.Text("Hello, world!");
+        ImGui.Dummy(new Vector2(10, 10));
     }
 }

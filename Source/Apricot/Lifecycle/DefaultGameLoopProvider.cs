@@ -1,4 +1,5 @@
 using Apricot.Events;
+using Apricot.Extensions;
 using Apricot.Graphics;
 using Apricot.Graphics.GameLoop;
 using Apricot.Lifecycle.TickHandlers;
@@ -49,19 +50,34 @@ public class DefaultGameLoopProvider : IGameLoopProvider
             new GameLoop(
                 Ids.Render,
                 [
-                    GameLoop.SimpleHandler(
+                    new GameLoop(
                         Ids.PreRender,
-                        new PrepareRenderTickHandle(
-                            _services.GetRequiredService<IGraphics>(),
-                            _services.GetRequiredService<IWindowsManager>()
-                        )
+                        [
+                            GameLoop.SimpleHandler(
+                                Ids.PrepareMainWindow,
+                                new PrepareRenderTickHandle(
+                                    _services.GetRequiredService<IGraphics>(),
+                                    _services.GetRequiredService<IWindowsManager>()
+                                )
+                            ),
+                            GameLoop.SimpleHandler(
+                                Ids.ImGuiBeginLayout,
+                                _services.GetRequiredService<ImGuiWrapper>().MainWindowRenderer?.BeginLayout
+                            )
+                        ]
                     ),
                     GameLoop.SimpleHandler(
                         Ids.GenericDrawHandlers,
                         new DrawHandlersTickHandler(_services.GetServices<IDrawHandler>().ToArray())
                     ),
-                    GameLoop.SimpleHandler(
+                    new GameLoop(
                         Ids.PresentGraphics,
+                        [
+                            GameLoop.SimpleHandler(
+                                Ids.ImGuiEndLayout,
+                                _services.GetRequiredService<ImGuiWrapper>().MainWindowRenderer?.EndLayout
+                            )
+                        ],
                         new PresentGraphicsTickHandle(
                             _services.GetRequiredService<IGraphics>()
                         )

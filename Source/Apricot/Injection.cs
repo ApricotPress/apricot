@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Apricot.Extensions;
 using Apricot.Jobs;
 using Apricot.Lifecycle;
 using Apricot.Timing;
@@ -48,6 +49,8 @@ public static class Injection
         .AddSingleton<TJar>()
         .AddSingleton<ITimeController, TimeController>()
         .AddSingleton<ITime, StopwatchTime>()
+        .AddSingleton<ImGuiWrapper>()
+        .AddSingleton<IJarLifecycleListener>(s => s.GetRequiredService<ImGuiWrapper>())
         .AddSingleton<IGameLoopProvider, DefaultGameLoopProvider>()
         .DoIf(addHostedQuit, s => s.AddHostedService<HostedQuit<TJar>>())
         .DoIf(rootConfiguration is not null, s => s

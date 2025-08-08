@@ -15,5 +15,5 @@ public record struct GameLoop(
     ITickHandler? Handler = null
 )
 {
-    public static GameLoop SimpleHandler(string id, ITickHandler handler) => new(id, [], handler);
+    public static GameLoop SimpleHandler(string id, ITickHandler? handler) => new(id, [], handler);
 }
