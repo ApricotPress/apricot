@@ -132,12 +132,10 @@ public class SdlWindow : IWindow
         }
 
         logger.LogDebug("Constructed SDL flags: {Flags}", sdlFlags);
+        
+        Handle = CreateWindow();
 
-        // SDL_CreateWindow does not work with web assembly so we create renderer which later be acquired via 
-        // SDL_GetRenderer. Why? I don't know. Maybe I've compiled SDL somehow faulty
-        //
-        // If I try - it gives Uncaught RuntimeError: null function or function signature mismatch
-        if (!SDL_CreateWindowAndRenderer(title, width, height, sdlFlags, out Handle, out var _))
+        if (Handle == 0)
         {
             SdlException.ThrowFromLatest(nameof(SDL_CreateWindow));
         }
@@ -145,6 +143,24 @@ public class SdlWindow : IWindow
         Id = SDL_GetWindowID(Handle);
 
         logger.LogInformation("Created window with handle {Handle} and {Id}", Handle, Id);
+
+        // SDL_CreateWindow does not work with web assembly so we create renderer which later be acquired via 
+        // SDL_GetRenderer. Why? I don't know. Maybe I've compiled SDL somehow faulty
+        //
+        // If I try - it gives Uncaught RuntimeError: null function or function signature mismatch
+        IntPtr CreateWindow()
+        {
+            if (OperatingSystem.IsBrowser())
+            {
+                SDL_CreateWindowAndRenderer(title, width, height, sdlFlags, out var handle, out var _);
+
+                return handle;
+            }
+            else
+            {
+                return SDL_CreateWindow(title, width, height, sdlFlags);
+            }
+        }
     }
 
     ~SdlWindow() => Dispose(false);
