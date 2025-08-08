@@ -17,6 +17,6 @@ public static class Injection
         .AddSingleton<IJarLifecycleListener>(s => s.GetRequiredService<SdlSubsystem>())
         .AddSingleton<IEventPoller>(s => s.GetRequiredService<SdlSubsystem>());
 
-    public static IServiceCollection AddSdlGraphics(this IServiceCollection services) => services
-        .AddSingleton<IGraphics, SdlGraphics>();
+    public static IServiceCollection AddSdlGpuGraphics(this IServiceCollection services) => services
+        .AddSingleton<IGraphics, SdlGpuGraphics>();
 }

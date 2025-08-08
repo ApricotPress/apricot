@@ -7,7 +7,7 @@ using SDL3;
 
 namespace Apricot.Sdl.Graphics;
 
-public unsafe class SdlGraphics(ILogger<SdlGraphics> logger) : IGraphics, IDisposable
+public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics, IDisposable
 {
     private string? _gpuDriver;
 
@@ -16,12 +16,12 @@ public unsafe class SdlGraphics(ILogger<SdlGraphics> logger) : IGraphics, IDispo
     private bool _fakePass;
     private IRenderTarget? _currentRenderTarget;
 
-    private readonly Dictionary<IWindow, SdlWindowTarget> _windowTargets = new();
-    private readonly Dictionary<IWindow, SwapchainTexture> _swapchains = new();
+    private readonly Dictionary<IWindow, SdlGpuWindowTarget> _windowTargets = new();
+    private readonly Dictionary<IWindow, GpuSwapchainTexture> _swapchains = new();
 
     public IntPtr GpuDeviceHandle { get; private set; }
 
-    ~SdlGraphics() => Dispose(false);
+    ~SdlGpuGraphics() => Dispose(false);
 
     public void Initialize()
     {
@@ -78,7 +78,7 @@ public unsafe class SdlGraphics(ILogger<SdlGraphics> logger) : IGraphics, IDispo
             throw new NotSupportedException("Sdl graphics only supports SdlWindow");
         }
 
-        _windowTargets[window] = new SdlWindowTarget(this, sdlWindow);
+        _windowTargets[window] = new SdlGpuWindowTarget(this, sdlWindow);
         return _windowTargets[window];
     }
 
@@ -154,7 +154,7 @@ public unsafe class SdlGraphics(ILogger<SdlGraphics> logger) : IGraphics, IDispo
 
         var targetInfo = target switch
         {
-            SdlWindowTarget { Window: { } window } => ColorTargetInfoFromWindow(window, clearColor),
+            SdlGpuWindowTarget { Window: { } window } => ColorTargetInfoFromWindow(window, clearColor),
             _ => throw new NotSupportedException($"Not supported render target: {target}")
         };
 
@@ -211,7 +211,7 @@ public unsafe class SdlGraphics(ILogger<SdlGraphics> logger) : IGraphics, IDispo
             };
     }
 
-    private SwapchainTexture GetSwapchainForWindow(SdlWindow window, bool wait)
+    private GpuSwapchainTexture GetSwapchainForWindow(SdlWindow window, bool wait)
     {
         if (_swapchains.TryGetValue(window, out var swapchain))
         {
@@ -231,7 +231,7 @@ public unsafe class SdlGraphics(ILogger<SdlGraphics> logger) : IGraphics, IDispo
                 SdlException.ThrowFromLatest(nameof(SDL.SDL_AcquireGPUSwapchainTexture));
             }
 
-            return _swapchains[window] = new SwapchainTexture(texture, w, h);
+            return _swapchains[window] = new GpuSwapchainTexture(texture, w, h);
         }
         else
         {
@@ -246,7 +246,7 @@ public unsafe class SdlGraphics(ILogger<SdlGraphics> logger) : IGraphics, IDispo
                 SdlException.ThrowFromLatest(nameof(SDL.SDL_WaitAndAcquireGPUSwapchainTexture));
             }
 
-            return _swapchains[window] = new SwapchainTexture(texture, w, h);
+            return _swapchains[window] = new GpuSwapchainTexture(texture, w, h);
         }
     }
 

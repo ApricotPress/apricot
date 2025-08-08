@@ -1,6 +1,6 @@
 namespace Apricot.Sdl.Graphics;
 
-public readonly struct SwapchainTexture(IntPtr texture, uint width, uint height)
+public readonly struct GpuSwapchainTexture(IntPtr texture, uint width, uint height)
 {
     public IntPtr TextureHandle { get; } = texture;
 

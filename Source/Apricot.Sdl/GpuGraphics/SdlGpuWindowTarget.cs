@@ -9,16 +9,16 @@ namespace Apricot.Sdl.Graphics;
 ///
 /// This class should not be constructed more than once for a window as it would try to claim window for GPU work twice.
 /// </summary>
-public sealed class SdlWindowTarget : IRenderTarget
+public sealed class SdlGpuWindowTarget : IRenderTarget
 {
-    private readonly SdlGraphics _graphics;
+    private readonly SdlGpuGraphics _graphics;
 
     /// <summary>
     /// Reference to SDL window. 
     /// </summary>
     public SdlWindow Window { get; }
 
-    public SdlWindowTarget(SdlGraphics graphics, SdlWindow window)
+    public SdlGpuWindowTarget(SdlGpuGraphics graphics, SdlWindow window)
     {
         if (!SDL.SDL_ClaimWindowForGPUDevice(graphics.GpuDeviceHandle, window.Handle))
         {
