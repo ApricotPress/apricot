@@ -13,7 +13,7 @@ public sealed class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
 
     private GlWindowTarget? _currentWindow;
 
-    public void Initialize() { }
+    public void Initialize(GraphicDriver preferredDriver, bool enableDebug) { }
 
     public void SetVsync(IWindow window, bool vsync) => glPlatform.SwapInterval = vsync ? 1 : 0;
 

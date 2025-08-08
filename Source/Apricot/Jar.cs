@@ -3,6 +3,7 @@ using Apricot.Lifecycle;
 using Apricot.Jobs;
 using Apricot.Windows;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Apricot;
 
@@ -15,7 +16,9 @@ public class Jar(
     IWindowsManager windows,
     IScheduler scheduler,
     IGraphics graphics,
-    IEnumerable<IJarLifecycleListener> lifecycleListeners)
+    IEnumerable<IJarLifecycleListener> lifecycleListeners,
+    IOptionsMonitor<JarOptions> jarOptions
+)
 {
     private readonly IJarLifecycleListener[] _lifecycleListeners = lifecycleListeners.ToArray();
 
@@ -105,6 +108,8 @@ public class Jar(
             window.Close();
         }
 
+        graphics.Dispose();
+        
         logger.LogInformation("Stopping all background tasks");
 
         scheduler.StopBackground();

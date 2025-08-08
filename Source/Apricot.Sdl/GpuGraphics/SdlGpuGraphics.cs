@@ -12,8 +12,6 @@ namespace Apricot.Sdl.Graphics;
 /// </summary>
 public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 {
-    private string? _gpuDriver;
-
     private IntPtr _renderCommandBuffer;
     private IntPtr _currentRenderPass;
     private bool _fakePass;
@@ -26,22 +24,28 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 
     ~SdlGpuGraphics() => Dispose(false);
 
-    public void Initialize()
+    public void Initialize(GraphicDriver preferredDriver, bool enableDebug)
     {
         if (GpuDeviceHandle != IntPtr.Zero)
         {
             throw new InvalidOperationException("GPU device is already initialized.");
         }
 
-        _gpuDriver = SDL.SDL_GetGPUDriver(0);
+        var driverName = preferredDriver switch
+        {
+            GraphicDriver.Metal => "metal",
+            GraphicDriver.Direct3d12 => "direct3d12",
+            GraphicDriver.Vulkan => "vulkan",
+            _ => null,
+        };
 
         // todo: properly configure
         GpuDeviceHandle = SDL.SDL_CreateGPUDevice(
             SDL.SDL_GPUShaderFormat.SDL_GPU_SHADERFORMAT_SPIRV |
             SDL.SDL_GPUShaderFormat.SDL_GPU_SHADERFORMAT_DXIL |
             SDL.SDL_GPUShaderFormat.SDL_GPU_SHADERFORMAT_MSL,
-            true,
-            _gpuDriver
+            enableDebug,
+            driverName!
         );
 
         if (GpuDeviceHandle == IntPtr.Zero)

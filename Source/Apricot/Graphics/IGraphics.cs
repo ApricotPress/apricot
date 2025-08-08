@@ -16,7 +16,9 @@ public interface IGraphics : IDisposable
     /// <summary>
     /// Initialize graphic system of the engine.
     /// </summary>
-    void Initialize();
+    /// <param name="preferredDriver">Preferred driver to use. May be ignored.</param>
+    /// <param name="enableDebug">Should be extra debugging enabled, if supported.</param>
+    void Initialize(GraphicDriver preferredDriver, bool enableDebug);
 
     /// <summary>
     /// Sets or disabled VSync. If supported, it would set VSync property only for specific window, although it's not
