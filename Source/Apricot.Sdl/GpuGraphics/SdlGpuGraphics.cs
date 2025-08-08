@@ -16,7 +16,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 {
     private IntPtr _renderCommandBuffer;
     private IntPtr _currentRenderPass;
-    private bool _fakePass;
+    private bool _fakeRenderPass;
     private IRenderTarget? _currentRenderTarget;
 
 
@@ -296,7 +296,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
         {
             _currentRenderTarget = target;
             _currentRenderPass = IntPtr.Zero;
-            _fakePass = true;
+            _fakeRenderPass = true;
 
             logger.LogTrace("Render pass was started as a fake one as target was not acquired");
         }
@@ -314,7 +314,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
                 depthTarget
             );
             _currentRenderTarget = target;
-            _fakePass = false;
+            _fakeRenderPass = false;
 
             logger.LogTrace("Successfully started render pass {RenderPass}", _currentRenderTarget);
         }
@@ -330,7 +330,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 
         _currentRenderPass = IntPtr.Zero;
         _currentRenderTarget = null;
-        _fakePass = false;
+        _fakeRenderPass = false;
     }
 
     private void BeginCopyPass()
