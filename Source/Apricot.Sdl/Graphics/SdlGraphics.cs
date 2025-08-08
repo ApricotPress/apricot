@@ -13,7 +13,11 @@ public unsafe class SdlGraphics(ILogger<SdlGraphics> logger) : IGraphics, IDispo
 
     private IntPtr _renderCommandBuffer;
     private IntPtr _currentRenderPass;
+    private bool _fakePass;
     private IRenderTarget? _currentRenderTarget;
+
+    private readonly Dictionary<IWindow, SdlWindowTarget> _windowTargets = new();
+    private readonly Dictionary<IWindow, SwapchainTexture> _swapchains = new();
 
     public IntPtr GpuDeviceHandle { get; private set; }
 
@@ -45,6 +49,47 @@ public unsafe class SdlGraphics(ILogger<SdlGraphics> logger) : IGraphics, IDispo
         PrepareCommandBuffers();
     }
 
+    public void SetVsync(IWindow window, bool vsync)
+    {
+        if (!_windowTargets.TryGetValue(window, out var sdlWindow))
+        {
+            throw new InvalidOperationException(
+                $"Window {window} is not a valid render target and therefore graphics device can't control its VSync"
+            );
+        }
+        
+        SDL.SDL_SetGPUSwapchainParameters(
+            GpuDeviceHandle,
+            sdlWindow.Window.Handle,
+            swapchain_composition: SDL.SDL_GPUSwapchainComposition.SDL_GPU_SWAPCHAINCOMPOSITION_SDR,
+            present_mode: SDL.SDL_GPUPresentMode.SDL_GPU_PRESENTMODE_IMMEDIATE
+        );
+    }
+
+    public IRenderTarget GetWindowRenderTarget(IWindow window)
+    {
+        if (_windowTargets.TryGetValue(window, out var target))
+        {
+            return target;
+        }
+
+        if (window is not SdlWindow sdlWindow)
+        {
+            throw new NotSupportedException("Sdl graphics only supports SdlWindow");
+        }
+
+        _windowTargets[window] = new SdlWindowTarget(this, sdlWindow);
+        return _windowTargets[window];
+    }
+
+    public void SetRenderTarget(IRenderTarget target, Color? clearColor)
+    {
+        if (_currentRenderPass != IntPtr.Zero && _currentRenderTarget == target && !clearColor.HasValue) return;
+
+        EndRenderPass();
+        BeginRenderPass(target, clearColor);
+    }
+
     public void Clear(Color color)
     {
         if (_currentRenderTarget is null)
@@ -58,24 +103,6 @@ public unsafe class SdlGraphics(ILogger<SdlGraphics> logger) : IGraphics, IDispo
         BeginRenderPass(target, color);
     }
 
-    public IRenderTarget GetWindowRenderTarget(IWindow window)
-    {
-        if (window is not SdlWindow sdlWindow)
-        {
-            throw new NotSupportedException("Sdl graphics only supports SdlWindow");
-        }
-
-        return new SdlWindowTarget(this, sdlWindow);
-    }
-
-    public void SetRenderTarget(IRenderTarget target, Color? clearColor)
-    {
-        if (_currentRenderPass != IntPtr.Zero && _currentRenderTarget == target && !clearColor.HasValue) return;
-
-        EndRenderPass();
-        BeginRenderPass(target, clearColor);
-    }
-
     public void Present()
     {
         EndRenderPass();
@@ -85,8 +112,12 @@ public unsafe class SdlGraphics(ILogger<SdlGraphics> logger) : IGraphics, IDispo
             throw SdlException.GetFromLatest(nameof(SDL.SDL_SubmitGPUCommandBuffer));
         }
 
+        _swapchains.Clear();
+
         _renderCommandBuffer = IntPtr.Zero;
         PrepareCommandBuffers();
+
+        // todo: cleanup windows dictionary if any of window was closed
     }
 
     public void Dispose()
@@ -115,64 +146,120 @@ public unsafe class SdlGraphics(ILogger<SdlGraphics> logger) : IGraphics, IDispo
 
     private void BeginRenderPass(IRenderTarget target, Color? clearColor)
     {
-        Span<SDL.SDL_GPUColorTargetInfo> targetInfoSpan = stackalloc SDL.SDL_GPUColorTargetInfo[1];
-        targetInfoSpan[0] = target switch
+        logger.LogTrace(
+            "Beginning render pass with target of {RenderTarget} and clear color {ClearColor}",
+            target,
+            clearColor
+        );
+
+        var targetInfo = target switch
         {
-            SdlWindowTarget { Window.Handle: var window } => ColorTargetInfoFromWindow(window, clearColor),
+            SdlWindowTarget { Window: { } window } => ColorTargetInfoFromWindow(window, clearColor),
             _ => throw new NotSupportedException($"Not supported render target: {target}")
         };
-        scoped ref var depthTarget = ref Unsafe.NullRef<SDL.SDL_GPUDepthStencilTargetInfo>();
 
+        if (targetInfo is null) // swapchain wasnot acquired, we should skip pass
+        {
+            _currentRenderTarget = target;
+            _currentRenderPass = IntPtr.Zero;
+            _fakePass = true;
 
-        _currentRenderPass = SDL.SDL_BeginGPURenderPass(
-            _renderCommandBuffer,
-            targetInfoSpan,
-            1,
-            depthTarget
-        );
-        _currentRenderTarget = target;
+            logger.LogTrace("Render pass was started as a fake one as target was not acquired");
+        }
+        else
+        {
+            Span<SDL.SDL_GPUColorTargetInfo> targetInfoSpan = stackalloc SDL.SDL_GPUColorTargetInfo[1];
+            targetInfoSpan[0] = targetInfo.Value;
+
+            scoped ref var depthTarget = ref Unsafe.NullRef<SDL.SDL_GPUDepthStencilTargetInfo>();
+
+            _currentRenderPass = SDL.SDL_BeginGPURenderPass(
+                _renderCommandBuffer,
+                targetInfoSpan,
+                1,
+                depthTarget
+            );
+            _currentRenderTarget = target;
+            _fakePass = false;
+
+            logger.LogTrace("Successfully started render pass {RenderPass}", _currentRenderTarget);
+        }
     }
 
-    private SDL.SDL_GPUColorTargetInfo ColorTargetInfoFromWindow(IntPtr window, Color? clearColor)
+    private SDL.SDL_GPUColorTargetInfo? ColorTargetInfoFromWindow(SdlWindow window, Color? clearColor)
     {
-        if (!SDL.SDL_WaitAndAcquireGPUSwapchainTexture(_renderCommandBuffer, window, out var texture, out _, out _))
+        var texture = GetSwapchainForWindow(window, true);
+
+        return texture.TextureHandle == IntPtr.Zero
+            ? null
+            : new SDL.SDL_GPUColorTargetInfo
+            {
+                texture = texture.TextureHandle,
+                clear_color = clearColor.HasValue
+                    ? new SDL.SDL_FColor
+                    {
+                        r = clearColor.Value.R,
+                        g = clearColor.Value.G,
+                        b = clearColor.Value.B,
+                        a = clearColor.Value.A
+                    }
+                    : default,
+                load_op = clearColor.HasValue
+                    ? SDL.SDL_GPULoadOp.SDL_GPU_LOADOP_CLEAR
+                    : SDL.SDL_GPULoadOp.SDL_GPU_LOADOP_DONT_CARE,
+                store_op = SDL.SDL_GPUStoreOp.SDL_GPU_STOREOP_STORE
+            };
+    }
+
+    private SwapchainTexture GetSwapchainForWindow(SdlWindow window, bool wait)
+    {
+        if (_swapchains.TryGetValue(window, out var swapchain))
         {
-            SdlException.ThrowFromLatest(nameof(SDL.SDL_WaitAndAcquireGPUSwapchainTexture));
+            return swapchain;
         }
 
-        if (texture == IntPtr.Zero)
+        if (wait)
         {
-            logger.LogError("Cry");
-            return default;
-        }
+            if (!SDL.SDL_AcquireGPUSwapchainTexture(
+                    _renderCommandBuffer,
+                    window.Handle,
+                    out var texture,
+                    out var w,
+                    out var h
+                ))
+            {
+                SdlException.ThrowFromLatest(nameof(SDL.SDL_AcquireGPUSwapchainTexture));
+            }
 
-        return new SDL.SDL_GPUColorTargetInfo
+            return _swapchains[window] = new SwapchainTexture(texture, w, h);
+        }
+        else
         {
-            texture = texture,
-            clear_color = clearColor.HasValue
-                ? new SDL.SDL_FColor
-                {
-                    r = clearColor.Value.R,
-                    g = clearColor.Value.G,
-                    b = clearColor.Value.B,
-                    a = clearColor.Value.A
-                }
-                : default,
-            load_op = clearColor.HasValue
-                ? SDL.SDL_GPULoadOp.SDL_GPU_LOADOP_CLEAR
-                : SDL.SDL_GPULoadOp.SDL_GPU_LOADOP_DONT_CARE,
-            store_op = SDL.SDL_GPUStoreOp.SDL_GPU_STOREOP_STORE
-        };
+            if (!SDL.SDL_WaitAndAcquireGPUSwapchainTexture(
+                    _renderCommandBuffer,
+                    window.Handle,
+                    out var texture,
+                    out var w,
+                    out var h
+                ))
+            {
+                SdlException.ThrowFromLatest(nameof(SDL.SDL_WaitAndAcquireGPUSwapchainTexture));
+            }
+
+            return _swapchains[window] = new SwapchainTexture(texture, w, h);
+        }
     }
 
     private void EndRenderPass()
     {
         if (_currentRenderPass != IntPtr.Zero)
         {
+            logger.LogTrace("Ending render pass of {RenderPass}", _currentRenderTarget);
             SDL.SDL_EndGPURenderPass(_currentRenderPass);
         }
 
         _currentRenderPass = IntPtr.Zero;
         _currentRenderTarget = null;
+        _fakePass = false;
     }
 }

@@ -123,7 +123,7 @@ public class Jar(
         catch (Exception e)
         {
             logger.LogError(e, "Unhandled exception during tick");
-            throw;
+            Quit();
         }
     }
 
@@ -161,8 +161,6 @@ public class Jar(
 
     private void ExecuteGameLoop(GameLoop loop)
     {
-        using var _ = logger.BeginScope(loop.Identifier);
-
         foreach (var child in loop.ChildGameLoops)
         {
             ExecuteGameLoop(child);

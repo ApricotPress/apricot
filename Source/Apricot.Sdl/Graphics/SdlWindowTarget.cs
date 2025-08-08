@@ -6,6 +6,8 @@ namespace Apricot.Sdl.Graphics;
 
 /// <summary>
 /// Holds handle to window that then can be used to acquire its swapchain.
+///
+/// This class should not be constructed more than once for a window as it would try to claim window for GPU work twice.
 /// </summary>
 public sealed class SdlWindowTarget : IRenderTarget
 {
@@ -22,11 +24,13 @@ public sealed class SdlWindowTarget : IRenderTarget
         {
             SdlException.ThrowFromLatest(nameof(SDL.SDL_ClaimWindowForGPUDevice));
         }
-        
+
         _graphics = graphics;
         Window = window;
     }
 
     /// <inheritdoc />
     public void Dispose() => SDL.SDL_ReleaseWindowFromGPUDevice(_graphics.GpuDeviceHandle, Window.Handle);
+
+    public override string ToString() => $"WindowTarget <{Window}>";
 }

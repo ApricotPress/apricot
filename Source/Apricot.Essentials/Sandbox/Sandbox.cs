@@ -5,24 +5,26 @@ using Microsoft.Extensions.Logging;
 
 namespace Apricot.Essentials.Sandbox;
 
-public class Sandbox(ITime time, IGraphics graphics, ILogger<Sandbox> logger) : IUpdateHandler, IDrawHandler
+public class Sandbox(
+    ITime time,
+    IGraphics graphics,
+    ILogger<Sandbox> logger
+) : IUpdateHandler, IDrawHandler
 {
     private readonly List<float> _lastDeltas = [];
-    
+
     public void Update()
     {
         _lastDeltas.Add(time.Delta);
-        
+
         if (_lastDeltas.Count > 100)
         {
             _lastDeltas.RemoveAt(0);
         }
-        
-        
+
+
         logger.LogInformation("Average FPS: {Average:F}", 1f / _lastDeltas.Average());
     }
 
-    public void Draw()
-    {
-    }
+    public void Draw() => graphics.Clear(Color.Blue);
 }
