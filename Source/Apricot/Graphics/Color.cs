@@ -26,6 +26,8 @@ public struct Color(float r, float g, float b, float a = 1) : IEquatable<Color>
 
     public float A { get; set; } = a;
 
+    public Color WithAlpha(float alpha) => new(R, G, B, alpha);
+
     public readonly override string ToString() => ToString("G");
 
     public readonly string ToString(string? format) =>
@@ -41,4 +43,30 @@ public struct Color(float r, float g, float b, float a = 1) : IEquatable<Color>
     public static bool operator ==(Color left, Color right) => left.Equals(right);
 
     public static bool operator !=(Color left, Color right) => !left.Equals(right);
+
+    public static Color FromHsv(float hue, float saturation, float lightness, float alpha = 1f)
+    {
+        if (saturation == 0f)
+        {
+            return Black.WithAlpha(alpha);
+        }
+
+        const float oneSixth = 1f / 6;
+        var hi = (int)(MathF.Floor(hue / oneSixth)) % 6;
+        var f = hue / oneSixth - MathF.Floor(hue / oneSixth);
+
+        var p = lightness * (1 - saturation);
+        var q = lightness * (1 - f * saturation);
+        var t = lightness * (1 - (1 - f) * saturation);
+
+        return hi switch
+        {
+            0 => new Color(lightness, t, p, alpha),
+            1 => new Color(q, lightness, p, alpha),
+            2 => new Color(p, lightness, t, alpha),
+            3 => new Color(p, q, lightness, alpha),
+            4 => new Color(t, p, lightness, alpha),
+            _ => new Color(lightness, p, q, alpha)
+        };
+    }
 }
