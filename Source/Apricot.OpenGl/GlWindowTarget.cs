@@ -10,7 +10,21 @@ namespace Apricot.OpenGl;
 public sealed class GlWindowTarget(IWindow window, IGlPlatform glPlatform) : IRenderTarget
 {
     public IWindow Window { get; } = window;
+
+    public string Name => $"OpenGL Window Target <{Window}>";
+
+
+    public bool IsDisposed { get; private set; }
+
     public GL Gl { get; } = GL.GetApi(new SilkApricotGlContext(window, glPlatform));
-    
-    public void Dispose() => Gl.Dispose();
+
+    public void Dispose()
+    {
+        if (IsDisposed) return;
+
+        IsDisposed = true;
+        Gl.Dispose();
+    }
+
+    public override string ToString() => Name;
 }

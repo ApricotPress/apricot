@@ -18,6 +18,10 @@ public sealed class SdlGpuWindowTarget : IRenderTarget
     /// </summary>
     public SdlWindow Window { get; }
 
+    public string Name => $"SDL Window Target <{Window}>";
+
+    public bool IsDisposed { get; private set; }
+
     public SdlGpuWindowTarget(SdlGpuGraphics graphics, SdlWindow window)
     {
         if (!SDL.SDL_ClaimWindowForGPUDevice(graphics.GpuDeviceHandle, window.Handle))
@@ -30,7 +34,13 @@ public sealed class SdlGpuWindowTarget : IRenderTarget
     }
 
     /// <inheritdoc />
-    public void Dispose() => SDL.SDL_ReleaseWindowFromGPUDevice(_graphics.GpuDeviceHandle, Window.Handle);
+    public void Dispose()
+    {
+        if (IsDisposed) return;
 
-    public override string ToString() => $"WindowTarget <{Window}>";
+        IsDisposed = true;
+        SDL.SDL_ReleaseWindowFromGPUDevice(_graphics.GpuDeviceHandle, Window.Handle);
+    }
+
+    public override string ToString() => Name;
 }
