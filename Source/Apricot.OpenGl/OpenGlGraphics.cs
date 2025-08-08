@@ -59,6 +59,10 @@ public sealed class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
 
     public void Present()
     {
+        if (_currentWindow is not null)
+        {
+            glPlatform.SwapBuffers(_currentWindow.Window);
+        }
         _currentWindow = null;
     }
 
