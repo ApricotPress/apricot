@@ -1,5 +1,14 @@
 namespace Apricot.Graphics;
 
+/// <summary>
+/// Represents... well... color! Stores 4 floats and provides simple color operations. All values should be in [0; 1]
+/// range. (0, 0, 0, 0) represents black transparent color and (1, 1, 1, 1) represents opaque white. All provided
+/// pre-defined colors have their alpha channel set to 1, except <see cref="Transparent"/>. 
+/// </summary>
+/// <param name="r">Red component of color.</param>
+/// <param name="g">Green component of color.</param>
+/// <param name="b">Blue component of color.</param>
+/// <param name="a">Alpha channel of a color.</param>
 public struct Color(float r, float g, float b, float a = 1) : IEquatable<Color>
 {
     public static Color Black { get; } = new(0, 0, 0);
@@ -7,6 +16,7 @@ public struct Color(float r, float g, float b, float a = 1) : IEquatable<Color>
     public static Color Red { get; } = new(1, 0, 0);
     public static Color Green { get; } = new(0, 1, 0);
     public static Color Blue { get; } = new(0, 0, 1);
+    public static Color Transparent { get; } = new(0, 0, 0, 0);
 
     public float R { get; set; } = r;
 

@@ -4,6 +4,9 @@ using Silk.NET.OpenGLES;
 
 namespace Apricot.OpenGl;
 
+/// <summary>
+/// Creates and hols context referencing one specific window.
+/// </summary>
 public class GlWindowTarget(IWindow window, IGlPlatform glPlatform) : IRenderTarget
 {
     public IWindow Window { get; } = window;

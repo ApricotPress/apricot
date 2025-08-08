@@ -1,5 +1,8 @@
 namespace Apricot.Lifecycle;
 
+/// <summary>
+/// Ids for default <see cref="GameLoop"/> implementation used by <see cref="DefaultGameLoopProvider"/>.
+/// </summary>
 public static class Ids
 {
     public const string DefaultGameLoop = nameof(DefaultGameLoop);

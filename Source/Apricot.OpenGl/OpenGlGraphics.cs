@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Apricot.Graphics;
 using Apricot.Windows;
@@ -8,13 +9,23 @@ namespace Apricot.OpenGl;
 
 public class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
 {
+    private readonly Dictionary<IWindow, GlWindowTarget> _windowTargets = new();
+
     private GlWindowTarget? _currentWindow;
 
     public void Initialize() { }
 
     public void SetVsync(IWindow window, bool vsync) => glPlatform.SwapInterval = vsync ? 1 : 0;
 
-    public IRenderTarget GetWindowRenderTarget(IWindow window) => new GlWindowTarget(window, glPlatform);
+    public IRenderTarget GetWindowRenderTarget(IWindow window)
+    {
+        if (_windowTargets.TryGetValue(window, out var target))
+        {
+            return target;
+        }
+
+        return _windowTargets[window] = new GlWindowTarget(window, glPlatform);
+    }
 
     public void SetRenderTarget(IRenderTarget target, Color? clearColor)
     {
@@ -48,6 +59,7 @@ public class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
 
     public void Present()
     {
+        _currentWindow = null;
     }
 
     [MemberNotNull(nameof(_currentWindow))]

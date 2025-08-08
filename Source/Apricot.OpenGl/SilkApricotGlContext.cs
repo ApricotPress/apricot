@@ -5,6 +5,9 @@ using Silk.NET.Core.Contexts;
 
 namespace Apricot.OpenGl;
 
+/// <summary>
+/// OpenGL graphics implementation using Silk.NET bindings to opengl.
+/// </summary>
 public class SilkApricotGlContext(
     IWindow window,
     IGlPlatform glPlatform
