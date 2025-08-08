@@ -26,5 +26,11 @@ public class Sandbox(
         logger.LogInformation("Average FPS: {Average:F}", 1f / _lastDeltas.Average());
     }
 
-    public void Draw() => graphics.Clear(Color.Blue);
+    public void Draw()
+    {
+        var t = time.Time % 10f / 10f;
+        var color = Color.FromHsv(t, 1, 0.5f);
+        
+        graphics.Clear(color);
+    }
 }
