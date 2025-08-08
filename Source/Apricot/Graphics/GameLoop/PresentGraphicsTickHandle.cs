@@ -1,7 +1,7 @@
 using Apricot.Lifecycle;
 using Apricot.Lifecycle.TickHandlers;
 
-namespace Apricot.Graphics;
+namespace Apricot.Graphics.GameLoop;
 
 /// <summary>
 /// Default post-render tick handler that calls <see cref="IGraphics.Present"/> after rendering routines have finished.

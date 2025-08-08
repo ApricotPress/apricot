@@ -1,8 +1,9 @@
+using Apricot.Graphics.Resources;
 using Apricot.Lifecycle;
 using Apricot.Lifecycle.TickHandlers;
 using Apricot.Windows;
 
-namespace Apricot.Graphics;
+namespace Apricot.Graphics.GameLoop;
 
 /// <summary>
 /// Default pre-render tick handler that sets render target to main window.

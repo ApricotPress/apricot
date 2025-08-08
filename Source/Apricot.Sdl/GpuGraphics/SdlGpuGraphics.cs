@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using Apricot.Graphics;
+using Apricot.Graphics.Resources;
 using Apricot.Sdl.Windows;
 using Apricot.Windows;
 using Microsoft.Extensions.Logging;

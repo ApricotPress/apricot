@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Apricot.Graphics;
+using Apricot.Graphics.Resources;
 using Apricot.Windows;
 using Silk.NET.OpenGLES;
 

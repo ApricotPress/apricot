@@ -1,5 +1,6 @@
 using Apricot.Events;
 using Apricot.Graphics;
+using Apricot.Graphics.GameLoop;
 using Apricot.Lifecycle.TickHandlers;
 using Apricot.Timing;
 using Apricot.Windows;
