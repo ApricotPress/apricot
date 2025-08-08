@@ -5,6 +5,7 @@ using Apricot.Graphics;
 using Apricot.Graphics.Resources;
 using Apricot.Windows;
 using Silk.NET.OpenGLES;
+using Texture = Apricot.Graphics.Resources.Texture;
 
 namespace Apricot.OpenGl;
 
@@ -26,6 +27,22 @@ public sealed class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
         }
 
         return _windowTargets[window] = new GlWindowTarget(window, glPlatform);
+    }
+
+    public Texture CreateTexture(string? name, int width, int height, TextureFormat format = TextureFormat.R8G8B8A8,
+        TextureUsage usage = TextureUsage.Sampling)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void SetTextureData(Texture texture, Span<byte> data)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void ReleaseTexture(Texture texture)
+    {
+        throw new NotImplementedException();
     }
 
     public void SetRenderTarget(IRenderTarget target, Color? clearColor)
@@ -64,6 +81,7 @@ public sealed class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
         {
             glPlatform.SwapBuffers(_currentWindow.Window);
         }
+
         _currentWindow = null;
     }
 

@@ -5,8 +5,8 @@ using SDL3;
 namespace Apricot.Sdl.Graphics;
 
 /// <summary>
-/// Holds handle to window that then can be used to acquire its swapchain.
-///
+/// Holds handle to window that then can be used to acquire its swapchain.<br/>
+/// <br/>
 /// This class should not be constructed more than once for a window as it would try to claim window for GPU work twice.
 /// </summary>
 public sealed class SdlGpuWindowTarget : IRenderTarget

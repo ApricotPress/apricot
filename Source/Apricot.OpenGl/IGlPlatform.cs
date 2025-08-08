@@ -5,8 +5,8 @@ namespace Apricot.OpenGl;
 
 /// <summary>
 /// This abstraction is used to connect OpenGL to any platform and should be added to DI container of game engine if
-/// OpenGL is intended to use.
-///
+/// OpenGL is intended to use.<br/>
+/// <br/>
 /// You can use SDL implementation (in Apricot.Sdl.GlBinding) as a reference implementation.
 /// </summary>
 public interface IGlPlatform
