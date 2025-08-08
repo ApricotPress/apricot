@@ -12,5 +12,8 @@
     "Height": 600,
     "Title": "Apricot Jam",
     "Flags": "Resizable"
+  },
+  "JarOptions": {
+    "EnableGraphicsDebug": true
   }
 }

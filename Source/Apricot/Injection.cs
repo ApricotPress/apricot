@@ -52,5 +52,6 @@ public static class Injection
         .DoIf(addHostedQuit, s => s.AddHostedService<HostedQuit<TJar>>())
         .DoIf(rootConfiguration is not null, s => s
             .Configure<MainWindowOptions>(rootConfiguration!.GetSection(nameof(MainWindowOptions)))
+            .Configure<JarOptions>(rootConfiguration.GetSection(nameof(JarOptions)))
         );
 }
