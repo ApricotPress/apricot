@@ -11,7 +11,7 @@ namespace Apricot.Graphics;
 /// you acquired previously from <see cref="GetWindowRenderTarget"/> or off-screen buffer (NB: not yet implemented)
 /// and afterwards you can proceed to draw commands.
 /// </summary>
-public interface IGraphics
+public interface IGraphics : IDisposable
 {
     /// <summary>
     /// Initialize graphic system of the engine.

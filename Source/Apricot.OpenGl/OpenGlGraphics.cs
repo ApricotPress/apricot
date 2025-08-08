@@ -7,7 +7,7 @@ using Silk.NET.OpenGLES;
 
 namespace Apricot.OpenGl;
 
-public class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
+public sealed class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
 {
     private readonly Dictionary<IWindow, GlWindowTarget> _windowTargets = new();
 
@@ -59,6 +59,17 @@ public class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
 
     public void Present()
     {
+        _currentWindow = null;
+    }
+
+    public void Dispose()
+    {
+        foreach (var windowTarget in _windowTargets.Values)
+        {
+            windowTarget.Dispose();
+        }
+
+        _windowTargets.Clear();
         _currentWindow = null;
     }
 

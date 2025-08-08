@@ -143,7 +143,7 @@ public class Jar(
     /// </summary>
     protected virtual void DoInitialization()
     {
-        graphics.Initialize();
+        graphics.Initialize(jarOptions.CurrentValue.PreferredDriver, jarOptions.CurrentValue.EnableGraphicsDebug);
 
         scheduler.StartBackground();
 

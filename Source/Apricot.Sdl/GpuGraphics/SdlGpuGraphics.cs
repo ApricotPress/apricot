@@ -10,7 +10,7 @@ namespace Apricot.Sdl.Graphics;
 /// <summary>
 /// Implemnentation of <see cref="IGraphics"/> layer with SDL_gpu. 
 /// </summary>
-public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics, IDisposable
+public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 {
     private string? _gpuDriver;
 
