@@ -7,7 +7,7 @@ namespace Apricot.Sdl.Windows;
 
 public class SdlWindow : IWindow
 {
-    protected internal IntPtr Handle;
+    public IntPtr Handle;
 
     protected ILogger<SdlWindow> Logger;
 

@@ -1,7 +1,10 @@
 using System;
 using System.Runtime.InteropServices.JavaScript;
 using Apricot;
+using Apricot.Essentials;
+using Apricot.OpenGl;
 using Apricot.Sdl;
+using Apricot.Sdl.GlBinding;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -41,8 +44,11 @@ public partial class Program
         builder.Services
             .AddLogging(static builder => builder.SetMinimumLevel(LogLevel.Information))
             .AddSingleton<ILoggerProvider, DumbConsoleLoggerProvider>()
+            .AddApricot<Jar>(addHostedQuit: false, builder.Configuration)
             .AddSdl()
-            .AddApricot<Jar>(addHostedQuit: false, builder.Configuration);
+            .AddSdlGlPlatform()
+            .AddOpenGl()
+            .AddSandbox();
 
         builder.Configuration.AddJsonFile("gameSettings.json", true, true);
         builder.Configuration.AddEnvironmentVariables("APRICOT_");
