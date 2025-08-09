@@ -1,4 +1,5 @@
 using Apricot.Graphics.Resources;
+using Apricot.Graphics.Textures;
 using Apricot.Lifecycle;
 using Apricot.Windows;
 

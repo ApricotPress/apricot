@@ -1,4 +1,4 @@
-namespace Apricot.Graphics.Resources;
+namespace Apricot.Graphics.Textures;
 
 public sealed class Texture(
     IGraphics graphics,

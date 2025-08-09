@@ -1,4 +1,4 @@
-namespace Apricot.Graphics;
+namespace Apricot.Graphics.Textures;
 
 [Flags]
 public enum TextureUsage

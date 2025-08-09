@@ -1,4 +1,4 @@
-using Apricot.Graphics.Resources;
+using Apricot.Graphics;
 using Apricot.Sdl.Windows;
 using SDL3;
 

@@ -1,4 +1,3 @@
-using Apricot.Graphics.Resources;
 using Apricot.Lifecycle;
 using Apricot.Lifecycle.TickHandlers;
 using Apricot.Windows;

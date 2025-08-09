@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Apricot.Graphics;
-using Apricot.Graphics.Resources;
+using Apricot.Graphics.Textures;
 using Apricot.Lifecycle.TickHandlers;
 using Apricot.Timing;
 using Apricot.Windows;

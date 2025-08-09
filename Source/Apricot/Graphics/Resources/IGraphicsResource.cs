@@ -1,4 +1,4 @@
-namespace Apricot.Graphics.Resources;
+namespace Apricot.Graphics;
 
 /// <summary>
 /// Some resource bound to <see cref="IGraphics"/>.

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Apricot.Graphics;
 using Apricot.Graphics.Resources;
+using Apricot.Graphics.Textures;
 using Apricot.Windows;
 using Silk.NET.OpenGLES;
-using Texture = Apricot.Graphics.Resources.Texture;
+using Texture = Apricot.Graphics.Textures.Texture;
 
 namespace Apricot.OpenGl;
 

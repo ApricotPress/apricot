@@ -1,4 +1,4 @@
-using Apricot.Graphics;
+using Apricot.Graphics.Textures;
 using SDL3;
 
 namespace Apricot.Sdl.Graphics;
