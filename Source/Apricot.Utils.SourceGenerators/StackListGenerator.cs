@@ -77,6 +77,16 @@ public sealed class StackListGenerator : IIncrementalGenerator
 
                   /// <summary>Read-only span over the active elements [0..Count).</summary>
                   public ReadOnlySpan<T> ReadOnlySpan => MemoryMarshal.CreateReadOnlySpan(ref elements[0], Count);
+                  
+                  public StackList{{capacity}}(in ReadOnlySpan<T> initialElements) 
+                  {
+                      if (initialElements.Length > Capacity) 
+                      {
+                          throw new InvalidOperationException("Exceeding Capacity of StackList{{capacity}}");
+                      }
+                      
+                      initialElements.CopyTo(elements);
+                  }
 
                   public void Add(T value)
                   {
@@ -128,7 +138,7 @@ public sealed class StackListGenerator : IIncrementalGenerator
                       if ((uint)index > (uint)count)
                           throw new IndexOutOfRangeException();
                       if (count >= Capacity)
-                          throw new Exception("Exceeding Capacity of StackList{{capacity}}");
+                          throw new InvalidOperationException("Exceeding Capacity of StackList{{capacity}}");
                       for (int i = count; i > index; i--)
                           elements[i] = elements[i - 1];
                       elements[index] = item;
