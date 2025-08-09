@@ -202,12 +202,29 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
         SDL.SDL_ReleaseGPUTransferBuffer(GpuDeviceHandle, transferBuffer);
     }
 
-    public void ReleaseTexture(Texture texture)
+    public void Release(Texture texture)
     {
         Debug.Assert(texture.IsDisposed);
 
         SDL.SDL_ReleaseGPUTexture(GpuDeviceHandle, texture.Handle);
         _loadedTextures.Remove(texture);
+    }
+
+    public IndexBuffer CreateIndexBuffer(string? name, IndexSize indexSize)
+    {
+        throw new NotImplementedException();
+    }
+    public void Release(IndexBuffer buffer)
+    {
+        throw new NotImplementedException();
+    }
+    public IndexBuffer CreateVertexBuffer(string? name)
+    {
+        throw new NotImplementedException();
+    }
+    public void Release(VertexBuffer buffer)
+    {
+        throw new NotImplementedException();
     }
 
     public void SetRenderTarget(IRenderTarget target, Color? clearColor)

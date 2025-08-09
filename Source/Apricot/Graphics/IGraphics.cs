@@ -1,4 +1,4 @@
-using Apricot.Graphics.Resources;
+using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Textures;
 using Apricot.Lifecycle;
 using Apricot.Windows;
@@ -54,8 +54,15 @@ public interface IGraphics : IDisposable
     /// Releases texture. Should be called only from <see cref="Texture"/> by its Dispose method.
     /// </summary>
     /// <param name="texture">Texture to dispose.</param>
-    void ReleaseTexture(Texture texture);
     void Release(Texture texture);
+
+    IndexBuffer CreateIndexBuffer(string? name, IndexSize indexSize);
+
+    void Release(IndexBuffer buffer);
+
+    IndexBuffer CreateVertexBuffer(string? name);
+    
+    void Release(VertexBuffer buffer);
 
     /// <summary>
     /// Sets current target for next draw commands. Render target should be reset in <see cref="Present"/> methof which
@@ -77,5 +84,4 @@ public interface IGraphics : IDisposable
     /// targets if needed. Also prepares state of graphic API for next frame.  
     /// </summary>
     void Present();
-
 }

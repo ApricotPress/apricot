@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Apricot.Graphics;
-using Apricot.Graphics.Resources;
+using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Textures;
 using Apricot.Windows;
 using Silk.NET.OpenGLES;
@@ -41,13 +41,17 @@ public sealed class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
         throw new NotImplementedException();
     }
 
-    public void ReleaseTexture(Texture texture)
-    {
-        throw new NotImplementedException();
-    }
     public void SetTextureData(Texture texture, in ReadOnlySpan<byte> data) => throw new NotImplementedException();
 
     public void Release(Texture texture) => throw new NotImplementedException();
+    
+    public IndexBuffer CreateIndexBuffer(string? name, IndexSize indexSize) => throw new NotImplementedException();
+
+    public void Release(IndexBuffer buffer) => throw new NotImplementedException();
+
+    public IndexBuffer CreateVertexBuffer(string? name) => throw new NotImplementedException();
+
+    public void Release(VertexBuffer buffer) => throw new NotImplementedException();
 
     public void SetRenderTarget(IRenderTarget target, Color? clearColor)
     {
