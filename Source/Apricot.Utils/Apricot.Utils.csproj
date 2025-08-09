@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference
+                Include="..\Apricot.Utils.SourceGenerators\Apricot.Utils.SourceGenerators.csproj"
+                OutputItemType="Analyzer"
+                ReferenceOutputAssembly="false"
+        />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <StackListCapacities>4,8,16,32,64</StackListCapacities>
+    </PropertyGroup>
+
+</Project>
