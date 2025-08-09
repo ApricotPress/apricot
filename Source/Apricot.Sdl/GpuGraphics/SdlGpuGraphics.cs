@@ -147,15 +147,17 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
             SdlException.ThrowFromLatest(nameof(SDL.SDL_CreateGPUTexture));
         }
 
-        Texture texture = new(this, name ?? handle.ToString(), width, height, handle, format, usage);
+        Texture texture = new(this, name ?? handle.ToString(), width, height, handle, format);
 
         _loadedTextures.Add(texture);
 
         return texture;
     }
 
-    public void SetTextureData(Texture texture, Span<byte> data)
+    public void SetTextureData(Texture texture, in ReadOnlySpan<byte> data)
     {
+        if (texture.IsDisposed) throw new InvalidOperationException("Texture is disposed");
+
         var transferBuffer = SDL.SDL_CreateGPUTransferBuffer(
             GpuDeviceHandle,
             new SDL.SDL_GPUTransferBufferCreateInfo

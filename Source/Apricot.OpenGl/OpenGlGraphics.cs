@@ -30,13 +30,13 @@ public sealed class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
         return _windowTargets[window] = new GlWindowTarget(window, glPlatform);
     }
 
-    public Texture CreateTexture(string? name, int width, int height, TextureFormat format = TextureFormat.R8G8B8A8,
-        TextureUsage usage = TextureUsage.Sampling)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void SetTextureData(Texture texture, Span<byte> data)
+    public Texture CreateTexture(
+        string? name,
+        int width,
+        int height,
+        TextureFormat format = TextureFormat.R8G8B8A8,
+        TextureUsage usage = TextureUsage.Sampling
+    )
     {
         throw new NotImplementedException();
     }
@@ -45,6 +45,9 @@ public sealed class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
     {
         throw new NotImplementedException();
     }
+    public void SetTextureData(Texture texture, in ReadOnlySpan<byte> data) => throw new NotImplementedException();
+
+    public void Release(Texture texture) => throw new NotImplementedException();
 
     public void SetRenderTarget(IRenderTarget target, Color? clearColor)
     {

@@ -6,8 +6,7 @@ public sealed class Texture(
     int width,
     int height,
     IntPtr handle,
-    TextureFormat format,
-    TextureUsage usage = TextureUsage.Sampling
+    TextureFormat format
 ) : IGraphicsResource
 {
     public string Name { get; } = $"Texture <{name}>";
@@ -21,13 +20,18 @@ public sealed class Texture(
     public IntPtr Handle { get; } = handle;
 
     public TextureFormat Format { get; } = format;
-    
-    public void SetData(Span<byte> data) => graphics.SetTextureData(this, data);
+
+    public void SetData(Span<byte> data)
+    {
+        if (IsDisposed) throw new InvalidOperationException("Texture was disposed and cannot have new data.");
+
+        graphics.SetTextureData(this, data);
+    }
 
     public void Dispose()
     {
         IsDisposed = true;
-        graphics.ReleaseTexture(this);
+        graphics.Release(this);
     }
 
     public override string ToString() => Name;

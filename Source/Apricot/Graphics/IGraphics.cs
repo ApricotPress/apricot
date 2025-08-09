@@ -48,13 +48,14 @@ public interface IGraphics : IDisposable
     /// <returns>Created and bound texture.</returns>
     Texture CreateTexture(string? name, int width, int height, TextureFormat format = TextureFormat.R8G8B8A8, TextureUsage usage = TextureUsage.Sampling);
 
-    void SetTextureData(Texture texture, Span<byte> data);
+    void SetTextureData(Texture texture, in ReadOnlySpan<byte> data);
     
     /// <summary>
-    /// Disposes texture. Should be called only from <see cref="Texture"/> by its Dispose method.
+    /// Releases texture. Should be called only from <see cref="Texture"/> by its Dispose method.
     /// </summary>
     /// <param name="texture">Texture to dispose.</param>
     void ReleaseTexture(Texture texture);
+    void Release(Texture texture);
 
     /// <summary>
     /// Sets current target for next draw commands. Render target should be reset in <see cref="Present"/> methof which
