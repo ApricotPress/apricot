@@ -58,13 +58,37 @@ public interface IGraphics : IDisposable
     /// <param name="texture">Texture to dispose.</param>
     void Release(Texture texture);
 
+    /// <summary>
+    /// Creates index buffer of asked capacity and given index size and allocates it on GPU.
+    /// </summary>
+    /// <param name="name">Optional name of buffer. Will be determined by implementation if null.</param>
+    /// <param name="indexSize">Size of buffer element.</param>
+    /// <param name="capacity">Number of elements requested.</param>
+    /// <returns>Returns managed object representing index buffer.</returns>
     IndexBuffer CreateIndexBuffer(string? name, IndexSize indexSize, int capacity);
 
+    /// <summary>
+    /// Releases buffer from graphics memory. Should be called only by <see cref="IndexBuffer"/> itself, as otherwise it
+    /// won't now it's disposed.
+    /// </summary>
+    /// <param name="buffer">Buffer to release.</param>
     void Release(IndexBuffer buffer);
 
+    /// <summary>
+    /// Creates vertex buffer of asked capacity and given vertex format and allocates it on GPU.
+    /// </summary>
+    /// <param name="name">Optional name of buffer. Will be determined by implementation if null.</param>
+    /// <param name="capacity">Number of elements requested.</param>
+    /// <typeparam name="T">Vertex struct that is used for each element.</typeparam>
+    /// <returns>Returns managed object representing vertex buffer.</returns>
     VertexBuffer<T> CreateVertexBuffer<T>(string? name, int capacity)
         where T : unmanaged, IVertex;
 
+    /// <summary>
+    /// Releases buffer from graphics memory. Should be called only by <see cref="VertexBuffer{T}"/> itself, as otherwise it
+    /// </summary>
+    /// <param name="buffer">Buffer to release.</param>
+    /// <typeparam name="T">Vertex struct that is used for each element.</typeparam>
     void Release<T>(VertexBuffer<T> buffer) where T : unmanaged, IVertex;
 
     /// <summary>
