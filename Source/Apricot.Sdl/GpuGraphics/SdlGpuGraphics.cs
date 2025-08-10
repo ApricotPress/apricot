@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using Apricot.Graphics;
 using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Textures;
+using Apricot.Graphics.Vertecies;
 using Apricot.Sdl.Windows;
 using Apricot.Windows;
 using Microsoft.Extensions.Logging;
@@ -244,19 +245,19 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
         SDL.SDL_ReleaseGPUBuffer(GpuDeviceHandle, buffer.NativePointer);
     }
 
-    public VertexBuffer CreateVertexBuffer(string? name, VertexFormat vertexFormat, int capacity)
+    public VertexBuffer<T> CreateVertexBuffer<T>(string? name, int capacity)
+        where T : unmanaged, IVertex
     {
         var nativeBuffer = CreateGraphicBuffer(
             name,
-            (uint)(vertexFormat.Stride * capacity),
+            (uint)(T.Format.Stride * capacity),
             SDL.SDL_GPUBufferUsageFlags.SDL_GPU_BUFFERUSAGE_VERTEX
         );
 
-        var buffer = new VertexBuffer(
+        var buffer = new VertexBuffer<T>(
             this,
             name ?? nativeBuffer.ToString(),
             capacity,
-            vertexFormat,
             nativeBuffer
         );
 
@@ -268,7 +269,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
         return buffer;
     }
 
-    public void Release(VertexBuffer buffer)
+    public void Release<T>(VertexBuffer<T> buffer) where T : unmanaged, IVertex
     {
         if (buffer.IsDisposed) throw new InvalidOperationException($"{buffer} is already disposed.");
 

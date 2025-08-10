@@ -1,6 +1,6 @@
 using Apricot.Utils.Collections;
 
-namespace Apricot.Graphics.Buffers;
+namespace Apricot.Graphics.Vertecies;
 
 public readonly struct VertexFormat : IEquatable<VertexFormat>
 {

@@ -1,4 +1,4 @@
-namespace Apricot.Graphics.Buffers;
+namespace Apricot.Graphics.Vertecies;
 
 public enum VertexElementFormat
 {

@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using Apricot.Graphics;
 using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Textures;
+using Apricot.Graphics.Vertecies;
 using Apricot.Windows;
 using Silk.NET.OpenGLES;
 using Texture = Apricot.Graphics.Textures.Texture;
@@ -44,14 +45,16 @@ public sealed class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
     public void SetTextureData(Texture texture, in ReadOnlySpan<byte> data) => throw new NotImplementedException();
 
     public void Release(Texture texture) => throw new NotImplementedException();
-    
-    public IndexBuffer CreateIndexBuffer(string? name, IndexSize indexSize, int capacity) => throw new NotImplementedException();
+
+    public IndexBuffer CreateIndexBuffer(string? name, IndexSize indexSize, int capacity) =>
+        throw new NotImplementedException();
 
     public void Release(IndexBuffer buffer) => throw new NotImplementedException();
 
-    public VertexBuffer CreateVertexBuffer(string? name, VertexFormat vertexFormat, int capacity) => throw new NotImplementedException();
+    public VertexBuffer<T> CreateVertexBuffer<T>(string? name, int capacity)
+        where T : unmanaged, IVertex => throw new NotImplementedException();
 
-    public void Release(VertexBuffer buffer) => throw new NotImplementedException();
+    public void Release<T>(VertexBuffer<T> buffer) where T : unmanaged, IVertex => throw new NotImplementedException();
 
     public void SetRenderTarget(IRenderTarget target, Color? clearColor)
     {

@@ -1,10 +1,13 @@
+using Apricot.Graphics.Vertecies;
+
 namespace Apricot.Graphics.Buffers;
 
-public sealed class VertexBuffer(IGraphics graphics, string name, int capacity, VertexFormat format, IntPtr nativePointer)
-    : GraphicBuffer(name, capacity, format.Stride, nativePointer, BufferUsage.Vertex)
+public sealed class VertexBuffer<T>(IGraphics graphics, string name, int capacity, IntPtr nativePointer)
+    : GraphicBuffer(name, capacity, T.Format.Stride, nativePointer, BufferUsage.Vertex)
+    where T : unmanaged, IVertex
 {
-    public VertexFormat Format { get; } = format;
-    
+    public VertexFormat Format => T.Format;
+
     public override void Dispose()
     {
         if (IsDisposed) return;

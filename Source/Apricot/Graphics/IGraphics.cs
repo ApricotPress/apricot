@@ -1,5 +1,6 @@
 using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Textures;
+using Apricot.Graphics.Vertecies;
 using Apricot.Lifecycle;
 using Apricot.Windows;
 
@@ -46,10 +47,11 @@ public interface IGraphics : IDisposable
     /// <param name="format">Format of texture.</param>
     /// <param name="usage">Usages of the texture.</param>
     /// <returns>Created and bound texture.</returns>
-    Texture CreateTexture(string? name, int width, int height, TextureFormat format = TextureFormat.R8G8B8A8, TextureUsage usage = TextureUsage.Sampling);
+    Texture CreateTexture(string? name, int width, int height, TextureFormat format = TextureFormat.R8G8B8A8,
+        TextureUsage usage = TextureUsage.Sampling);
 
     void SetTextureData(Texture texture, in ReadOnlySpan<byte> data);
-    
+
     /// <summary>
     /// Releases texture. Should be called only from <see cref="Texture"/> by its Dispose method.
     /// </summary>
@@ -60,9 +62,10 @@ public interface IGraphics : IDisposable
 
     void Release(IndexBuffer buffer);
 
-    VertexBuffer CreateVertexBuffer(string? name, VertexFormat vertexFormat, int capacity);
-    
-    void Release(VertexBuffer buffer);
+    VertexBuffer<T> CreateVertexBuffer<T>(string? name, int capacity)
+        where T : unmanaged, IVertex;
+
+    void Release<T>(VertexBuffer<T> buffer) where T : unmanaged, IVertex;
 
     /// <summary>
     /// Sets current target for next draw commands. Render target should be reset in <see cref="Present"/> methof which
