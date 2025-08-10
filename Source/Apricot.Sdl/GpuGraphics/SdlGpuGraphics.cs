@@ -34,7 +34,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 
     private readonly HashSet<Texture> _loadedTextures = [];
     private readonly HashSet<GraphicBuffer> _loadedBuffers = [];
-    private readonly HashSet<Shader> _loadedShaders = [];
+    private readonly HashSet<ShaderProgram> _loadedShaders = [];
 
     public IntPtr GpuDeviceHandle { get; private set; }
 
@@ -365,7 +365,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
         SDL.SDL_ReleaseGPUTransferBuffer(GpuDeviceHandle, transferBuffer);
     }
 
-    public Shader CreateShader(string? name, ShaderStage stage, in ShaderProgramDescription description)
+    public ShaderProgram CreateShaderProgram(string? name, in ShaderProgramDescription description)
     {
         var format = _driver switch
         {
@@ -388,7 +388,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
                     code = code,
                     entrypoint = entryPointPtr,
                     format = format,
-                    stage = stage == ShaderStage.Fragment
+                    stage = description.Stage == ShaderStage.Fragment
                         ? SDL.SDL_GPUShaderStage.SDL_GPU_SHADERSTAGE_FRAGMENT
                         : SDL.SDL_GPUShaderStage.SDL_GPU_SHADERSTAGE_VERTEX,
                     num_samplers = (uint)description.SamplerCount,
@@ -400,11 +400,11 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 
         if (nativeShader == IntPtr.Zero) SdlException.ThrowFromLatest(nameof(SDL.SDL_CreateGPUShader));
 
-        var shader = new Shader(
+        var shader = new ShaderProgram(
             this,
             name ?? nativeShader.ToString(),
             nativeShader,
-            stage
+            description.Stage
         );
 
         lock (_loadedShaders) _loadedShaders.Add(shader);
@@ -412,13 +412,13 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
         return shader;
     }
 
-    public void Release(Shader shader)
+    public void Release(ShaderProgram shaderProgram)
     {
-        if (shader.IsDisposed) throw new InvalidOperationException($"Shader {shader} is already released.");
+        if (shaderProgram.IsDisposed) throw new InvalidOperationException($"Shader {shaderProgram} is already released.");
 
-        SDL.SDL_ReleaseGPUShader(GpuDeviceHandle, shader.Handle);
+        SDL.SDL_ReleaseGPUShader(GpuDeviceHandle, shaderProgram.Handle);
 
-        lock (_loadedShaders) _loadedShaders.Remove(shader);
+        lock (_loadedShaders) _loadedShaders.Remove(shaderProgram);
     }
 
     public void SetRenderTarget(IRenderTarget target, Color? clearColor)

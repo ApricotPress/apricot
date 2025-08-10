@@ -1,6 +1,6 @@
 namespace Apricot.Graphics.Shaders;
 
-public sealed class Shader(
+public sealed class ShaderProgram(
     IGraphics graphics,
     string name,
     IntPtr handle,

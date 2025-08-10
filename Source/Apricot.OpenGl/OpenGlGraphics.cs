@@ -9,7 +9,6 @@ using Apricot.Graphics.Textures;
 using Apricot.Graphics.Vertices;
 using Apricot.Windows;
 using Silk.NET.OpenGLES;
-using Shader = Apricot.Graphics.Shaders.Shader;
 using Texture = Apricot.Graphics.Textures.Texture;
 
 namespace Apricot.OpenGl;
@@ -59,10 +58,12 @@ public sealed class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
     public void UploadBufferData<T>(GraphicBuffer buffer, in ReadOnlySpan<T> data) where T : unmanaged =>
         throw new NotImplementedException();
 
-    public Shader CreateShader(string? name, ShaderStage state, in ShaderProgramDescription description) =>
-        throw new NotImplementedException();
+    public ShaderProgram CreateShaderProgram(
+        string? name,
+        in ShaderProgramDescription description
+    ) => throw new NotImplementedException();
 
-    public void Release(Shader shader) => throw new NotImplementedException();
+    public void Release(ShaderProgram shaderProgram) => throw new NotImplementedException();
 
 
     public void SetRenderTarget(IRenderTarget target, Color? clearColor)

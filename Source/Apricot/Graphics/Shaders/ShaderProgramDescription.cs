@@ -4,5 +4,6 @@ public readonly record struct ShaderProgramDescription(
     byte[] Code,
     int SamplerCount,
     int UniformBufferCount,
-    string EntryPoint = "main"
+    ShaderStage Stage,
+    string EntryPoint
 );

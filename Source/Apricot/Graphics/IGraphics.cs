@@ -49,8 +49,13 @@ public interface IGraphics : IDisposable
     /// <param name="format">Format of texture.</param>
     /// <param name="usage">Usages of the texture.</param>
     /// <returns>Created and bound texture.</returns>
-    Texture CreateTexture(string? name, int width, int height, TextureFormat format = TextureFormat.R8G8B8A8,
-        TextureUsage usage = TextureUsage.Sampling);
+    Texture CreateTexture(
+        string? name,
+        int width,
+        int height,
+        TextureFormat format = TextureFormat.R8G8B8A8,
+        TextureUsage usage = TextureUsage.Sampling
+    );
 
     void SetTextureData(Texture texture, in ReadOnlySpan<byte> data);
 
@@ -104,9 +109,9 @@ public interface IGraphics : IDisposable
     /// <typeparam name="T">Vertex struct that is used for each element.</typeparam>
     void UploadBufferData<T>(GraphicBuffer buffer, in ReadOnlySpan<T> data) where T : unmanaged;
 
-    Shader CreateShader(string? name, ShaderStage state, in ShaderProgramDescription description); 
+    ShaderProgram CreateShaderProgram(string? name, in ShaderProgramDescription description);
 
-    void Release(Shader shader);
+    void Release(ShaderProgram shaderProgram);
 
     /// <summary>
     /// Sets current target for next draw commands. Render target should be reset in <see cref="Present"/> methof which
