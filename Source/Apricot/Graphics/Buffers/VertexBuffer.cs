@@ -8,6 +8,8 @@ public sealed class VertexBuffer<T>(IGraphics graphics, string name, int capacit
 {
     public VertexFormat Format => T.Format;
 
+    public void UploadData(in ReadOnlySpan<T> vertices) => graphics.UploadBufferData(this, vertices);
+
     public override void Dispose()
     {
         if (IsDisposed) return;

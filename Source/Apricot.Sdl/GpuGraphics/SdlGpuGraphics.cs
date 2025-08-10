@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Apricot.Graphics;
 using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Textures;
@@ -160,7 +161,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 
     public void SetTextureData(Texture texture, in ReadOnlySpan<byte> data)
     {
-        if (texture.IsDisposed) throw new InvalidOperationException("Texture is disposed");
+        if (texture.IsDisposed) throw new InvalidOperationException($"{texture} is disposed");
 
         var transferBuffer = SDL.SDL_CreateGPUTransferBuffer(
             GpuDeviceHandle,
@@ -274,6 +275,45 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
         if (buffer.IsDisposed) throw new InvalidOperationException($"{buffer} is already disposed.");
 
         SDL.SDL_ReleaseGPUBuffer(GpuDeviceHandle, buffer.NativePointer);
+    }
+
+    public void UploadBufferData<T>(GraphicBuffer buffer, in ReadOnlySpan<T> data) where T : unmanaged
+    {
+        if (buffer.IsDisposed) throw new InvalidOperationException($"{buffer} is disposed.");
+
+        var transferBuffer = SDL.SDL_CreateGPUTransferBuffer(
+            GpuDeviceHandle,
+            new SDL.SDL_GPUTransferBufferCreateInfo
+            {
+                usage = SDL.SDL_GPUTransferBufferUsage.SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
+                size = (uint)data.Length
+            }
+        );
+
+        var dstPointer = SDL.SDL_MapGPUTransferBuffer(GpuDeviceHandle, transferBuffer, true);
+        var dstSpan = new Span<byte>(dstPointer.ToPointer(), data.Length);
+        MemoryMarshal.AsBytes(data).CopyTo(dstSpan);
+
+        SDL.SDL_UnmapGPUTransferBuffer(GpuDeviceHandle, transferBuffer);
+
+        BeginCopyPass();
+        SDL.SDL_UploadToGPUBuffer(
+            _currentCopyPass,
+            new SDL.SDL_GPUTransferBufferLocation
+            {
+                transfer_buffer = transferBuffer,
+                offset = 0
+            },
+            new SDL.SDL_GPUBufferRegion
+            {
+                buffer = transferBuffer,
+                offset = 0,
+                size = (uint)data.Length
+            },
+            false // todo: figure out cycles 
+        );
+
+        SDL.SDL_ReleaseGPUTransferBuffer(GpuDeviceHandle, transferBuffer);
     }
 
     public void SetRenderTarget(IRenderTarget target, Color? clearColor)

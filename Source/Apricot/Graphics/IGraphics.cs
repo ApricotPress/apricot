@@ -69,7 +69,7 @@ public interface IGraphics : IDisposable
 
     /// <summary>
     /// Releases buffer from graphics memory. Should be called only by <see cref="IndexBuffer"/> itself, as otherwise it
-    /// won't now it's disposed.
+    /// won't know it is native GPU data was disposed.
     /// </summary>
     /// <param name="buffer">Buffer to release.</param>
     void Release(IndexBuffer buffer);
@@ -85,11 +85,22 @@ public interface IGraphics : IDisposable
         where T : unmanaged, IVertex;
 
     /// <summary>
-    /// Releases buffer from graphics memory. Should be called only by <see cref="VertexBuffer{T}"/> itself, as otherwise it
+    /// Releases buffer from graphics memory. Should be called only by <see cref="VertexBuffer{T}"/> itself, as
+    /// otherwise it won't know it is native GPU data was disposed.
     /// </summary>
     /// <param name="buffer">Buffer to release.</param>
     /// <typeparam name="T">Vertex struct that is used for each element.</typeparam>
     void Release<T>(VertexBuffer<T> buffer) where T : unmanaged, IVertex;
+
+    /// <summary>
+    /// Uploads buffer data to GPU. It uses raw bytes to upload and therefore not type safe. So it's better to use
+    /// corresponding methods in buffers such as <see cref="VertexBuffer{T}.UploadData"/> and
+    /// <see cref="IndexBuffer.UploadData"/>.
+    /// </summary>
+    /// <param name="buffer">Destination buffer.</param>
+    /// <param name="data">Vertices to upload.</param>
+    /// <typeparam name="T">Vertex struct that is used for each element.</typeparam>
+    void UploadBufferData<T>(GraphicBuffer buffer, in ReadOnlySpan<T> data) where T : unmanaged;
 
     /// <summary>
     /// Sets current target for next draw commands. Render target should be reset in <see cref="Present"/> methof which

@@ -37,10 +37,7 @@ public sealed class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
         int height,
         TextureFormat format = TextureFormat.R8G8B8A8,
         TextureUsage usage = TextureUsage.Sampling
-    )
-    {
-        throw new NotImplementedException();
-    }
+    ) => throw new NotImplementedException();
 
     public void SetTextureData(Texture texture, in ReadOnlySpan<byte> data) => throw new NotImplementedException();
 
@@ -51,10 +48,14 @@ public sealed class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
 
     public void Release(IndexBuffer buffer) => throw new NotImplementedException();
 
-    public VertexBuffer<T> CreateVertexBuffer<T>(string? name, int capacity)
-        where T : unmanaged, IVertex => throw new NotImplementedException();
+    public VertexBuffer<T> CreateVertexBuffer<T>(string? name, int capacity) where T : unmanaged, IVertex =>
+        throw new NotImplementedException();
 
     public void Release<T>(VertexBuffer<T> buffer) where T : unmanaged, IVertex => throw new NotImplementedException();
+
+    public void UploadBufferData<T>(GraphicBuffer buffer, in ReadOnlySpan<T> data) where T : unmanaged =>
+        throw new NotImplementedException();
+
 
     public void SetRenderTarget(IRenderTarget target, Color? clearColor)
     {
