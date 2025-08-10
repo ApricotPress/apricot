@@ -1,4 +1,4 @@
-namespace Apricot.Graphics;
+namespace Apricot.Graphics.Structs;
 
 /// <summary>
 /// Represents... well... color! Stores 4 floats and provides simple color operations. All values should be in [0; 1]
@@ -43,6 +43,13 @@ public struct Color(float r, float g, float b, float a = 1) : IEquatable<Color>
     public static bool operator ==(Color left, Color right) => left.Equals(right);
 
     public static bool operator !=(Color left, Color right) => !left.Equals(right);
+
+    public static implicit operator Color(PackedColor packed) => new(
+        packed.R / 255f,
+        packed.G / 255f,
+        packed.B / 255f,
+        packed.A / 255f
+    );
 
     public static Color FromHsv(float hue, float saturation, float lightness, float alpha = 1f)
     {

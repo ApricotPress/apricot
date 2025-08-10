@@ -1,5 +1,6 @@
 using System.Numerics;
 using Apricot.Graphics;
+using Apricot.Graphics.Structs;
 using Apricot.Lifecycle.TickHandlers;
 using Apricot.Timing;
 using ImGuiNET;

@@ -1,4 +1,5 @@
 using Apricot.Graphics.Buffers;
+using Apricot.Graphics.Structs;
 using Apricot.Graphics.Textures;
 using Apricot.Graphics.Vertices;
 using Apricot.Lifecycle;
