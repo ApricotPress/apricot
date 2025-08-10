@@ -3,8 +3,8 @@ using System.Runtime.InteropServices;
 
 namespace Apricot.Graphics.Vertices;
 
-[StructLayout(LayoutKind.Sequential)]
-public struct VertexPosUv(Vector3 position, Vector2 uv) : IVertex
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct PositionTextureVertex(Vector3 position, Vector2 uv) : IVertex
 {
     public static VertexFormat Format { get; } = new VertexFormat([
         new VertexFormat.Element(0, VertexElementFormat.Vector3, false),
