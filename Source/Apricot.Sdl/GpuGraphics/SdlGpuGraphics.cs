@@ -117,6 +117,15 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
         TextureUsage usage = TextureUsage.Sampling
     )
     {
+        logger.LogDebug(
+            "Creating texture of name {name} {width}x{height} with format {format} for {usage}",
+            name,
+            width,
+            height,
+            format,
+            usage
+        );
+
         uint props = 0;
 
         if (!string.IsNullOrEmpty(name))
@@ -163,6 +172,8 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
     public void SetTextureData(Texture texture, in ReadOnlySpan<byte> data)
     {
         if (texture.IsDisposed) throw new InvalidOperationException($"{texture} is disposed");
+
+        logger.LogDebug("Setting data of texture {texture}", texture);
 
         var transferBuffer = SDL.SDL_CreateGPUTransferBuffer(
             GpuDeviceHandle,
@@ -212,12 +223,21 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
     {
         if (texture.IsDisposed) throw new InvalidOperationException($"{texture} is already disposed.");
 
+        logger.LogDebug("Releasing texture {texture}", texture);
+
         SDL.SDL_ReleaseGPUTexture(GpuDeviceHandle, texture.Handle);
         lock (_loadedTextures) _loadedTextures.Remove(texture);
     }
 
     public IndexBuffer CreateIndexBuffer(string? name, IndexSize indexSize, int capacity)
     {
+        logger.LogDebug(
+            "Creating index buffer with name {name} with {capacity} elements of {size} size",
+            name,
+            capacity,
+            indexSize
+        );
+
         var nativeBuffer = CreateGraphicBuffer(
             name,
             (uint)((int)indexSize * capacity),
@@ -242,7 +262,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 
     public void Release(IndexBuffer buffer)
     {
-        if (buffer.IsDisposed) throw new InvalidOperationException($"{buffer} is already disposed.");
+        if (buffer.IsDisposed) throw new InvalidOperationException($"{buffer.Name} is already disposed.");
 
         SDL.SDL_ReleaseGPUBuffer(GpuDeviceHandle, buffer.NativePointer);
     }
@@ -250,6 +270,13 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
     public VertexBuffer<T> CreateVertexBuffer<T>(string? name, int capacity)
         where T : unmanaged, IVertex
     {
+        logger.LogDebug(
+            "Creating vertex buffer with name {name} with {capacity} elements of {vertex} vertex type",
+            name,
+            capacity,
+            typeof(T)
+        );
+
         var nativeBuffer = CreateGraphicBuffer(
             name,
             (uint)(T.Format.Stride * capacity),
@@ -273,7 +300,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 
     public void Release<T>(VertexBuffer<T> buffer) where T : unmanaged, IVertex
     {
-        if (buffer.IsDisposed) throw new InvalidOperationException($"{buffer} is already disposed.");
+        if (buffer.IsDisposed) throw new InvalidOperationException($"{buffer.Name} is already disposed.");
 
         SDL.SDL_ReleaseGPUBuffer(GpuDeviceHandle, buffer.NativePointer);
     }
@@ -281,6 +308,9 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
     public void UploadBufferData<T>(GraphicBuffer buffer, in ReadOnlySpan<T> data) where T : unmanaged
     {
         if (buffer.IsDisposed) throw new InvalidOperationException($"{buffer} is disposed.");
+        if (buffer.IsDisposed) throw new InvalidOperationException($"{buffer.Name} is disposed.");
+
+        logger.LogDebug("Uploading data {buffer}", buffer.Name);
 
         var transferBuffer = SDL.SDL_CreateGPUTransferBuffer(
             GpuDeviceHandle,
