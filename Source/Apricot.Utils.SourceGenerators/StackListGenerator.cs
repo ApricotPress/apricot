@@ -86,6 +86,7 @@ public sealed class StackListGenerator : IIncrementalGenerator
                       }
                       
                       initialElements.CopyTo(elements);
+                      count = initialElements.Length;
                   }
 
                   public void Add(T value)
