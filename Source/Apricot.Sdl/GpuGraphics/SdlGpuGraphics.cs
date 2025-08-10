@@ -1,7 +1,9 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 using Apricot.Graphics;
 using Apricot.Graphics.Buffers;
+using Apricot.Graphics.Shaders;
 using Apricot.Graphics.Structs;
 using Apricot.Graphics.Textures;
 using Apricot.Graphics.Vertices;
@@ -22,6 +24,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
     private bool _fakeRenderPass;
     private IRenderTarget? _currentRenderTarget;
 
+    private GraphicDriver _driver = GraphicDriver.Unknown;
 
     private IntPtr _uploadCommandBuffer;
     private IntPtr _currentCopyPass;
@@ -31,6 +34,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 
     private readonly HashSet<Texture> _loadedTextures = [];
     private readonly HashSet<GraphicBuffer> _loadedBuffers = [];
+    private readonly HashSet<Shader> _loadedShaders = [];
 
     public IntPtr GpuDeviceHandle { get; private set; }
 
@@ -64,6 +68,15 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
         {
             SdlException.ThrowFromLatest(nameof(SDL.SDL_CreateGPUDevice));
         }
+
+        var effectiveDriver = SDL.SDL_GetGPUDeviceDriver(GpuDeviceHandle);
+        _driver = effectiveDriver switch
+        {
+            "metal" => GraphicDriver.Metal,
+            "vulkan" => GraphicDriver.Vulkan,
+            "direct3d12" => GraphicDriver.Direct3d12,
+            _ => GraphicDriver.Unknown
+        };
 
         PrepareCommandBuffers();
     }
@@ -350,6 +363,62 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
         );
 
         SDL.SDL_ReleaseGPUTransferBuffer(GpuDeviceHandle, transferBuffer);
+    }
+
+    public Shader CreateShader(string? name, ShaderStage stage, in ShaderProgramDescription description)
+    {
+        var format = _driver switch
+        {
+            GraphicDriver.Metal => SDL.SDL_GPUShaderFormat.SDL_GPU_SHADERFORMAT_MSL,
+            GraphicDriver.Vulkan => SDL.SDL_GPUShaderFormat.SDL_GPU_SHADERFORMAT_SPIRV,
+            GraphicDriver.Direct3d12 => SDL.SDL_GPUShaderFormat.SDL_GPU_SHADERFORMAT_DXIL,
+            _ => SDL.SDL_GPUShaderFormat.SDL_GPU_SHADERFORMAT_SPIRV
+        };
+
+        var entryPoint = Encoding.UTF8.GetBytes(description.EntryPoint);
+        IntPtr nativeShader;
+
+        fixed (byte* entryPointPtr = entryPoint)
+        fixed (byte* code = description.Code)
+            nativeShader = SDL.SDL_CreateGPUShader(
+                GpuDeviceHandle,
+                new SDL.SDL_GPUShaderCreateInfo
+                {
+                    code_size = (nuint)description.Code.Length,
+                    code = code,
+                    entrypoint = entryPointPtr,
+                    format = format,
+                    stage = stage == ShaderStage.Fragment
+                        ? SDL.SDL_GPUShaderStage.SDL_GPU_SHADERSTAGE_FRAGMENT
+                        : SDL.SDL_GPUShaderStage.SDL_GPU_SHADERSTAGE_VERTEX,
+                    num_samplers = (uint)description.SamplerCount,
+                    num_storage_textures = 0,
+                    num_storage_buffers = 0,
+                    num_uniform_buffers = (uint)description.UniformBufferCount,
+                }
+            );
+
+        if (nativeShader == IntPtr.Zero) SdlException.ThrowFromLatest(nameof(SDL.SDL_CreateGPUShader));
+
+        var shader = new Shader(
+            this,
+            name ?? nativeShader.ToString(),
+            nativeShader,
+            stage
+        );
+
+        lock (_loadedShaders) _loadedShaders.Add(shader);
+
+        return shader;
+    }
+
+    public void Release(Shader shader)
+    {
+        if (shader.IsDisposed) throw new InvalidOperationException($"Shader {shader} is already released.");
+
+        SDL.SDL_ReleaseGPUShader(GpuDeviceHandle, shader.Handle);
+
+        lock (_loadedShaders) _loadedShaders.Remove(shader);
     }
 
     public void SetRenderTarget(IRenderTarget target, Color? clearColor)

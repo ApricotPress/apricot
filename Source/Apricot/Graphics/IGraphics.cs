@@ -1,4 +1,5 @@
 using Apricot.Graphics.Buffers;
+using Apricot.Graphics.Shaders;
 using Apricot.Graphics.Structs;
 using Apricot.Graphics.Textures;
 using Apricot.Graphics.Vertices;
@@ -102,6 +103,10 @@ public interface IGraphics : IDisposable
     /// <param name="data">Vertices to upload.</param>
     /// <typeparam name="T">Vertex struct that is used for each element.</typeparam>
     void UploadBufferData<T>(GraphicBuffer buffer, in ReadOnlySpan<T> data) where T : unmanaged;
+
+    Shader CreateShader(string? name, ShaderStage state, in ShaderProgramDescription description); 
+
+    void Release(Shader shader);
 
     /// <summary>
     /// Sets current target for next draw commands. Render target should be reset in <see cref="Present"/> methof which
