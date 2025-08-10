@@ -15,7 +15,27 @@ public sealed class IndexBuffer(IGraphics graphics, string name, int capacity, I
         graphics.UploadBufferData(this, indices);
     }
 
+    public void UploadData(in ReadOnlySpan<uint> indices)
+    {
+        if (IndexSize != IndexSize._4)
+        {
+            throw new NotSupportedException("You are trying to upload 4-byte indices to 2-bytes buffer.");
+        }
+
+        graphics.UploadBufferData(this, indices);
+    }
+
     public void UploadData(in ReadOnlySpan<short> indices)
+    {
+        if (IndexSize != IndexSize._2)
+        {
+            throw new NotSupportedException("You are trying to upload 2-byte indices to 4-bytes buffer.");
+        }
+
+        graphics.UploadBufferData(this, indices);
+    }
+
+    public void UploadData(in ReadOnlySpan<ushort> indices)
     {
         if (IndexSize != IndexSize._2)
         {
