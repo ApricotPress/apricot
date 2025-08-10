@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Apricot.Graphics;
@@ -115,6 +116,7 @@ public unsafe class ImGuiWindowRenderer
         _indexBuffer.UploadData(_indices);
     }
 
+    [MemberNotNull(nameof(_vertexBuffer)), MemberNotNull(nameof(_vertices))]
     private void ResizeVertexBuffer(int capacity)
     {
         _vertexBuffer?.Dispose();
@@ -126,6 +128,7 @@ public unsafe class ImGuiWindowRenderer
         );
     }
 
+    [MemberNotNull(nameof(_indexBuffer)), MemberNotNull(nameof(_indices))]
     private void ResizeIndexBuffer(int capacity)
     {
         _indexBuffer?.Dispose();

@@ -54,6 +54,8 @@ public static class Injection
         .AddSingleton<IGameLoopProvider, DefaultGameLoopProvider>()
         .DoIf(addHostedQuit, s => s.AddHostedService<HostedQuit<TJar>>())
         .DoIf(rootConfiguration is not null, s => s
+            // todo: make it trimming friendly
+            // https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-8/runtime#configuration-binding-source-generator
             .Configure<MainWindowOptions>(rootConfiguration!.GetSection(nameof(MainWindowOptions)))
             .Configure<JarOptions>(rootConfiguration.GetSection(nameof(JarOptions)))
         );
