@@ -307,22 +307,27 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 
     public void UploadBufferData<T>(GraphicBuffer buffer, in ReadOnlySpan<T> data) where T : unmanaged
     {
-        if (buffer.IsDisposed) throw new InvalidOperationException($"{buffer} is disposed.");
         if (buffer.IsDisposed) throw new InvalidOperationException($"{buffer.Name} is disposed.");
 
         logger.LogDebug("Uploading data {buffer}", buffer.Name);
+
+        var dataSize = data.Length * Marshal.SizeOf<T>();
+        if (dataSize > buffer.Capacity * buffer.ElementSize)
+        {
+            throw new InvalidOperationException("Buffer is too short");
+        }
 
         var transferBuffer = SDL.SDL_CreateGPUTransferBuffer(
             GpuDeviceHandle,
             new SDL.SDL_GPUTransferBufferCreateInfo
             {
                 usage = SDL.SDL_GPUTransferBufferUsage.SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-                size = (uint)data.Length
+                size = (uint)dataSize
             }
         );
 
         var dstPointer = SDL.SDL_MapGPUTransferBuffer(GpuDeviceHandle, transferBuffer, true);
-        var dstSpan = new Span<byte>(dstPointer.ToPointer(), data.Length);
+        var dstSpan = new Span<byte>(dstPointer.ToPointer(), dataSize);
         MemoryMarshal.AsBytes(data).CopyTo(dstSpan);
 
         SDL.SDL_UnmapGPUTransferBuffer(GpuDeviceHandle, transferBuffer);
@@ -339,7 +344,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
             {
                 buffer = transferBuffer,
                 offset = 0,
-                size = (uint)data.Length
+                size = (uint)dataSize
             },
             false // todo: figure out cycles 
         );
