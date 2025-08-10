@@ -1,6 +1,6 @@
 using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Textures;
-using Apricot.Graphics.Vertecies;
+using Apricot.Graphics.Vertices;
 using Apricot.Lifecycle;
 using Apricot.Windows;
 

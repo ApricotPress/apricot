@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using Apricot.Graphics;
 using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Textures;
-using Apricot.Graphics.Vertecies;
+using Apricot.Graphics.Vertices;
 using Apricot.Sdl.Windows;
 using Apricot.Windows;
 using Microsoft.Extensions.Logging;

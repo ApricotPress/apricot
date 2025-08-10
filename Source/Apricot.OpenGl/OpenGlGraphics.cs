@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using Apricot.Graphics;
 using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Textures;
-using Apricot.Graphics.Vertecies;
+using Apricot.Graphics.Vertices;
 using Apricot.Windows;
 using Silk.NET.OpenGLES;
 using Texture = Apricot.Graphics.Textures.Texture;

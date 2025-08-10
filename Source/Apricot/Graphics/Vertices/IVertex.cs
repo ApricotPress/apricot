@@ -1,4 +1,4 @@
-namespace Apricot.Graphics.Vertecies;
+namespace Apricot.Graphics.Vertices;
 
 public interface IVertex
 {

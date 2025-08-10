@@ -1,6 +1,6 @@
 using Apricot.Utils.Collections;
 
-namespace Apricot.Graphics.Vertecies;
+namespace Apricot.Graphics.Vertices;
 
 public readonly struct VertexFormat : IEquatable<VertexFormat>
 {
@@ -36,7 +36,7 @@ public readonly struct VertexFormat : IEquatable<VertexFormat>
     public override int GetHashCode() => Elements.Aggregate(Stride.GetHashCode(), HashCode.Combine);
 
     public readonly record struct Element(
-        int Index,
+        int Location,
         VertexElementFormat Format,
         bool Normalized = true
     );

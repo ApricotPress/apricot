@@ -1,4 +1,4 @@
-using Apricot.Graphics.Vertecies;
+using Apricot.Graphics.Vertices;
 
 namespace Apricot.Graphics.Buffers;
 
