@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Apricot.Graphics;
 using Apricot.Graphics.Buffers;
@@ -28,6 +27,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
     private readonly Dictionary<IWindow, GpuSwapchainTexture> _swapchains = new();
 
     private readonly HashSet<Texture> _loadedTextures = [];
+    private readonly HashSet<GraphicBuffer> _loadedBuffers = [];
 
     public IntPtr GpuDeviceHandle { get; private set; }
 
@@ -149,7 +149,10 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 
         Texture texture = new(this, name ?? handle.ToString(), width, height, handle, format);
 
-        _loadedTextures.Add(texture);
+        lock (_loadedTextures)
+        {
+            _loadedTextures.Add(texture);
+        }
 
         return texture;
     }
@@ -204,27 +207,72 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 
     public void Release(Texture texture)
     {
-        Debug.Assert(texture.IsDisposed);
+        if (texture.IsDisposed) throw new InvalidOperationException($"{texture} is already disposed.");
 
         SDL.SDL_ReleaseGPUTexture(GpuDeviceHandle, texture.Handle);
-        _loadedTextures.Remove(texture);
+        lock (_loadedTextures) _loadedTextures.Remove(texture);
     }
 
-    public IndexBuffer CreateIndexBuffer(string? name, IndexSize indexSize)
+    public IndexBuffer CreateIndexBuffer(string? name, IndexSize indexSize, int capacity)
     {
-        throw new NotImplementedException();
+        var nativeBuffer = CreateGraphicBuffer(
+            name,
+            (uint)((int)indexSize * capacity),
+            SDL.SDL_GPUBufferUsageFlags.SDL_GPU_BUFFERUSAGE_VERTEX
+        );
+
+        var buffer = new IndexBuffer(
+            this,
+            name ?? nativeBuffer.ToString(),
+            capacity,
+            indexSize,
+            nativeBuffer
+        );
+
+        lock (_loadedBuffers)
+        {
+            _loadedBuffers.Add(buffer);
+        }
+
+        return buffer;
     }
+
     public void Release(IndexBuffer buffer)
     {
-        throw new NotImplementedException();
+        if (buffer.IsDisposed) throw new InvalidOperationException($"{buffer} is already disposed.");
+
+        SDL.SDL_ReleaseGPUBuffer(GpuDeviceHandle, buffer.NativePointer);
     }
-    public IndexBuffer CreateVertexBuffer(string? name)
+
+    public VertexBuffer CreateVertexBuffer(string? name, VertexFormat vertexFormat, int capacity)
     {
-        throw new NotImplementedException();
+        var nativeBuffer = CreateGraphicBuffer(
+            name,
+            (uint)(vertexFormat.Stride * capacity),
+            SDL.SDL_GPUBufferUsageFlags.SDL_GPU_BUFFERUSAGE_VERTEX
+        );
+
+        var buffer = new VertexBuffer(
+            this,
+            name ?? nativeBuffer.ToString(),
+            capacity,
+            vertexFormat,
+            nativeBuffer
+        );
+
+        lock (_loadedBuffers)
+        {
+            _loadedBuffers.Add(buffer);
+        }
+
+        return buffer;
     }
+
     public void Release(VertexBuffer buffer)
     {
-        throw new NotImplementedException();
+        if (buffer.IsDisposed) throw new InvalidOperationException($"{buffer} is already disposed.");
+
+        SDL.SDL_ReleaseGPUBuffer(GpuDeviceHandle, buffer.NativePointer);
     }
 
     public void SetRenderTarget(IRenderTarget target, Color? clearColor)
@@ -435,5 +483,37 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 
             return _swapchains[window] = new GpuSwapchainTexture(texture, w, h);
         }
+    }
+
+    private IntPtr CreateGraphicBuffer(string? name, uint size, SDL.SDL_GPUBufferUsageFlags usage)
+    {
+        uint props = 0;
+        if (!string.IsNullOrEmpty(name))
+        {
+            props = SDL.SDL_CreateProperties();
+            SDL.SDL_SetStringProperty(props, SDL.SDL_PROP_GPU_BUFFER_CREATE_NAME_STRING, name);
+        }
+
+        var buffer = SDL.SDL_CreateGPUBuffer(
+            GpuDeviceHandle,
+            new SDL.SDL_GPUBufferCreateInfo
+            {
+                usage = usage,
+                size = size,
+                props = props
+            }
+        );
+
+        if (props != 0)
+        {
+            SDL.SDL_DestroyProperties(props);
+        }
+
+        if (buffer == IntPtr.Zero)
+        {
+            SdlException.ThrowFromLatest(nameof(SDL.SDL_CreateGPUBuffer));
+        }
+
+        return buffer;
     }
 }

@@ -45,11 +45,11 @@ public sealed class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
 
     public void Release(Texture texture) => throw new NotImplementedException();
     
-    public IndexBuffer CreateIndexBuffer(string? name, IndexSize indexSize) => throw new NotImplementedException();
+    public IndexBuffer CreateIndexBuffer(string? name, IndexSize indexSize, int capacity) => throw new NotImplementedException();
 
     public void Release(IndexBuffer buffer) => throw new NotImplementedException();
 
-    public IndexBuffer CreateVertexBuffer(string? name) => throw new NotImplementedException();
+    public VertexBuffer CreateVertexBuffer(string? name, VertexFormat vertexFormat, int capacity) => throw new NotImplementedException();
 
     public void Release(VertexBuffer buffer) => throw new NotImplementedException();
 

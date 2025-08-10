@@ -9,7 +9,7 @@ public sealed class VertexBuffer(IGraphics graphics, string name, int capacity, 
     {
         if (IsDisposed) return;
 
-        IsDisposed = true;
         graphics.Release(this);
+        IsDisposed = true;
     }
 }

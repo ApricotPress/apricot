@@ -30,8 +30,8 @@ public sealed class Texture(
 
     public void Dispose()
     {
-        IsDisposed = true;
         graphics.Release(this);
+        IsDisposed = true;
     }
 
     public override string ToString() => Name;

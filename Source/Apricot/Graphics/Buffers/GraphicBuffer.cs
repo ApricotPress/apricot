@@ -8,7 +8,7 @@ public abstract class GraphicBuffer(
     BufferUsage usage
 ) : IGraphicsResource
 {
-    public string Name { get; } = name;
+    public string Name { get; } = $"{usage}Buffer <{name}>";
 
     public int ElementSize { get; } = elementSize;
 

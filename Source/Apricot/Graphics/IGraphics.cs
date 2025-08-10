@@ -56,11 +56,11 @@ public interface IGraphics : IDisposable
     /// <param name="texture">Texture to dispose.</param>
     void Release(Texture texture);
 
-    IndexBuffer CreateIndexBuffer(string? name, IndexSize indexSize);
+    IndexBuffer CreateIndexBuffer(string? name, IndexSize indexSize, int capacity);
 
     void Release(IndexBuffer buffer);
 
-    IndexBuffer CreateVertexBuffer(string? name);
+    VertexBuffer CreateVertexBuffer(string? name, VertexFormat vertexFormat, int capacity);
     
     void Release(VertexBuffer buffer);
 
