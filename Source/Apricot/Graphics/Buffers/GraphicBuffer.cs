@@ -2,8 +2,8 @@ namespace Apricot.Graphics.Buffers;
 
 public abstract class GraphicBuffer(
     string name,
-    int elementSize,
     int capacity,
+    int elementSize,
     IntPtr nativePointer,
     BufferUsage usage
 ) : IGraphicsResource
