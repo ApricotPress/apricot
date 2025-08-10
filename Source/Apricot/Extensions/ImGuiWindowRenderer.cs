@@ -135,7 +135,7 @@ public unsafe class ImGuiWindowRenderer
 
         Array.Resize(ref _indices, capacity);
         _indexBuffer = _graphics.CreateIndexBuffer(
-            "ImGui vertices",
+            "ImGui indices",
             IndexSize._2,
             capacity
         );
