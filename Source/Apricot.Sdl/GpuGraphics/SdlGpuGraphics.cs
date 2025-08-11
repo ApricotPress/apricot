@@ -423,15 +423,7 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
 
     public void Clear(Color color)
     {
-        if (_renderPass.CurrentRenderTarget is null)
-        {
-            throw new InvalidOperationException($"First call {nameof(SetRenderTarget)}");
-        }
-
-        var target = _renderPass.CurrentRenderTarget;
-
-        _renderPass.EndRenderPass();
-        _renderPass.BeginRenderPass(target, color);
+        _renderPass.Clear(color);
     }
 
     public void Submit(DrawCommand command)
@@ -478,6 +470,7 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
 
     public void Dispose()
     {
+        // todo: add Shutdown() method and dispose all loaded resources
         Dispose(true);
         GC.SuppressFinalize(this);
     }

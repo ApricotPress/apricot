@@ -12,6 +12,9 @@ namespace Apricot.Sdl.Graphics;
 
 public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILogger logger)
 {
+    private IntPtr _handle;
+
+    private IRenderTarget? _currentRenderTarget;
     private IntPtr _currentPipeline;
     private Rect _currentViewport;
     private Rect _currentScissors;
@@ -21,10 +24,20 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
     private StackList16<SDL.SDL_GPUTextureSamplerBinding> _vertexSamplers = [];
     private bool _fakeRenderPass;
 
-    public IRenderTarget? CurrentRenderTarget { get; private set; }
-    public IntPtr Handle { get; private set; }
 
-    [MemberNotNull(nameof(CurrentRenderTarget))]
+    public void Clear(Color color)
+    {
+        if (_currentRenderTarget is null)
+        {
+            throw new InvalidOperationException($"First set render target");
+        }
+
+        var target = _currentRenderTarget;
+        EndRenderPass();
+        BeginRenderPass(target, color);
+    }
+
+    [MemberNotNull(nameof(_currentRenderTarget))]
     public void BeginRenderPass(IRenderTarget target, Color? clearColor = null)
     {
         logger.LogTrace(
@@ -41,8 +54,8 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
 
         if (targetInfo is null) // swapchain wasnt acquired, we should skip pass
         {
-            CurrentRenderTarget = target;
-            Handle = IntPtr.Zero;
+            _currentRenderTarget = target;
+            _handle = IntPtr.Zero;
             _fakeRenderPass = true;
 
             logger.LogTrace("Render pass was started as a fake one as target was not acquired");
@@ -54,39 +67,39 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
 
             scoped ref var depthTarget = ref Unsafe.NullRef<SDL.SDL_GPUDepthStencilTargetInfo>();
 
-            Handle = SDL.SDL_BeginGPURenderPass(
+            _handle = SDL.SDL_BeginGPURenderPass(
                 commandBuffer,
                 targetInfoSpan,
                 1,
                 depthTarget
             );
-            CurrentRenderTarget = target;
+            _currentRenderTarget = target;
             _fakeRenderPass = false;
 
-            logger.LogTrace("Successfully started render pass {RenderPass}", CurrentRenderTarget);
+            logger.LogTrace("Successfully started render pass {RenderPass}", _currentRenderTarget);
         }
     }
 
     public void EndRenderPass()
     {
-        if (Handle != IntPtr.Zero)
+        if (_handle != IntPtr.Zero)
         {
-            logger.LogTrace("Ending render pass of {RenderPass}", CurrentRenderTarget);
-            SDL.SDL_EndGPURenderPass(Handle);
+            logger.LogTrace("Ending render pass of {RenderPass}", _currentRenderTarget);
+            SDL.SDL_EndGPURenderPass(_handle);
         }
 
-        Handle = IntPtr.Zero;
-        CurrentRenderTarget = null;
+        _handle = IntPtr.Zero;
+        _currentRenderTarget = null;
         _currentPipeline = IntPtr.Zero;
         _currentVertexBuffer = null;
         _currentIndexBuffer = null;
         _fakeRenderPass = false;
     }
 
-    [MemberNotNull(nameof(CurrentRenderTarget))]
+    [MemberNotNull(nameof(_currentRenderTarget))]
     public void SetRenderTarget(IRenderTarget target, Color? clearColor = null)
     {
-        if (Handle != IntPtr.Zero && CurrentRenderTarget == target && !clearColor.HasValue) return;
+        if (_handle != IntPtr.Zero && _currentRenderTarget == target && !clearColor.HasValue) return;
 
         EndRenderPass();
         BeginRenderPass(target, clearColor);
@@ -99,7 +112,7 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
         _currentViewport = viewport;
 
         SDL.SDL_SetGPUViewport(
-            Handle,
+            _handle,
             new SDL.SDL_GPUViewport()
             {
                 x = viewport.X,
@@ -118,7 +131,7 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
 
         _currentScissors = scissors;
         SDL.SDL_SetGPUScissor(
-            Handle,
+            _handle,
             new SDL.SDL_Rect
             {
                 x = scissors.X,
@@ -134,7 +147,7 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
         if (_currentPipeline == pipeline) return;
 
         _currentPipeline = pipeline;
-        SDL.SDL_BindGPUGraphicsPipeline(Handle, pipeline);
+        SDL.SDL_BindGPUGraphicsPipeline(_handle, pipeline);
     }
 
     public void SetIndexBuffer(IndexBuffer? indexBuffer)
@@ -145,7 +158,7 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
         if (_currentIndexBuffer != null)
         {
             SDL.SDL_BindGPUIndexBuffer(
-                Handle,
+                _handle,
                 new SDL.SDL_GPUBufferBinding
                 {
                     buffer = _currentIndexBuffer.NativePointer,
@@ -162,7 +175,7 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
         if (_currentVertexBuffer != null)
         {
             SDL.SDL_BindGPUVertexBuffers(
-                Handle,
+                _handle,
                 0,
                 [
                     new SDL.SDL_GPUBufferBinding
@@ -184,7 +197,7 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
         {
             _fragmentSamplers = sdlSamplers;
             SDL.SDL_BindGPUFragmentSamplers(
-                Handle,
+                _handle,
                 0,
                 sdlSamplers.Span,
                 (uint)samplers.Length
@@ -200,7 +213,7 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
         {
             _vertexSamplers = sdlSamplers;
             SDL.SDL_BindGPUVertexSamplers(
-                Handle,
+                _handle,
                 0,
                 sdlSamplers.Span,
                 (uint)samplers.Length
@@ -232,7 +245,7 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
 
     public void DrawIndexed(int indicesCount, int indicesOffset, int verticesOffset) =>
         SDL.SDL_DrawGPUIndexedPrimitives(
-            render_pass: Handle,
+            render_pass: _handle,
             num_indices: (uint)indicesCount,
             num_instances: 1,
             first_index: (uint)indicesOffset,
@@ -242,7 +255,7 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
 
     public void Draw(int verticesCount, int commandVerticesOffset) =>
         SDL.SDL_DrawGPUPrimitives(
-            render_pass: Handle,
+            render_pass: _handle,
             num_vertices: (uint)verticesCount,
             num_instances: 1,
             first_vertex: (uint)verticesCount,
