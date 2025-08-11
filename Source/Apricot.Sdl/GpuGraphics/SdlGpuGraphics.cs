@@ -24,12 +24,7 @@ namespace Apricot.Sdl.Graphics;
 public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 {
     private IntPtr _renderCommandBuffer;
-    private IntPtr _currentRenderPass;
-    private IntPtr _currentRenderPipeline;
-    private VertexBuffer? _currentVertexBuffer;
-    private IndexBuffer? _currentIndexBuffer;
-    private bool _fakeRenderPass;
-    private IRenderTarget? _currentRenderTarget;
+    private RenderPassState _renderPass;
 
     private GraphicDriver _driver = GraphicDriver.Unknown;
 
@@ -48,6 +43,8 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
     private Texture? _emptyTexture;
 
     public IntPtr GpuDeviceHandle { get; private set; }
+
+    public Texture EmptyTexture => _emptyTexture ?? throw new InvalidOperationException("Device is not initialized");
 
     ~SdlGpuGraphics() => Dispose(false);
 
@@ -88,7 +85,6 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
             "direct3d12" => GraphicDriver.Direct3d12,
             _ => GraphicDriver.Unknown
         };
-
 
         PrepareCommandBuffers();
 
@@ -422,186 +418,52 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
         lock (_loadedShaders) _loadedShaders.Remove(shaderProgram);
     }
 
-    public void SetRenderTarget(IRenderTarget target, Color? clearColor)
-    {
-        if (_currentRenderPass != IntPtr.Zero && _currentRenderTarget == target && !clearColor.HasValue) return;
-
-        EndRenderPass();
-        BeginRenderPass(target, clearColor);
-    }
+    public void SetRenderTarget(IRenderTarget target, Color? clearColor) =>
+        _renderPass.SetRenderTarget(target, clearColor);
 
     public void Clear(Color color)
     {
-        if (_currentRenderTarget is null)
+        if (_renderPass.CurrentRenderTarget is null)
         {
             throw new InvalidOperationException($"First call {nameof(SetRenderTarget)}");
         }
 
-        var target = _currentRenderTarget;
+        var target = _renderPass.CurrentRenderTarget;
 
-        EndRenderPass();
-        BeginRenderPass(target, color);
+        _renderPass.EndRenderPass();
+        _renderPass.BeginRenderPass(target, color);
     }
 
     public void Submit(DrawCommand command)
     {
-        if (command.IndicesCount == 0) return;
-        if (command.Target != _currentRenderTarget)
-        {
-            BeginRenderPass(command.Target);
-        }
+        // todo: add warnings
+        if (command is { IndexBuffer: not null, IndicesCount: 0 }) return;
 
-        if (_fakeRenderPass) return;
+        _renderPass.SetRenderTarget(command.Target);
+        _renderPass.SetViewport(command.Viewport ?? command.Target.Viewport);
+        _renderPass.SetScissors(command.Scissors ?? command.Target.Viewport);
 
-        SDL.SDL_SetGPUViewport(
-            _currentRenderPass,
-            new SDL.SDL_GPUViewport
-            {
-                x = 0,
-                y = 0,
-                w = _currentRenderTarget.Width,
-                h = _currentRenderTarget.Height,
-                min_depth = 0,
-                max_depth = 1
-            }
-        );
+        _renderPass.SetPipeline(GetGraphicsPipeline(command));
 
-        var pipeline = GetGraphicsPipeline(command);
-        if (pipeline != _currentRenderPipeline)
-        {
-            _currentRenderPipeline = pipeline;
-            SDL.SDL_BindGPUGraphicsPipeline(_currentRenderPass, pipeline);
-        }
+        _renderPass.SetIndexBuffer(command.IndexBuffer);
+        _renderPass.SetVertexBuffer(command.VertexBuffer);
 
+        _renderPass.SetFragmentSamplers(command.Material.FragmentStage.Samplers);
+        _renderPass.SetVertexSamplers(command.Material.VertexStage.Samplers);
 
-        if (_currentIndexBuffer != command.IndexBuffer)
-        {
-            _currentIndexBuffer = command.IndexBuffer;
+        _renderPass.SetFragmentUniform(command.Material.FragmentStage.UniformBuffer);
+        _renderPass.SetVertexUniform(command.Material.VertexStage.UniformBuffer);
 
-            if (_currentIndexBuffer != null)
-            {
-                SDL.SDL_BindGPUIndexBuffer(
-                    _currentRenderPass,
-                    new SDL.SDL_GPUBufferBinding
-                    {
-                        buffer = _currentIndexBuffer.NativePointer,
-                        offset = 0
-                    },
-                    _currentIndexBuffer.IndexSize.ToSdl()
-                );
-            }
-        }
-
-        if (_currentVertexBuffer != command.VertexBuffer)
-        {
-            _currentVertexBuffer = command.VertexBuffer;
-            if (_currentVertexBuffer != null)
-            {
-                SDL.SDL_BindGPUVertexBuffers(
-                    _currentRenderPass,
-                    0,
-                    [
-                        new SDL.SDL_GPUBufferBinding
-                        {
-                            buffer = _currentVertexBuffer.NativePointer,
-                            offset = 0
-                        }
-                    ],
-                    1
-                );
-            }
-        }
-
-        var fragmentInfo = command.Material.FragmentStage.ShaderProgram.Description;
-        var vertexInfo = command.Material.VertexStage.ShaderProgram.Description;
-
-        // bind fragment samplers
-        // TODO: only do this if Samplers change
-        if (fragmentInfo.SamplerCount > 0)
-        {
-            Span<SDL.SDL_GPUTextureSamplerBinding> samplers =
-                stackalloc SDL.SDL_GPUTextureSamplerBinding[fragmentInfo.SamplerCount];
-
-            for (var i = 0; i < fragmentInfo.SamplerCount; i++)
-            {
-                if (command.Material.FragmentStage.Samplers[i].Texture is { IsDisposed: false } tex)
-                    samplers[i].texture = tex.Handle;
-                else
-                    samplers[i].texture = _emptyTexture!.Handle;
-
-                samplers[i].sampler = GetSampler(command.Material.FragmentStage.Samplers[i].Sampler);
-            }
-
-            SDL.SDL_BindGPUFragmentSamplers(_currentRenderPass, 0, samplers, (uint)fragmentInfo.SamplerCount);
-        }
-
-        // bind vertex samplers
-        // TODO: only do this if Samplers change
-        if (vertexInfo.SamplerCount > 0)
-        {
-            Span<SDL.SDL_GPUTextureSamplerBinding> samplers =
-                stackalloc SDL.SDL_GPUTextureSamplerBinding[vertexInfo.SamplerCount];
-
-            for (var i = 0; i < vertexInfo.SamplerCount; i++)
-            {
-                if (command.Material.VertexStage.Samplers[i].Texture is { IsDisposed: false } tex)
-                    samplers[i].texture = tex.Handle;
-                else
-                    samplers[i].texture = _emptyTexture!.Handle;
-
-                samplers[i].sampler = GetSampler(command.Material.VertexStage.Samplers[i].Sampler);
-            }
-
-            SDL.SDL_BindGPUVertexSamplers(_currentRenderPass, 0, samplers, (uint)vertexInfo.SamplerCount);
-        }
-
-        // Upload Fragment Uniforms
-        // TODO: only do this if Uniforms change
-        for (var i = 0; i < fragmentInfo.UniformBufferCount; i++)
-        {
-            fixed (byte* ptr = command.Material.FragmentStage.UniformBuffer)
-                SDL.SDL_PushGPUFragmentUniformData(
-                    _renderCommandBuffer,
-                    (uint)i,
-                    new nint(ptr),
-                    (uint)command.Material.FragmentStage.UniformBuffer.Length
-                );
-        }
-
-        // Upload Vertex Uniforms
-        // TODO: only do this if Uniforms change
-        for (var i = 0; i < vertexInfo.UniformBufferCount; i++)
-        {
-            fixed (byte* ptr = command.Material.VertexStage.UniformBuffer)
-                SDL.SDL_PushGPUVertexUniformData(
-                    _renderCommandBuffer,
-                    (uint)i,
-                    new nint(ptr),
-                    (uint)command.Material.VertexStage.UniformBuffer.Length
-                );
-        }
 
         // perform draw
         if (command.IndexBuffer != null)
         {
-            SDL.SDL_DrawGPUIndexedPrimitives(
-                render_pass: _currentRenderPass,
-                num_indices: (uint)command.IndicesCount,
-                num_instances: 1,
-                first_index: (uint)command.IndicesOffset,
-                vertex_offset: command.VerticesOffset,
-                first_instance: 0
-            );
+            _renderPass.DrawIndexed(command.IndicesCount, command.IndicesOffset, command.VerticesOffset);
+            
         }
         else
         {
-            SDL.SDL_DrawGPUPrimitives(
-                render_pass: _currentRenderPass,
-                num_vertices: (uint)command.VerticesCount,
-                num_instances: 1,
-                first_vertex: (uint)command.VerticesOffset,
-                first_instance: 0
-            );
+            _renderPass.Draw(command.VerticesCount, command.VerticesOffset);
         }
     }
 
@@ -631,7 +493,7 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
     private void SubmitCommands(bool wait)
     {
         EndCopyPass();
-        EndRenderPass();
+        _renderPass.EndRenderPass();
 
         var fences = new StackList4<IntPtr>();
 
@@ -683,65 +545,8 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
 
         _uploadCommandBuffer = SDL.SDL_AcquireGPUCommandBuffer(GpuDeviceHandle);
         _renderCommandBuffer = SDL.SDL_AcquireGPUCommandBuffer(GpuDeviceHandle);
-    }
 
-    [MemberNotNull(nameof(_currentRenderTarget))]
-    private void BeginRenderPass(IRenderTarget target, Color? clearColor = null)
-    {
-        logger.LogTrace(
-            "Beginning render pass with target of {RenderTarget} and clear color {ClearColor}",
-            target,
-            clearColor
-        );
-
-        var targetInfo = target switch
-        {
-            SdlGpuWindowTarget { Window: { } window } => ColorTargetInfoFromWindow(window, clearColor),
-            _ => throw new NotSupportedException($"Not supported render target: {target}")
-        };
-
-        if (targetInfo is null) // swapchain wasnt acquired, we should skip pass
-        {
-            _currentRenderTarget = target;
-            _currentRenderPass = IntPtr.Zero;
-            _fakeRenderPass = true;
-
-            logger.LogTrace("Render pass was started as a fake one as target was not acquired");
-        }
-        else
-        {
-            Span<SDL.SDL_GPUColorTargetInfo> targetInfoSpan = stackalloc SDL.SDL_GPUColorTargetInfo[1];
-            targetInfoSpan[0] = targetInfo.Value;
-
-            scoped ref var depthTarget = ref Unsafe.NullRef<SDL.SDL_GPUDepthStencilTargetInfo>();
-
-            _currentRenderPass = SDL.SDL_BeginGPURenderPass(
-                _renderCommandBuffer,
-                targetInfoSpan,
-                1,
-                depthTarget
-            );
-            _currentRenderTarget = target;
-            _fakeRenderPass = false;
-
-            logger.LogTrace("Successfully started render pass {RenderPass}", _currentRenderTarget);
-        }
-    }
-
-    private void EndRenderPass()
-    {
-        if (_currentRenderPass != IntPtr.Zero)
-        {
-            logger.LogTrace("Ending render pass of {RenderPass}", _currentRenderTarget);
-            SDL.SDL_EndGPURenderPass(_currentRenderPass);
-        }
-
-        _currentRenderPass = IntPtr.Zero;
-        _currentRenderTarget = null;
-        _currentRenderPipeline = IntPtr.Zero;
-        _currentVertexBuffer = null;
-        _currentIndexBuffer = null;
-        _fakeRenderPass = false;
+        _renderPass = new RenderPassState(this, _renderCommandBuffer, logger);
     }
 
     private void BeginCopyPass()
@@ -764,7 +569,7 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
         _currentCopyPass = IntPtr.Zero;
     }
 
-    private SDL.SDL_GPUColorTargetInfo? ColorTargetInfoFromWindow(SdlWindow window, Color? clearColor)
+    public SDL.SDL_GPUColorTargetInfo? ColorTargetInfoFromWindow(SdlWindow window, Color? clearColor)
     {
         var texture = GetSwapchainForWindow(window, true);
 
@@ -940,13 +745,14 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
             };
             offset += (uint)vertexElement.Format.Size();
         }
-        
+
         // todo: implement proper color attachments work
         var colorAttachments = stackalloc SDL.SDL_GPUColorTargetDescription[]
         {
             new SDL.SDL_GPUColorTargetDescription
             {
-                format = SDL.SDL_GetGPUSwapchainTextureFormat(GpuDeviceHandle, ((SdlGpuWindowTarget)command.Target).Window.Handle),
+                format = SDL.SDL_GetGPUSwapchainTextureFormat(GpuDeviceHandle,
+                    ((SdlGpuWindowTarget)command.Target).Window.Handle),
                 blend_state = command.BlendMode.ToSdl()
             }
         };
@@ -1006,7 +812,7 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
         return pipeline;
     }
 
-    private nint GetSampler(in TextureSampler sampler)
+    public nint GetSampler(in TextureSampler sampler)
     {
         if (_samplersCache.TryGetValue(sampler, out var result)) return result;
 

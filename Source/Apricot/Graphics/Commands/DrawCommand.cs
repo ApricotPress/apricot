@@ -1,5 +1,6 @@
 using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Materials;
+using Apricot.Graphics.Structs;
 
 namespace Apricot.Graphics.Commands;
 
@@ -20,6 +21,10 @@ public struct DrawCommand(IRenderTarget target, Material material, VertexBuffer 
     public int IndicesCount { get; set; }
 
     public int IndicesOffset { get; set; }
+
+    public Rect? Viewport { get; set; } = null;
+
+    public Rect? Scissors { get; set; } = null;
 
     public BlendMode BlendMode { get; set; } = BlendMode.Premultiply;
 

@@ -1,3 +1,5 @@
+using Apricot.Graphics.Structs;
+
 namespace Apricot.Graphics;
 
 /// <summary>
@@ -8,4 +10,6 @@ public interface IRenderTarget : IGraphicsResource
     int Width { get; }
     
     int Height { get; }
+    
+    Rect Viewport => new(0, 0, Width, Height);
 }

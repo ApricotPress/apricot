@@ -19,6 +19,8 @@ namespace Apricot.Graphics;
 /// </summary>
 public interface IGraphics : IDisposable
 {
+    Texture EmptyTexture { get; }
+    
     /// <summary>
     /// Initialize graphic system of the engine.
     /// </summary>
