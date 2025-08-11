@@ -1,4 +1,6 @@
+using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Commands;
+using Apricot.Graphics.Materials;
 using Apricot.Graphics.Textures;
 using Apricot.Graphics.Vertices;
 using Apricot.Utils;
@@ -6,7 +8,7 @@ using SDL3;
 
 namespace Apricot.Sdl.Graphics;
 
-public static class SdlEnumConvertors
+public static class ToSdlExtensions
 {
     public static SDL.SDL_GPUTextureFormat ToSdl(this TextureFormat format) => format switch
     {
@@ -91,57 +93,80 @@ public static class SdlEnumConvertors
         _ => throw new ArgumentOutOfRangeException(nameof(cullMode), cullMode, null)
     };
 
-    public static SDL.SDL_GPUColorTargetBlendState ToSdl(this BlendMode blend)
-    {
-        return new SDL.SDL_GPUColorTargetBlendState
+    public static SDL.SDL_GPUColorTargetBlendState ToSdl(this BlendMode blend) =>
+        new()
         {
             enable_blend = true,
-            src_color_blendfactor = GetFactor(blend.ColorSource),
-            dst_color_blendfactor = GetFactor(blend.ColorDestination),
-            color_blend_op = GetOp(blend.ColorOperation),
-            src_alpha_blendfactor = GetFactor(blend.AlphaSource),
-            dst_alpha_blendfactor = GetFactor(blend.AlphaDestination),
-            alpha_blend_op = GetOp(blend.AlphaOperation),
+            src_color_blendfactor = blend.ColorSource.ToSdl(),
+            dst_color_blendfactor = blend.ColorDestination.ToSdl(),
+            color_blend_op = blend.ColorOperation.ToSdl(),
+            src_alpha_blendfactor = blend.AlphaSource.ToSdl(),
+            dst_alpha_blendfactor = blend.AlphaDestination.ToSdl(),
+            alpha_blend_op = blend.AlphaOperation.ToSdl(),
             color_write_mask = GetFlags(blend.Mask)
         };
 
-        // todo: refactor
-        SDL.SDL_GPUBlendFactor GetFactor(BlendFactor factor) => factor switch
-        {
-            BlendFactor.Zero => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ZERO,
-            BlendFactor.One => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE,
-            BlendFactor.SrcColor => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_SRC_COLOR,
-            BlendFactor.OneMinusSrcColor => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_COLOR,
-            BlendFactor.DstColor => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_DST_COLOR,
-            BlendFactor.OneMinusDstColor => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE_MINUS_DST_COLOR,
-            BlendFactor.SrcAlpha => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_SRC_ALPHA,
-            BlendFactor.OneMinusSrcAlpha => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
-            BlendFactor.DstAlpha => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_DST_ALPHA,
-            BlendFactor.OneMinusDstAlpha => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE_MINUS_DST_ALPHA,
-            BlendFactor.ConstantColor => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_CONSTANT_COLOR,
-            BlendFactor.OneMinusConstantColor => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE_MINUS_CONSTANT_COLOR,
-            BlendFactor.SrcAlphaSaturate => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_SRC_ALPHA_SATURATE,
-            _ => throw new NotImplementedException()
-        };
+    public static SDL.SDL_GPUBlendFactor ToSdl(this BlendFactor factor) => factor switch
+    {
+        BlendFactor.Zero => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ZERO,
+        BlendFactor.One => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE,
+        BlendFactor.SrcColor => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_SRC_COLOR,
+        BlendFactor.OneMinusSrcColor => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_COLOR,
+        BlendFactor.DstColor => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_DST_COLOR,
+        BlendFactor.OneMinusDstColor => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE_MINUS_DST_COLOR,
+        BlendFactor.SrcAlpha => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_SRC_ALPHA,
+        BlendFactor.OneMinusSrcAlpha => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
+        BlendFactor.DstAlpha => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_DST_ALPHA,
+        BlendFactor.OneMinusDstAlpha => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE_MINUS_DST_ALPHA,
+        BlendFactor.ConstantColor => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_CONSTANT_COLOR,
+        BlendFactor.OneMinusConstantColor => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE_MINUS_CONSTANT_COLOR,
+        BlendFactor.SrcAlphaSaturate => SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_SRC_ALPHA_SATURATE,
+        _ => throw new ArgumentOutOfRangeException(nameof(factor), factor, null)
+    };
 
-        SDL.SDL_GPUBlendOp GetOp(BlendOp op) => op switch
-        {
-            BlendOp.Add => SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_ADD,
-            BlendOp.Subtract => SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_SUBTRACT,
-            BlendOp.ReverseSubtract => SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_REVERSE_SUBTRACT,
-            BlendOp.Min => SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_MIN,
-            BlendOp.Max => SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_MAX,
-            _ => throw new NotImplementedException()
-        };
 
-        SDL.SDL_GPUColorComponentFlags GetFlags(BlendMask mask)
-        {
-            SDL.SDL_GPUColorComponentFlags flags = default;
-            if (mask.Has(BlendMask.Red)) flags |= SDL.SDL_GPUColorComponentFlags.SDL_GPU_COLORCOMPONENT_R;
-            if (mask.Has(BlendMask.Green)) flags |= SDL.SDL_GPUColorComponentFlags.SDL_GPU_COLORCOMPONENT_G;
-            if (mask.Has(BlendMask.Blue)) flags |= SDL.SDL_GPUColorComponentFlags.SDL_GPU_COLORCOMPONENT_B;
-            if (mask.Has(BlendMask.Alpha)) flags |= SDL.SDL_GPUColorComponentFlags.SDL_GPU_COLORCOMPONENT_A;
-            return flags;
-        }
+    public static SDL.SDL_GPUBlendOp ToSdl(this BlendOp op) => op switch
+    {
+        BlendOp.Add => SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_ADD,
+        BlendOp.Subtract => SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_SUBTRACT,
+        BlendOp.ReverseSubtract => SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_REVERSE_SUBTRACT,
+        BlendOp.Min => SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_MIN,
+        BlendOp.Max => SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_MAX,
+        _ => throw new ArgumentOutOfRangeException(nameof(op), op, null)
+    };
+
+
+    public static SDL.SDL_GPUColorComponentFlags GetFlags(this BlendMask mask)
+    {
+        SDL.SDL_GPUColorComponentFlags flags = default;
+
+        if (mask.Has(BlendMask.Red)) flags |= SDL.SDL_GPUColorComponentFlags.SDL_GPU_COLORCOMPONENT_R;
+        if (mask.Has(BlendMask.Green)) flags |= SDL.SDL_GPUColorComponentFlags.SDL_GPU_COLORCOMPONENT_G;
+        if (mask.Has(BlendMask.Blue)) flags |= SDL.SDL_GPUColorComponentFlags.SDL_GPU_COLORCOMPONENT_B;
+        if (mask.Has(BlendMask.Alpha)) flags |= SDL.SDL_GPUColorComponentFlags.SDL_GPU_COLORCOMPONENT_A;
+
+        return flags;
     }
+
+    public static SDL.SDL_GPUIndexElementSize ToSdl(this IndexSize size) => size switch
+    {
+        IndexSize._2 => SDL.SDL_GPUIndexElementSize.SDL_GPU_INDEXELEMENTSIZE_16BIT,
+        IndexSize._4 => SDL.SDL_GPUIndexElementSize.SDL_GPU_INDEXELEMENTSIZE_32BIT,
+        _ => throw new ArgumentOutOfRangeException(nameof(size), size, null)
+    };
+
+    public static SDL.SDL_GPUSamplerAddressMode ToSdl(this WrapMode wrap) => wrap switch
+    {
+        WrapMode.Repeat => SDL.SDL_GPUSamplerAddressMode.SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
+        WrapMode.Mirror => SDL.SDL_GPUSamplerAddressMode.SDL_GPU_SAMPLERADDRESSMODE_MIRRORED_REPEAT,
+        WrapMode.Clamp => SDL.SDL_GPUSamplerAddressMode.SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
+        _ => throw new ArgumentOutOfRangeException(nameof(wrap), wrap, null)
+    };
+
+    public static SDL.SDL_GPUFilter ToSdl(this FilterMode filterMode) => filterMode switch
+    {
+        FilterMode.Nearest => SDL.SDL_GPUFilter.SDL_GPU_FILTER_NEAREST,
+        FilterMode.Linear => SDL.SDL_GPUFilter.SDL_GPU_FILTER_LINEAR,
+        _ => throw new ArgumentOutOfRangeException(nameof(filterMode), filterMode, null)
+    };
 }

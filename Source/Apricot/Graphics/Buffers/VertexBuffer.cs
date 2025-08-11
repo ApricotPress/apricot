@@ -2,8 +2,8 @@ using Apricot.Graphics.Vertices;
 
 namespace Apricot.Graphics.Buffers;
 
-public class VertexBuffer(IGraphics graphics, string name, int capacity, VertexFormat format, IntPtr nativePointer)
-    : GraphicBuffer(name, capacity, format.Stride, nativePointer, BufferUsage.Vertex)
+public class VertexBuffer(IGraphics graphics, string name, VertexFormat format, int capacity, IntPtr nativePointer)
+    : GraphicBuffer(name, format.Stride, capacity, nativePointer, BufferUsage.Vertex)
 {
     protected IGraphics Graphics { get; } = graphics;
     
@@ -19,7 +19,7 @@ public class VertexBuffer(IGraphics graphics, string name, int capacity, VertexF
 }
 
 public class VertexBuffer<T>(IGraphics graphics, string name, int capacity, IntPtr nativePointer)
-    : VertexBuffer(graphics, name, capacity, T.Format, nativePointer)
+    : VertexBuffer(graphics, name, T.Format, capacity, nativePointer)
     where T : unmanaged, IVertex
 {
     public void UploadData(in ReadOnlySpan<T> vertices) => Graphics.UploadBufferData(this, vertices);

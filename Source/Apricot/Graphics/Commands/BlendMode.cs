@@ -1,5 +1,3 @@
-using Apricot.Graphics.Structs;
-
 namespace Apricot.Graphics.Commands;
 
 public struct BlendMode : IEquatable<BlendMode>
@@ -21,9 +19,14 @@ public struct BlendMode : IEquatable<BlendMode>
     }
 
     public BlendMode(
-        BlendOp colorOperation, BlendFactor colorSource, BlendFactor colorDestination,
-        BlendOp alphaOperation, BlendFactor alphaSource, BlendFactor alphaDestination,
-        BlendMask mask)
+        BlendOp colorOperation,
+        BlendFactor colorSource,
+        BlendFactor colorDestination,
+        BlendOp alphaOperation,
+        BlendFactor alphaSource,
+        BlendFactor alphaDestination,
+        BlendMask mask
+    )
     {
         ColorOperation = colorOperation;
         ColorSource = colorSource;

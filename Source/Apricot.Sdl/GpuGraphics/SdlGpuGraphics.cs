@@ -300,10 +300,9 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
             name,
             format,
             capacity,
-            (n, handle) => new VertexBuffer(this, n, capacity, format, handle)
+            (n, handle) => new VertexBuffer(this, n, format, capacity, handle)
         );
 
-    // todo: do not duplicate so much somehow?
     public VertexBuffer<T> CreateVertexBuffer<T>(string? name, int capacity) where T : unmanaged, IVertex =>
         CreateVertexBuffer<VertexBuffer<T>>(
             name,
@@ -478,36 +477,38 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
         if (_currentIndexBuffer != command.IndexBuffer)
         {
             _currentIndexBuffer = command.IndexBuffer;
+
             if (_currentIndexBuffer != null)
             {
-                SDL.SDL_GPUBufferBinding indexBinding = new()
-                {
-                    buffer = _currentIndexBuffer.NativePointer,
-                    offset = 0
-                };
-                SDL.SDL_BindGPUIndexBuffer(_currentRenderPass, indexBinding, _currentIndexBuffer.IndexSize switch
-                {
-                    IndexSize._2 => SDL.SDL_GPUIndexElementSize.SDL_GPU_INDEXELEMENTSIZE_16BIT,
-                    IndexSize._4 => SDL.SDL_GPUIndexElementSize.SDL_GPU_INDEXELEMENTSIZE_32BIT,
-                    _ => throw new NotImplementedException()
-                });
+                SDL.SDL_BindGPUIndexBuffer(
+                    _currentRenderPass,
+                    new SDL.SDL_GPUBufferBinding
+                    {
+                        buffer = _currentIndexBuffer.NativePointer,
+                        offset = 0
+                    },
+                    _currentIndexBuffer.IndexSize.ToSdl()
+                );
             }
         }
-
 
         if (_currentVertexBuffer != command.VertexBuffer)
         {
             _currentVertexBuffer = command.VertexBuffer;
             if (_currentVertexBuffer != null)
             {
-                Span<SDL.SDL_GPUBufferBinding> vertexBinding = stackalloc SDL.SDL_GPUBufferBinding[1];
-                vertexBinding[0] = new SDL.SDL_GPUBufferBinding
-                {
-                    buffer = _currentVertexBuffer.NativePointer,
-                    offset = 0
-                };
-
-                SDL.SDL_BindGPUVertexBuffers(_currentRenderPass, 0, vertexBinding, 1);
+                SDL.SDL_BindGPUVertexBuffers(
+                    _currentRenderPass,
+                    0,
+                    [
+                        new SDL.SDL_GPUBufferBinding
+                        {
+                            buffer = _currentVertexBuffer.NativePointer,
+                            offset = 0
+                        }
+                    ],
+                    1
+                );
             }
         }
 
@@ -526,7 +527,7 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
                 if (command.Material.FragmentStage.Samplers[i].Texture is { IsDisposed: false } tex)
                     samplers[i].texture = tex.Handle;
                 else
-                    samplers[i].texture = _emptyTexture.Handle;
+                    samplers[i].texture = _emptyTexture!.Handle;
 
                 samplers[i].sampler = GetSampler(command.Material.FragmentStage.Samplers[i].Sampler);
             }
@@ -546,7 +547,7 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
                 if (command.Material.VertexStage.Samplers[i].Texture is { IsDisposed: false } tex)
                     samplers[i].texture = tex.Handle;
                 else
-                    samplers[i].texture = _emptyTexture.Handle;
+                    samplers[i].texture = _emptyTexture!.Handle;
 
                 samplers[i].sampler = GetSampler(command.Material.VertexStage.Samplers[i].Sampler);
             }
@@ -826,6 +827,7 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
             return _swapchains[window] = new GpuSwapchainTexture(texture, w, h);
         }
     }
+
     private T CreateVertexBuffer<T>(
         string? name,
         VertexFormat format,
@@ -929,7 +931,7 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
         {
             var vertexElement = command.VertexBuffer.Format.Elements[i];
 
-            vertexAttributes[i] = new SDL.SDL_GPUVertexAttribute()
+            vertexAttributes[i] = new SDL.SDL_GPUVertexAttribute
             {
                 buffer_slot = 0,
                 format = vertexElement.Format.ToSdl(vertexElement.Normalized),
@@ -938,25 +940,24 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
             };
             offset += (uint)vertexElement.Format.Size();
         }
-
-
-        // todo: proper color attachments work
-        var sdlWindow = ((SdlGpuWindowTarget)command.Target).Window;
-        var colorAttachments = stackalloc SDL.SDL_GPUColorTargetDescription[1];
-        colorAttachments[0] = new SDL.SDL_GPUColorTargetDescription()
+        
+        // todo: implement proper color attachments work
+        var colorAttachments = stackalloc SDL.SDL_GPUColorTargetDescription[]
         {
-            format = SDL.SDL_GetGPUSwapchainTextureFormat(GpuDeviceHandle, sdlWindow.Handle),
-            blend_state = command.BlendMode.ToSdl()
+            new SDL.SDL_GPUColorTargetDescription
+            {
+                format = SDL.SDL_GetGPUSwapchainTextureFormat(GpuDeviceHandle, ((SdlGpuWindowTarget)command.Target).Window.Handle),
+                blend_state = command.BlendMode.ToSdl()
+            }
         };
-
 
         var pipeline = SDL.SDL_CreateGPUGraphicsPipeline(
             GpuDeviceHandle,
-            new SDL.SDL_GPUGraphicsPipelineCreateInfo()
+            new SDL.SDL_GPUGraphicsPipelineCreateInfo
             {
                 vertex_shader = command.Material.VertexStage.ShaderProgram.Handle,
                 fragment_shader = command.Material.FragmentStage.ShaderProgram.Handle,
-                vertex_input_state = new()
+                vertex_input_state = new SDL.SDL_GPUVertexInputState
                 {
                     vertex_buffer_descriptions = vertexBindings,
                     num_vertex_buffers = 1,
@@ -973,7 +974,6 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
                 },
                 multisample_state = new SDL.SDL_GPUMultisampleState
                 {
-                    // todo: check?
                     sample_count = SDL.SDL_GPUSampleCount.SDL_GPU_SAMPLECOUNT_1,
                     sample_mask = 0
                 },
@@ -986,7 +986,7 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
                     write_mask = 0xff,
                     enable_depth_test = command.DepthTestEnabled,
                     enable_depth_write = command.DepthWriteEnabled,
-                    enable_stencil_test = false, // todo: add to command
+                    enable_stencil_test = false
                 },
                 target_info = new SDL.SDL_GPUGraphicsPipelineTargetInfo
                 {
@@ -1008,30 +1008,15 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
 
     private nint GetSampler(in TextureSampler sampler)
     {
-        static SDL.SDL_GPUSamplerAddressMode GetWrapMode(WrapMode wrap) => wrap switch
-        {
-            WrapMode.Repeat => SDL.SDL_GPUSamplerAddressMode.SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
-            WrapMode.Mirror => SDL.SDL_GPUSamplerAddressMode.SDL_GPU_SAMPLERADDRESSMODE_MIRRORED_REPEAT,
-            WrapMode.Clamp => SDL.SDL_GPUSamplerAddressMode.SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
-            _ => throw new ArgumentException("Invalid Texture Wrap", nameof(wrap)),
-        };
-
         if (_samplersCache.TryGetValue(sampler, out var result)) return result;
-
-        var filter = sampler.Filter switch
-        {
-            FilterMode.Nearest => SDL.SDL_GPUFilter.SDL_GPU_FILTER_NEAREST,
-            FilterMode.Linear => SDL.SDL_GPUFilter.SDL_GPU_FILTER_LINEAR,
-            _ => throw new ArgumentException("Invalid Texture Filter", nameof(sampler)),
-        };
 
         SDL.SDL_GPUSamplerCreateInfo info = new()
         {
-            min_filter = filter,
-            mag_filter = filter,
-            address_mode_u = GetWrapMode(sampler.WrapU),
-            address_mode_v = GetWrapMode(sampler.WrapV),
-            address_mode_w = GetWrapMode(sampler.WrapW),
+            min_filter = sampler.Filter.ToSdl(),
+            mag_filter = sampler.Filter.ToSdl(),
+            address_mode_u = sampler.WrapU.ToSdl(),
+            address_mode_v = sampler.WrapV.ToSdl(),
+            address_mode_w = sampler.WrapW.ToSdl(),
             compare_op = SDL.SDL_GPUCompareOp.SDL_GPU_COMPAREOP_ALWAYS,
             enable_compare = false
         };

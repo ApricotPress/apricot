@@ -1,5 +1,8 @@
 namespace Apricot.Graphics.Buffers;
 
+/// <summary>
+/// Size of index buffer in bytes.
+/// </summary>
 public enum IndexSize
 {
     /// <summary>

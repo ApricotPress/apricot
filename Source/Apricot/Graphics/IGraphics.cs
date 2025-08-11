@@ -73,7 +73,6 @@ public interface IGraphics : IDisposable
     /// <param name="indexSize">Size of buffer element.</param>
     /// <param name="capacity">Number of elements requested.</param>
     /// <returns>Returns managed object representing index buffer.</returns>
-    // todo: order capacity and size everywhere in a simillar manner
     IndexBuffer CreateIndexBuffer(string? name, IndexSize indexSize, int capacity);
 
     /// <summary>
@@ -90,7 +89,6 @@ public interface IGraphics : IDisposable
     /// <param name="format">Format of vertex buffer.</param>
     /// <param name="capacity">Number of elements requested.</param>
     /// <returns>Returns managed object representing vertex buffer.</returns>
-    // todo: order capacity and size everywhere in a similar manner
     VertexBuffer CreateVertexBuffer(string? name, VertexFormat format, int capacity);
 
     /// <summary>
@@ -100,7 +98,6 @@ public interface IGraphics : IDisposable
     /// <param name="capacity">Number of elements requested.</param>
     /// <typeparam name="T">Vertex struct that is used for each element.</typeparam>
     /// <returns>Returns managed object representing vertex buffer.</returns>
-    // todo: order capacity and size everywhere in a similar manner
     VertexBuffer<T> CreateVertexBuffer<T>(string? name, int capacity) where T : unmanaged, IVertex;
 
     /// <summary>
