@@ -9,9 +9,9 @@ namespace Apricot.Extensions;
 public struct ImGuiVertex(Vector2 pos, Vector2 uv, PackedColor color) : IVertex
 {
     public static VertexFormat Format { get; } = new([
-        new VertexFormat.Element(0, VertexElementFormat.Vector3, false),
+        new VertexFormat.Element(0, VertexElementFormat.Vector2, false),
         new VertexFormat.Element(1, VertexElementFormat.Vector2, false),
-        new VertexFormat.Element(2, VertexElementFormat.UByte4, false),
+        new VertexFormat.Element(2, VertexElementFormat.UByte4, true),
     ]);
 
 
