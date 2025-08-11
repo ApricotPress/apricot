@@ -209,16 +209,15 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
     {
         var sdlSamplers = BuildSamplers(samplers);
 
-        if (!SamplersEquals(sdlSamplers, _vertexSamplers))
-        {
-            _vertexSamplers = sdlSamplers;
-            SDL.SDL_BindGPUVertexSamplers(
-                _handle,
-                0,
-                sdlSamplers.Span,
-                (uint)samplers.Length
-            );
-        }
+        if (SamplersEquals(sdlSamplers, _vertexSamplers)) return;
+
+        _vertexSamplers = sdlSamplers;
+        SDL.SDL_BindGPUVertexSamplers(
+            _handle,
+            0,
+            sdlSamplers.Span,
+            (uint)samplers.Length
+        );
     }
 
     public unsafe void SetFragmentUniform(byte[] uniform)
