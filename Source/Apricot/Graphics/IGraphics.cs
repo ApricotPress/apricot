@@ -1,4 +1,5 @@
 using Apricot.Graphics.Buffers;
+using Apricot.Graphics.Commands;
 using Apricot.Graphics.Shaders;
 using Apricot.Graphics.Structs;
 using Apricot.Graphics.Textures;
@@ -72,6 +73,7 @@ public interface IGraphics : IDisposable
     /// <param name="indexSize">Size of buffer element.</param>
     /// <param name="capacity">Number of elements requested.</param>
     /// <returns>Returns managed object representing index buffer.</returns>
+    // todo: order capacity and size everywhere in a simillar manner
     IndexBuffer CreateIndexBuffer(string? name, IndexSize indexSize, int capacity);
 
     /// <summary>
@@ -85,24 +87,32 @@ public interface IGraphics : IDisposable
     /// Creates vertex buffer of asked capacity and given vertex format and allocates it on GPU.
     /// </summary>
     /// <param name="name">Optional name of buffer. Will be determined by implementation if null.</param>
+    /// <param name="format">Format of vertex buffer.</param>
+    /// <param name="capacity">Number of elements requested.</param>
+    /// <returns>Returns managed object representing vertex buffer.</returns>
+    // todo: order capacity and size everywhere in a similar manner
+    VertexBuffer CreateVertexBuffer(string? name, VertexFormat format, int capacity);
+
+    /// <summary>
+    /// Creates vertex buffer of asked capacity and given vertex format and allocates it on GPU.
+    /// </summary>
+    /// <param name="name">Optional name of buffer. Will be determined by implementation if null.</param>
     /// <param name="capacity">Number of elements requested.</param>
     /// <typeparam name="T">Vertex struct that is used for each element.</typeparam>
     /// <returns>Returns managed object representing vertex buffer.</returns>
-    VertexBuffer<T> CreateVertexBuffer<T>(string? name, int capacity)
-        where T : unmanaged, IVertex;
+    // todo: order capacity and size everywhere in a similar manner
+    VertexBuffer<T> CreateVertexBuffer<T>(string? name, int capacity) where T : unmanaged, IVertex;
 
     /// <summary>
     /// Releases buffer from graphics memory. Should be called only by <see cref="VertexBuffer{T}"/> itself, as
     /// otherwise it won't know it is native GPU data was disposed.
     /// </summary>
     /// <param name="buffer">Buffer to release.</param>
-    /// <typeparam name="T">Vertex struct that is used for each element.</typeparam>
-    void Release<T>(VertexBuffer<T> buffer) where T : unmanaged, IVertex;
+    void Release(VertexBuffer buffer);
 
     /// <summary>
     /// Uploads buffer data to GPU. It uses raw bytes to upload and therefore not type safe. So it's better to use
-    /// corresponding methods in buffers such as <see cref="VertexBuffer{T}.UploadData"/> and
-    /// <see cref="IndexBuffer.UploadData"/>.
+    /// corresponding methods in buffers such as <see cref="VertexBuffer{T}.UploadData" /> and IndexBuffer.UploadData.
     /// </summary>
     /// <param name="buffer">Destination buffer.</param>
     /// <param name="data">Vertices to upload.</param>
@@ -127,6 +137,8 @@ public interface IGraphics : IDisposable
     /// </summary>
     /// <param name="color">Color to clear color buffer of render target</param>
     void Clear(Color color);
+
+    void Submit(DrawCommand command);
 
     /// <summary>
     /// Waits for all ongoing render routines, fences, command buffers, etc. and flushes them to corresponding render

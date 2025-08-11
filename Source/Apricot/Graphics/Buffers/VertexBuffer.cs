@@ -2,19 +2,25 @@ using Apricot.Graphics.Vertices;
 
 namespace Apricot.Graphics.Buffers;
 
-public sealed class VertexBuffer<T>(IGraphics graphics, string name, int capacity, IntPtr nativePointer)
-    : GraphicBuffer(name, capacity, T.Format.Stride, nativePointer, BufferUsage.Vertex)
-    where T : unmanaged, IVertex
+public class VertexBuffer(IGraphics graphics, string name, int capacity, VertexFormat format, IntPtr nativePointer)
+    : GraphicBuffer(name, capacity, format.Stride, nativePointer, BufferUsage.Vertex)
 {
-    public VertexFormat Format => T.Format;
-
-    public void UploadData(in ReadOnlySpan<T> vertices) => graphics.UploadBufferData(this, vertices);
+    protected IGraphics Graphics { get; } = graphics;
+    
+    public VertexFormat Format { get; } = format;
 
     public override void Dispose()
     {
         if (IsDisposed) return;
 
-        graphics.Release(this);
+        Graphics.Release(this);
         IsDisposed = true;
     }
+}
+
+public class VertexBuffer<T>(IGraphics graphics, string name, int capacity, IntPtr nativePointer)
+    : VertexBuffer(graphics, name, capacity, T.Format, nativePointer)
+    where T : unmanaged, IVertex
+{
+    public void UploadData(in ReadOnlySpan<T> vertices) => Graphics.UploadBufferData(this, vertices);
 }

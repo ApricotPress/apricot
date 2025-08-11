@@ -1,12 +1,16 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using Apricot.Graphics;
 using Apricot.Graphics.Buffers;
+using Apricot.Graphics.Commands;
+using Apricot.Graphics.Materials;
 using Apricot.Graphics.Shaders;
 using Apricot.Graphics.Structs;
 using Apricot.Graphics.Textures;
 using Apricot.Graphics.Vertices;
+using Apricot.Utils.Collections;
 using Apricot.Sdl.Windows;
 using Apricot.Windows;
 using Microsoft.Extensions.Logging;
@@ -17,10 +21,13 @@ namespace Apricot.Sdl.Graphics;
 /// <summary>
 /// Implemnentation of <see cref="IGraphics"/> layer with SDL_gpu. 
 /// </summary>
-public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
+public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 {
     private IntPtr _renderCommandBuffer;
     private IntPtr _currentRenderPass;
+    private IntPtr _currentRenderPipeline;
+    private VertexBuffer? _currentVertexBuffer;
+    private IndexBuffer? _currentIndexBuffer;
     private bool _fakeRenderPass;
     private IRenderTarget? _currentRenderTarget;
 
@@ -31,10 +38,14 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 
     private readonly Dictionary<IWindow, SdlGpuWindowTarget> _windowTargets = new();
     private readonly Dictionary<IWindow, GpuSwapchainTexture> _swapchains = new();
+    private readonly Dictionary<int, IntPtr> _renderPipelinesCache = new();
+    private readonly Dictionary<TextureSampler, IntPtr> _samplersCache = new();
 
     private readonly HashSet<Texture> _loadedTextures = [];
     private readonly HashSet<GraphicBuffer> _loadedBuffers = [];
     private readonly HashSet<ShaderProgram> _loadedShaders = [];
+
+    private Texture? _emptyTexture;
 
     public IntPtr GpuDeviceHandle { get; private set; }
 
@@ -78,7 +89,11 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
             _ => GraphicDriver.Unknown
         };
 
+
         PrepareCommandBuffers();
+
+        _emptyTexture = CreateTexture("Fallback", 1, 1);
+        SetTextureData(_emptyTexture, [255, 0, 255, 255]); // magenta
     }
 
     public void SetVsync(IWindow window, bool vsync)
@@ -130,7 +145,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
         TextureUsage usage = TextureUsage.Sampling
     )
     {
-        logger.LogDebug(
+        logger.LogTrace(
             "Creating texture of name {name} {width}x{height} with format {format} for {usage}",
             name,
             width,
@@ -186,7 +201,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
     {
         if (texture.IsDisposed) throw new InvalidOperationException($"{texture} is disposed");
 
-        logger.LogDebug("Setting data of texture {texture}", texture);
+        logger.LogTrace("Setting data of texture {texture}", texture);
 
         var transferBuffer = SDL.SDL_CreateGPUTransferBuffer(
             GpuDeviceHandle,
@@ -236,7 +251,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
     {
         if (texture.IsDisposed) throw new InvalidOperationException($"{texture} is already disposed.");
 
-        logger.LogDebug("Releasing texture {texture}", texture);
+        logger.LogTrace("Releasing texture {texture}", texture);
 
         SDL.SDL_ReleaseGPUTexture(GpuDeviceHandle, texture.Handle);
         lock (_loadedTextures) _loadedTextures.Remove(texture);
@@ -244,7 +259,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 
     public IndexBuffer CreateIndexBuffer(string? name, IndexSize indexSize, int capacity)
     {
-        logger.LogDebug(
+        logger.LogTrace(
             "Creating index buffer with name {name} with {capacity} elements of {size} size",
             name,
             capacity,
@@ -254,7 +269,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
         var nativeBuffer = CreateGraphicBuffer(
             name,
             (uint)((int)indexSize * capacity),
-            SDL.SDL_GPUBufferUsageFlags.SDL_GPU_BUFFERUSAGE_VERTEX
+            SDL.SDL_GPUBufferUsageFlags.SDL_GPU_BUFFERUSAGE_INDEX
         );
 
         var buffer = new IndexBuffer(
@@ -280,38 +295,24 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
         SDL.SDL_ReleaseGPUBuffer(GpuDeviceHandle, buffer.NativePointer);
     }
 
-    public VertexBuffer<T> CreateVertexBuffer<T>(string? name, int capacity)
-        where T : unmanaged, IVertex
-    {
-        logger.LogDebug(
-            "Creating vertex buffer with name {name} with {capacity} elements of {vertex} vertex type",
+    public VertexBuffer CreateVertexBuffer(string? name, VertexFormat format, int capacity) =>
+        CreateVertexBuffer<VertexBuffer>(
             name,
+            format,
             capacity,
-            typeof(T)
+            (n, handle) => new VertexBuffer(this, n, capacity, format, handle)
         );
 
-        var nativeBuffer = CreateGraphicBuffer(
+    // todo: do not duplicate so much somehow?
+    public VertexBuffer<T> CreateVertexBuffer<T>(string? name, int capacity) where T : unmanaged, IVertex =>
+        CreateVertexBuffer<VertexBuffer<T>>(
             name,
-            (uint)(T.Format.Stride * capacity),
-            SDL.SDL_GPUBufferUsageFlags.SDL_GPU_BUFFERUSAGE_VERTEX
-        );
-
-        var buffer = new VertexBuffer<T>(
-            this,
-            name ?? nativeBuffer.ToString(),
+            T.Format,
             capacity,
-            nativeBuffer
+            (n, handle) => new VertexBuffer<T>(this, n, capacity, handle)
         );
 
-        lock (_loadedBuffers)
-        {
-            _loadedBuffers.Add(buffer);
-        }
-
-        return buffer;
-    }
-
-    public void Release<T>(VertexBuffer<T> buffer) where T : unmanaged, IVertex
+    public void Release(VertexBuffer buffer)
     {
         if (buffer.IsDisposed) throw new InvalidOperationException($"{buffer.Name} is already disposed.");
 
@@ -322,7 +323,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
     {
         if (buffer.IsDisposed) throw new InvalidOperationException($"{buffer.Name} is disposed.");
 
-        logger.LogDebug("Uploading data {buffer}", buffer.Name);
+        logger.LogTrace("Uploading data {buffer}", buffer.Name);
 
         var dataSize = data.Length * Marshal.SizeOf<T>();
         if (dataSize > buffer.Capacity * buffer.ElementSize)
@@ -339,10 +340,10 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
             }
         );
 
-        var dstPointer = SDL.SDL_MapGPUTransferBuffer(GpuDeviceHandle, transferBuffer, true);
-        var dstSpan = new Span<byte>(dstPointer.ToPointer(), dataSize);
-        MemoryMarshal.AsBytes(data).CopyTo(dstSpan);
-
+        var dstPointer = SDL.SDL_MapGPUTransferBuffer(GpuDeviceHandle, transferBuffer, false).ToPointer();
+        var dstSpan = new Span<byte>(dstPointer, dataSize);
+        var srcSpan = MemoryMarshal.AsBytes(data);
+        srcSpan.CopyTo(dstSpan);
         SDL.SDL_UnmapGPUTransferBuffer(GpuDeviceHandle, transferBuffer);
 
         BeginCopyPass();
@@ -355,11 +356,11 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
             },
             new SDL.SDL_GPUBufferRegion
             {
-                buffer = transferBuffer,
+                buffer = buffer.NativePointer,
                 offset = 0,
                 size = (uint)dataSize
             },
-            false // todo: figure out cycles 
+            false
         );
 
         SDL.SDL_ReleaseGPUTransferBuffer(GpuDeviceHandle, transferBuffer);
@@ -404,7 +405,7 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
             this,
             name ?? nativeShader.ToString(),
             nativeShader,
-            description.Stage
+            description
         );
 
         lock (_loadedShaders) _loadedShaders.Add(shader);
@@ -414,7 +415,8 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 
     public void Release(ShaderProgram shaderProgram)
     {
-        if (shaderProgram.IsDisposed) throw new InvalidOperationException($"Shader {shaderProgram} is already released.");
+        if (shaderProgram.IsDisposed)
+            throw new InvalidOperationException($"Shader {shaderProgram} is already released.");
 
         SDL.SDL_ReleaseGPUShader(GpuDeviceHandle, shaderProgram.Handle);
 
@@ -442,27 +444,171 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
         BeginRenderPass(target, color);
     }
 
+    public void Submit(DrawCommand command)
+    {
+        if (command.IndicesCount == 0) return;
+        if (command.Target != _currentRenderTarget)
+        {
+            BeginRenderPass(command.Target);
+        }
+
+        if (_fakeRenderPass) return;
+
+        SDL.SDL_SetGPUViewport(
+            _currentRenderPass,
+            new SDL.SDL_GPUViewport
+            {
+                x = 0,
+                y = 0,
+                w = _currentRenderTarget.Width,
+                h = _currentRenderTarget.Height,
+                min_depth = 0,
+                max_depth = 1
+            }
+        );
+
+        var pipeline = GetGraphicsPipeline(command);
+        if (pipeline != _currentRenderPipeline)
+        {
+            _currentRenderPipeline = pipeline;
+            SDL.SDL_BindGPUGraphicsPipeline(_currentRenderPass, pipeline);
+        }
+
+
+        if (_currentIndexBuffer != command.IndexBuffer)
+        {
+            _currentIndexBuffer = command.IndexBuffer;
+            if (_currentIndexBuffer != null)
+            {
+                SDL.SDL_GPUBufferBinding indexBinding = new()
+                {
+                    buffer = _currentIndexBuffer.NativePointer,
+                    offset = 0
+                };
+                SDL.SDL_BindGPUIndexBuffer(_currentRenderPass, indexBinding, _currentIndexBuffer.IndexSize switch
+                {
+                    IndexSize._2 => SDL.SDL_GPUIndexElementSize.SDL_GPU_INDEXELEMENTSIZE_16BIT,
+                    IndexSize._4 => SDL.SDL_GPUIndexElementSize.SDL_GPU_INDEXELEMENTSIZE_32BIT,
+                    _ => throw new NotImplementedException()
+                });
+            }
+        }
+
+
+        if (_currentVertexBuffer != command.VertexBuffer)
+        {
+            _currentVertexBuffer = command.VertexBuffer;
+            if (_currentVertexBuffer != null)
+            {
+                Span<SDL.SDL_GPUBufferBinding> vertexBinding = stackalloc SDL.SDL_GPUBufferBinding[1];
+                vertexBinding[0] = new SDL.SDL_GPUBufferBinding
+                {
+                    buffer = _currentVertexBuffer.NativePointer,
+                    offset = 0
+                };
+
+                SDL.SDL_BindGPUVertexBuffers(_currentRenderPass, 0, vertexBinding, 1);
+            }
+        }
+
+        var fragmentInfo = command.Material.FragmentStage.ShaderProgram.Description;
+        var vertexInfo = command.Material.VertexStage.ShaderProgram.Description;
+
+        // bind fragment samplers
+        // TODO: only do this if Samplers change
+        if (fragmentInfo.SamplerCount > 0)
+        {
+            Span<SDL.SDL_GPUTextureSamplerBinding> samplers =
+                stackalloc SDL.SDL_GPUTextureSamplerBinding[fragmentInfo.SamplerCount];
+
+            for (var i = 0; i < fragmentInfo.SamplerCount; i++)
+            {
+                if (command.Material.FragmentStage.Samplers[i].Texture is { IsDisposed: false } tex)
+                    samplers[i].texture = tex.Handle;
+                else
+                    samplers[i].texture = _emptyTexture.Handle;
+
+                samplers[i].sampler = GetSampler(command.Material.FragmentStage.Samplers[i].Sampler);
+            }
+
+            SDL.SDL_BindGPUFragmentSamplers(_currentRenderPass, 0, samplers, (uint)fragmentInfo.SamplerCount);
+        }
+
+        // bind vertex samplers
+        // TODO: only do this if Samplers change
+        if (vertexInfo.SamplerCount > 0)
+        {
+            Span<SDL.SDL_GPUTextureSamplerBinding> samplers =
+                stackalloc SDL.SDL_GPUTextureSamplerBinding[vertexInfo.SamplerCount];
+
+            for (var i = 0; i < vertexInfo.SamplerCount; i++)
+            {
+                if (command.Material.VertexStage.Samplers[i].Texture is { IsDisposed: false } tex)
+                    samplers[i].texture = tex.Handle;
+                else
+                    samplers[i].texture = _emptyTexture.Handle;
+
+                samplers[i].sampler = GetSampler(command.Material.VertexStage.Samplers[i].Sampler);
+            }
+
+            SDL.SDL_BindGPUVertexSamplers(_currentRenderPass, 0, samplers, (uint)vertexInfo.SamplerCount);
+        }
+
+        // Upload Fragment Uniforms
+        // TODO: only do this if Uniforms change
+        for (var i = 0; i < fragmentInfo.UniformBufferCount; i++)
+        {
+            fixed (byte* ptr = command.Material.FragmentStage.UniformBuffer)
+                SDL.SDL_PushGPUFragmentUniformData(
+                    _renderCommandBuffer,
+                    (uint)i,
+                    new nint(ptr),
+                    (uint)command.Material.FragmentStage.UniformBuffer.Length
+                );
+        }
+
+        // Upload Vertex Uniforms
+        // TODO: only do this if Uniforms change
+        for (var i = 0; i < vertexInfo.UniformBufferCount; i++)
+        {
+            fixed (byte* ptr = command.Material.VertexStage.UniformBuffer)
+                SDL.SDL_PushGPUVertexUniformData(
+                    _renderCommandBuffer,
+                    (uint)i,
+                    new nint(ptr),
+                    (uint)command.Material.VertexStage.UniformBuffer.Length
+                );
+        }
+
+        // perform draw
+        if (command.IndexBuffer != null)
+        {
+            SDL.SDL_DrawGPUIndexedPrimitives(
+                render_pass: _currentRenderPass,
+                num_indices: (uint)command.IndicesCount,
+                num_instances: 1,
+                first_index: (uint)command.IndicesOffset,
+                vertex_offset: command.VerticesOffset,
+                first_instance: 0
+            );
+        }
+        else
+        {
+            SDL.SDL_DrawGPUPrimitives(
+                render_pass: _currentRenderPass,
+                num_vertices: (uint)command.VerticesCount,
+                num_instances: 1,
+                first_vertex: (uint)command.VerticesOffset,
+                first_instance: 0
+            );
+        }
+    }
+
     public void Present()
     {
-        EndCopyPass();
-        EndRenderPass();
-
-        if (!SDL.SDL_SubmitGPUCommandBuffer(_uploadCommandBuffer))
-        {
-            throw SdlException.GetFromLatest(nameof(SDL.SDL_SubmitGPUCommandBuffer));
-        }
-
-        if (!SDL.SDL_SubmitGPUCommandBuffer(_renderCommandBuffer))
-        {
-            throw SdlException.GetFromLatest(nameof(SDL.SDL_SubmitGPUCommandBuffer));
-        }
+        SubmitCommands(false);
 
         _swapchains.Clear();
-
-        _renderCommandBuffer = IntPtr.Zero;
-        _uploadCommandBuffer = IntPtr.Zero;
-
-        PrepareCommandBuffers();
 
         // todo: cleanup windows dictionary if any of window was closed
     }
@@ -473,11 +619,57 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
         GC.SuppressFinalize(this);
     }
 
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (GpuDeviceHandle != IntPtr.Zero)
         {
             SDL.SDL_DestroyGPUDevice(GpuDeviceHandle);
+        }
+    }
+
+    private void SubmitCommands(bool wait)
+    {
+        EndCopyPass();
+        EndRenderPass();
+
+        var fences = new StackList4<IntPtr>();
+
+        if (wait)
+        {
+            CollectFence(_uploadCommandBuffer);
+            CollectFence(_renderCommandBuffer);
+        }
+        else
+        {
+            if (!SDL.SDL_SubmitGPUCommandBuffer(_uploadCommandBuffer) ||
+                !SDL.SDL_SubmitGPUCommandBuffer(_renderCommandBuffer))
+            {
+                throw SdlException.GetFromLatest(nameof(SDL.SDL_SubmitGPUCommandBuffer));
+            }
+        }
+
+        _renderCommandBuffer = _uploadCommandBuffer = 0;
+        PrepareCommandBuffers();
+
+        if (fences.Count > 0) SDL.SDL_WaitForGPUFences(GpuDeviceHandle, true, fences.Span, (uint)fences.Count);
+
+        foreach (var fence in fences)
+        {
+            SDL.SDL_ReleaseGPUFence(GpuDeviceHandle, fence);
+        }
+
+        void CollectFence(IntPtr commandBuffer)
+        {
+            var fence = SDL.SDL_SubmitGPUCommandBufferAndAcquireFence(commandBuffer);
+
+            if (fence == IntPtr.Zero)
+            {
+                logger.LogWarning("Failed to acquire fence: {Error}", SDL.SDL_GetError());
+            }
+            else
+            {
+                fences.Add(fence);
+            }
         }
     }
 
@@ -488,11 +680,12 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
             throw new InvalidOperationException("Previous command buffer was not dispatched");
         }
 
-        _renderCommandBuffer = SDL.SDL_AcquireGPUCommandBuffer(GpuDeviceHandle);
         _uploadCommandBuffer = SDL.SDL_AcquireGPUCommandBuffer(GpuDeviceHandle);
+        _renderCommandBuffer = SDL.SDL_AcquireGPUCommandBuffer(GpuDeviceHandle);
     }
 
-    private void BeginRenderPass(IRenderTarget target, Color? clearColor)
+    [MemberNotNull(nameof(_currentRenderTarget))]
+    private void BeginRenderPass(IRenderTarget target, Color? clearColor = null)
     {
         logger.LogTrace(
             "Beginning render pass with target of {RenderTarget} and clear color {ClearColor}",
@@ -544,6 +737,9 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
 
         _currentRenderPass = IntPtr.Zero;
         _currentRenderTarget = null;
+        _currentRenderPipeline = IntPtr.Zero;
+        _currentVertexBuffer = null;
+        _currentIndexBuffer = null;
         _fakeRenderPass = false;
     }
 
@@ -630,6 +826,35 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
             return _swapchains[window] = new GpuSwapchainTexture(texture, w, h);
         }
     }
+    private T CreateVertexBuffer<T>(
+        string? name,
+        VertexFormat format,
+        int capacity,
+        Func<string, IntPtr, T> factory
+    ) where T : VertexBuffer
+    {
+        logger.LogTrace(
+            "Creating vertex buffer with name {name} with {capacity} elements of {vertex} vertex format",
+            name,
+            capacity,
+            format
+        );
+
+        var nativeBuffer = CreateGraphicBuffer(
+            name,
+            (uint)(format.Stride * capacity),
+            SDL.SDL_GPUBufferUsageFlags.SDL_GPU_BUFFERUSAGE_VERTEX
+        );
+
+        var buffer = factory(
+            name ?? nativeBuffer.ToString(),
+            nativeBuffer
+        );
+
+        lock (_loadedBuffers) _loadedBuffers.Add(buffer);
+
+        return buffer;
+    }
 
     private IntPtr CreateGraphicBuffer(string? name, uint size, SDL.SDL_GPUBufferUsageFlags usage)
     {
@@ -661,5 +886,162 @@ public unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGraphics
         }
 
         return buffer;
+    }
+
+    private IntPtr GetGraphicsPipeline(DrawCommand command)
+    {
+        var hash = HashCode.Combine(
+            command.Material.FragmentStage.ShaderProgram.Handle,
+            command.Material.VertexStage.ShaderProgram.Handle,
+            command.CullMode,
+            command.DepthCompare,
+            command.DepthTestEnabled,
+            command.DepthWriteEnabled,
+            command.BlendMode
+        );
+
+        hash = HashCode.Combine(
+            hash,
+            command.IndexBuffer?.IndexSize,
+            command.VertexBuffer.Format
+        );
+
+        return _renderPipelinesCache.TryGetValue(hash, out var pipeline)
+            ? pipeline
+            : _renderPipelinesCache[hash] = BuildGraphicsPipeline(command);
+    }
+
+    private IntPtr BuildGraphicsPipeline(DrawCommand command)
+    {
+        var vertexBindings = stackalloc SDL.SDL_GPUVertexBufferDescription[1];
+        var vertexAttributes = stackalloc SDL.SDL_GPUVertexAttribute[command.VertexBuffer.Format.Elements.Count];
+
+        vertexBindings[0] = new SDL.SDL_GPUVertexBufferDescription
+        {
+            input_rate = SDL.SDL_GPUVertexInputRate.SDL_GPU_VERTEXINPUTRATE_VERTEX,
+            instance_step_rate = 0,
+            pitch = (uint)command.VertexBuffer.ElementSize,
+            slot = 0
+        };
+
+        uint offset = 0;
+        for (var i = 0; i < command.VertexBuffer.Format.Elements.Count; i++)
+        {
+            var vertexElement = command.VertexBuffer.Format.Elements[i];
+
+            vertexAttributes[i] = new SDL.SDL_GPUVertexAttribute()
+            {
+                buffer_slot = 0,
+                format = vertexElement.Format.ToSdl(vertexElement.Normalized),
+                location = (uint)vertexElement.Location,
+                offset = offset
+            };
+            offset += (uint)vertexElement.Format.Size();
+        }
+
+
+        // todo: proper color attachments work
+        var sdlWindow = ((SdlGpuWindowTarget)command.Target).Window;
+        var colorAttachments = stackalloc SDL.SDL_GPUColorTargetDescription[1];
+        colorAttachments[0] = new SDL.SDL_GPUColorTargetDescription()
+        {
+            format = SDL.SDL_GetGPUSwapchainTextureFormat(GpuDeviceHandle, sdlWindow.Handle),
+            blend_state = command.BlendMode.ToSdl()
+        };
+
+
+        var pipeline = SDL.SDL_CreateGPUGraphicsPipeline(
+            GpuDeviceHandle,
+            new SDL.SDL_GPUGraphicsPipelineCreateInfo()
+            {
+                vertex_shader = command.Material.VertexStage.ShaderProgram.Handle,
+                fragment_shader = command.Material.FragmentStage.ShaderProgram.Handle,
+                vertex_input_state = new()
+                {
+                    vertex_buffer_descriptions = vertexBindings,
+                    num_vertex_buffers = 1,
+                    vertex_attributes = vertexAttributes,
+                    num_vertex_attributes = (uint)command.VertexBuffer.Format.Elements.Count
+                },
+                primitive_type = SDL.SDL_GPUPrimitiveType.SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
+                rasterizer_state = new SDL.SDL_GPURasterizerState
+                {
+                    fill_mode = SDL.SDL_GPUFillMode.SDL_GPU_FILLMODE_FILL, // todo: add different fill modes
+                    cull_mode = command.CullMode.ToSdl(),
+                    front_face = SDL.SDL_GPUFrontFace.SDL_GPU_FRONTFACE_CLOCKWISE,
+                    enable_depth_bias = false
+                },
+                multisample_state = new SDL.SDL_GPUMultisampleState
+                {
+                    // todo: check?
+                    sample_count = SDL.SDL_GPUSampleCount.SDL_GPU_SAMPLECOUNT_1,
+                    sample_mask = 0
+                },
+                depth_stencil_state = new SDL.SDL_GPUDepthStencilState
+                {
+                    compare_op = command.DepthCompare.ToSdl(),
+                    back_stencil_state = default,
+                    front_stencil_state = default,
+                    compare_mask = 0xff,
+                    write_mask = 0xff,
+                    enable_depth_test = command.DepthTestEnabled,
+                    enable_depth_write = command.DepthWriteEnabled,
+                    enable_stencil_test = false, // todo: add to command
+                },
+                target_info = new SDL.SDL_GPUGraphicsPipelineTargetInfo
+                {
+                    color_target_descriptions = colorAttachments,
+                    num_color_targets = 1,
+                    has_depth_stencil_target = false,
+                    depth_stencil_format = SDL.SDL_GPUTextureFormat.SDL_GPU_TEXTUREFORMAT_INVALID
+                }
+            }
+        );
+
+        if (pipeline == IntPtr.Zero)
+        {
+            SdlException.ThrowFromLatest(nameof(SDL.SDL_CreateGPUGraphicsPipeline));
+        }
+
+        return pipeline;
+    }
+
+    private nint GetSampler(in TextureSampler sampler)
+    {
+        static SDL.SDL_GPUSamplerAddressMode GetWrapMode(WrapMode wrap) => wrap switch
+        {
+            WrapMode.Repeat => SDL.SDL_GPUSamplerAddressMode.SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
+            WrapMode.Mirror => SDL.SDL_GPUSamplerAddressMode.SDL_GPU_SAMPLERADDRESSMODE_MIRRORED_REPEAT,
+            WrapMode.Clamp => SDL.SDL_GPUSamplerAddressMode.SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
+            _ => throw new ArgumentException("Invalid Texture Wrap", nameof(wrap)),
+        };
+
+        if (_samplersCache.TryGetValue(sampler, out var result)) return result;
+
+        var filter = sampler.Filter switch
+        {
+            FilterMode.Nearest => SDL.SDL_GPUFilter.SDL_GPU_FILTER_NEAREST,
+            FilterMode.Linear => SDL.SDL_GPUFilter.SDL_GPU_FILTER_LINEAR,
+            _ => throw new ArgumentException("Invalid Texture Filter", nameof(sampler)),
+        };
+
+        SDL.SDL_GPUSamplerCreateInfo info = new()
+        {
+            min_filter = filter,
+            mag_filter = filter,
+            address_mode_u = GetWrapMode(sampler.WrapU),
+            address_mode_v = GetWrapMode(sampler.WrapV),
+            address_mode_w = GetWrapMode(sampler.WrapW),
+            compare_op = SDL.SDL_GPUCompareOp.SDL_GPU_COMPAREOP_ALWAYS,
+            enable_compare = false
+        };
+
+        result = SDL.SDL_CreateGPUSampler(GpuDeviceHandle, info);
+        if (result == IntPtr.Zero)
+        {
+            SdlException.ThrowFromLatest(nameof(SDL.SDL_CreateGPUSampler));
+        }
+
+        return _samplersCache[sampler] = result;
     }
 }

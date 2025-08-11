@@ -38,6 +38,6 @@ public readonly struct VertexFormat : IEquatable<VertexFormat>
     public readonly record struct Element(
         int Location,
         VertexElementFormat Format,
-        bool Normalized = true
+        bool Normalized
     );
 }

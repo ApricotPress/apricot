@@ -3,6 +3,9 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using Apricot.Graphics;
 using Apricot.Graphics.Buffers;
+using Apricot.Graphics.Commands;
+using Apricot.Graphics.Materials;
+using Apricot.Graphics.Shaders;
 using Apricot.Graphics.Textures;
 using Apricot.Lifecycle.TickHandlers;
 using Apricot.Timing;
@@ -29,6 +32,9 @@ public unsafe class ImGuiWindowRenderer
     private ImGuiVertex[] _vertices;
     private ushort[] _indices;
 
+    private readonly IRenderTarget _renderTarget;
+    private readonly Material _material;
+
     public ITickHandler BeginLayout { get; }
 
     public ITickHandler EndLayout { get; }
@@ -41,7 +47,37 @@ public unsafe class ImGuiWindowRenderer
         _window = window;
         _time = time;
 
-        ResizeVertexBuffer(1024);
+
+        var assetsPath = "/Users/yogurt/Developer/Projects/Apricot/Source/Apricot.Sample/bin/Debug/net9.0/";
+
+        var shaderProgramFrag = graphics.CreateShaderProgram(
+            "Standard Fragment",
+            new ShaderProgramDescription
+            {
+                Code = File.ReadAllBytes(assetsPath + "Assets/Shaders/Compiled/Standard.frag.msl"),
+                EntryPoint = "frag",
+                SamplerCount = 1,
+                UniformBufferCount = 0,
+                Stage = ShaderStage.Fragment
+            }
+        );
+        var shaderProgramVert = graphics.CreateShaderProgram(
+            "Standard Vertex",
+            new ShaderProgramDescription
+            {
+                Code = File.ReadAllBytes(assetsPath + "Assets/Shaders/Compiled/Standard.vert.msl"),
+                EntryPoint = "vert",
+                SamplerCount = 0,
+                UniformBufferCount = 1,
+                Stage = ShaderStage.Vertex
+            }
+        );
+
+
+        _renderTarget = graphics.GetWindowRenderTarget(window);
+        _material = new Material(shaderProgramFrag, shaderProgramVert);
+
+        ResizeVertexBuffer(2048);
         ResizeIndexBuffer(1024);
 
         BeginLayout = new BeginHandler(this);
@@ -83,6 +119,53 @@ public unsafe class ImGuiWindowRenderer
 
     private void Render(ImDrawDataPtr data)
     {
+        RebuildBuffers(data);
+
+        var cmd = new DrawCommand(_renderTarget, _material, _vertexBuffer)
+        {
+            BlendMode = new BlendMode(BlendOp.Add, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha),
+            IndexBuffer = _indexBuffer
+        };
+
+        var mat =
+            Matrix4x4.CreateScale(data.FramebufferScale.X, data.FramebufferScale.Y, 1.0f) *
+            Matrix4x4.CreateOrthographicOffCenter(0, _window.Width, _window.Height, 0, 0.1f, 1000.0f);
+        _material.VertexStage.SetUniformBuffer(mat);
+
+        var globalVtxOffset = 0;
+        var globalIdxOffset = 0;
+        for (var i = 0; i < data.CmdListsCount; i++)
+        {
+            var imList = data.CmdLists[i];
+
+            for (var j = 0; j < imList.CmdBuffer.Size; j++)
+            {
+                var imCmd = imList.CmdBuffer[j];
+
+                var textureIndex = imCmd.TextureId.ToInt32();
+                if (textureIndex < _loadedTextures.Count)
+                    _material.FragmentStage.Samplers[0] = new BoundSampler(
+                        _loadedTextures[textureIndex],
+                        new TextureSampler()
+                    );
+
+                cmd.VerticesOffset = (int)(imCmd.VtxOffset + globalVtxOffset);
+                cmd.IndicesOffset = (int)(imCmd.IdxOffset + globalIdxOffset);
+                cmd.IndicesCount = (int)imCmd.ElemCount;
+
+                _graphics.Submit(cmd);
+            }
+
+            globalVtxOffset += imList.VtxBuffer.Size;
+            globalIdxOffset += imList.IdxBuffer.Size;
+        }
+
+
+        _graphics.Submit(cmd);
+    }
+
+    private void RebuildBuffers(ImDrawDataPtr data)
+    {
         if (data.TotalVtxCount <= 0) return;
 
         if (data.TotalVtxCount > _vertexBuffer.Capacity)
@@ -111,7 +194,7 @@ public unsafe class ImGuiWindowRenderer
             vtxOffset += list.VtxBuffer.Size;
             idxOffset += list.IdxBuffer.Size;
         }
-        
+
         _vertexBuffer.UploadData(_vertices);
         _indexBuffer.UploadData(_indices);
     }

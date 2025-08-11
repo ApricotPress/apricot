@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Apricot.Graphics;
 using Apricot.Graphics.Buffers;
+using Apricot.Graphics.Commands;
 using Apricot.Graphics.Shaders;
 using Apricot.Graphics.Structs;
 using Apricot.Graphics.Textures;
@@ -50,10 +51,13 @@ public sealed class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
 
     public void Release(IndexBuffer buffer) => throw new NotImplementedException();
 
+    public VertexBuffer CreateVertexBuffer(string? name, VertexFormat format, int capacity) =>
+        throw new NotImplementedException();
+
     public VertexBuffer<T> CreateVertexBuffer<T>(string? name, int capacity) where T : unmanaged, IVertex =>
         throw new NotImplementedException();
 
-    public void Release<T>(VertexBuffer<T> buffer) where T : unmanaged, IVertex => throw new NotImplementedException();
+    public void Release(VertexBuffer buffer) => throw new NotImplementedException();
 
     public void UploadBufferData<T>(GraphicBuffer buffer, in ReadOnlySpan<T> data) where T : unmanaged =>
         throw new NotImplementedException();
@@ -95,6 +99,8 @@ public sealed class OpenGlGraphics(IGlPlatform glPlatform) : IGraphics
         );
         _currentWindow.Gl.Clear(ClearBufferMask.ColorBufferBit);
     }
+
+    public void Submit(DrawCommand command) => throw new NotImplementedException();
 
     public void Present()
     {
