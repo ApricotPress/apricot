@@ -1,3 +1,4 @@
+using System;
 using Apricot.Graphics;
 using Apricot.Windows;
 using Silk.NET.OpenGLES;
@@ -13,6 +14,9 @@ public sealed class GlWindowTarget(IWindow window, IGlPlatform glPlatform) : IRe
 
     public string Name => $"OpenGL Window Target <{Window}>";
 
+    public int Width => Window.Width;
+    
+    public int Height => Window.Height;
 
     public bool IsDisposed { get; private set; }
 

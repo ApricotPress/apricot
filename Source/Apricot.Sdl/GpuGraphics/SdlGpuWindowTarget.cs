@@ -18,6 +18,10 @@ public sealed class SdlGpuWindowTarget : IRenderTarget
     /// </summary>
     public SdlWindow Window { get; }
 
+    public int Width => Window.Width;
+
+    public int Height => Window.Height;
+
     public string Name => $"SDL Window Target <{Window}>";
 
     public bool IsDisposed { get; private set; }
