@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Apricot.Sdl.Windows;
 using Apricot.OpenGl;
 using Apricot.Windows;
@@ -10,6 +11,16 @@ public class SdlGlPlatform : IGlPlatform
     public IntPtr CreateGlContext(IWindow window)
     {
         var sdlWindow = ToSdlWindow(window);
+        
+        SDL.SDL_GL_SetAttribute(SDL.SDL_GLAttr.SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+        SDL.SDL_GL_SetAttribute(SDL.SDL_GLAttr.SDL_GL_CONTEXT_MINOR_VERSION, 1);
+        SDL.SDL_GL_SetAttribute(SDL.SDL_GLAttr.SDL_GL_CONTEXT_PROFILE_MASK, 1); // SDL_GL_CONTEXT_PROFILE_CORE
+        
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            // SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG
+            SDL.SDL_GL_SetAttribute(SDL.SDL_GLAttr.SDL_GL_CONTEXT_FLAGS, 2);
+        } 
 
         return SDL.SDL_GL_CreateContext(sdlWindow.Handle);
     }
