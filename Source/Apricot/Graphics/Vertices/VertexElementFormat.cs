@@ -31,4 +31,19 @@ public static class VertexElementFormatExtensions
         VertexElementFormat.UShort4 => 8,
         _ => throw new NotImplementedException(),
     };
+    
+    public static int ComponentsCount(this VertexElementFormat type) => type switch
+    {
+        VertexElementFormat.Single => 1,
+        VertexElementFormat.Vector2 => 2,
+        VertexElementFormat.Vector3 => 3,
+        VertexElementFormat.Vector4 => 4,
+        VertexElementFormat.Byte4 => 4,
+        VertexElementFormat.UByte4 => 4,
+        VertexElementFormat.Short2 => 2,
+        VertexElementFormat.UShort2 => 2,
+        VertexElementFormat.Short4 => 4,
+        VertexElementFormat.UShort4 => 4,
+        _ => throw new NotImplementedException(),
+    };
 }

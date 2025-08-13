@@ -1,7 +1,7 @@
 using System;
 using Apricot.Graphics;
 using Apricot.Windows;
-using Silk.NET.OpenGLES;
+using Silk.NET.OpenGL;
 
 namespace Apricot.OpenGl;
 
