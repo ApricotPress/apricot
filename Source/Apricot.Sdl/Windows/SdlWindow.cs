@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Apricot.Utils;
 using Apricot.Windows;
 using Microsoft.Extensions.Logging;
 using static SDL3.SDL;
@@ -114,12 +115,12 @@ public class SdlWindow : IWindow
 
         var sdlFlags = SDL_WindowFlags.SDL_WINDOW_HIGH_PIXEL_DENSITY;
 
-        if (flags.HasFlag(WindowCreationFlags.Fullscreen))
+        if (flags.Has(WindowCreationFlags.Fullscreen))
         {
             sdlFlags |= SDL_WindowFlags.SDL_WINDOW_FULLSCREEN;
         }
 
-        if (flags.HasFlag(WindowCreationFlags.Resizable))
+        if (flags.Has(WindowCreationFlags.Resizable))
         {
             // todo: it would not follow actual required size
             // see: https://wiki.libsdl.org/SDL3/SDL_WindowFlags#remarks
@@ -132,7 +133,7 @@ public class SdlWindow : IWindow
         }
 
         logger.LogDebug("Constructed SDL flags: {Flags}", sdlFlags);
-        
+
         Handle = CreateWindow();
 
         if (Handle == 0)
