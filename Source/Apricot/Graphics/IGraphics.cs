@@ -21,6 +21,8 @@ public interface IGraphics : IDisposable
 {
     Texture EmptyTexture { get; }
     
+    GraphicDriver Driver { get; }
+
     /// <summary>
     /// Initialize graphic system of the engine.
     /// </summary>

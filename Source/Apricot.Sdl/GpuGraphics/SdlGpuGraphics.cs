@@ -26,8 +26,6 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
     private IntPtr _renderCommandBuffer;
     private RenderPassState _renderPass;
 
-    private GraphicDriver _driver = GraphicDriver.Unknown;
-
     private IntPtr _uploadCommandBuffer;
     private IntPtr _currentCopyPass;
 
@@ -45,6 +43,8 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
     public IntPtr GpuDeviceHandle { get; private set; }
 
     public Texture EmptyTexture => _emptyTexture ?? throw new InvalidOperationException("Device is not initialized");
+    
+    public GraphicDriver Driver { get; private set; } = GraphicDriver.Unknown;
 
     ~SdlGpuGraphics() => Dispose(false);
 
@@ -78,7 +78,7 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
         }
 
         var effectiveDriver = SDL.SDL_GetGPUDeviceDriver(GpuDeviceHandle);
-        _driver = effectiveDriver switch
+        Driver = effectiveDriver switch
         {
             "metal" => GraphicDriver.Metal,
             "vulkan" => GraphicDriver.Vulkan,
@@ -363,7 +363,7 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
 
     public ShaderProgram CreateShaderProgram(string? name, in ShaderProgramDescription description)
     {
-        var format = _driver switch
+        var format = Driver switch
         {
             GraphicDriver.Metal => SDL.SDL_GPUShaderFormat.SDL_GPU_SHADERFORMAT_MSL,
             GraphicDriver.Vulkan => SDL.SDL_GPUShaderFormat.SDL_GPU_SHADERFORMAT_SPIRV,

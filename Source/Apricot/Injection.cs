@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Apricot.Extensions;
 using Apricot.Jobs;
 using Apricot.Lifecycle;
+using Apricot.Platform;
 using Apricot.Timing;
 using Apricot.Utils;
 using Apricot.Windows;
@@ -47,6 +48,7 @@ public static class Injection
     ) where TJar : Jar => services
         .AddSingleton<IScheduler>(s => new Scheduler(Environment.ProcessorCount - 1))
         .AddSingleton<TJar>()
+        .AddSingleton<IPlatformInfo, DefaultPlatformInfo>()
         .AddSingleton<ITimeController, TimeController>()
         .AddSingleton<ITime, StopwatchTime>()
         .AddSingleton<ImGuiWrapper>()

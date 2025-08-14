@@ -29,8 +29,11 @@ public unsafe sealed class OpenGlGraphics(
     private readonly Dictionary<GL, uint> _tempVaos = new(); // used by MacOS
 
     private GlWindowTarget? _currentWindow;
+    private Texture? _emptyTexture;
 
-    public Texture EmptyTexture => throw new NotImplementedException();
+    public Texture EmptyTexture => _emptyTexture ?? throw new InvalidOperationException("Graphics is not initialized");
+    
+    public GraphicDriver Driver => GraphicDriver.OpenGl;
 
     public void Initialize(GraphicDriver preferredDriver, bool enableDebug)
     {
@@ -38,6 +41,9 @@ public unsafe sealed class OpenGlGraphics(
 
         GetWindowRenderTarget(mainWindow);
         _currentWindow = _windowTargets[mainWindow];
+
+        _emptyTexture = CreateTexture("Empty Texture", 1, 1);
+        _emptyTexture.SetData([255, 0, 255, 0]);
     }
 
     private void CheckErrors(GL gl, string context)
