@@ -51,6 +51,13 @@ public struct Color(float r, float g, float b, float a = 1) : IEquatable<Color>
         packed.A / 255f
     );
 
+    public static implicit operator PackedColor(Color color) => new(
+        (byte)(color.R * 255),
+        (byte)(color.G * 255),
+        (byte)(color.B * 255),
+        (byte)(color.A * 255)
+    );
+
     public static Color FromHsv(float hue, float saturation, float lightness, float alpha = 1f)
     {
         if (saturation == 0f)
