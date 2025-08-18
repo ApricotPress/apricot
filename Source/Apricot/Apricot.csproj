@@ -9,18 +9,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="ImGui.NET" Version="1.91.6.1" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.7" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.7" />
-      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.7" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.7" />
-      <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.7" />
-      <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.7" />
+        <PackageReference Include="ImGui.NET" Version="1.91.6.1"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.7"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.7"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.7"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.7"/>
+        <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.7"/>
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.7"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Apricot.Jobs\Apricot.Jobs.csproj" />
-      <ProjectReference Include="..\Apricot.Utils\Apricot.Utils.csproj" />
+        <ProjectReference Include="..\Apricot.Common\Apricot.Common.csproj" />
+        <ProjectReference Include="..\Apricot.Jobs\Apricot.Jobs.csproj"/>
+        <ProjectReference Include="..\Apricot.Utils\Apricot.Utils.csproj"/>
     </ItemGroup>
 
 </Project>
