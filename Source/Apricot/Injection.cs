@@ -48,6 +48,7 @@ public static class Injection
     ) where TJar : Jar => services
         .AddSingleton<IScheduler>(s => new Scheduler(Environment.ProcessorCount - 1))
         .AddSingleton<TJar>()
+        .AddSingleton<Jar>(s => s.GetRequiredService<TJar>())
         .AddSingleton<IPlatformInfo, DefaultPlatformInfo>()
         .AddSingleton<ITimeController, TimeController>()
         .AddSingleton<ITime, StopwatchTime>()
