@@ -4,14 +4,25 @@ using Apricot.Common;
 
 namespace Apricot;
 
+/// <summary>
+/// Class for adding built-in embedded assets to <see cref="PreBakedAssetsImporter"/> and for accessing their ids.
+/// </summary>
 public static class BuiltInAssets
 {
+    /// <summary>
+    /// List of constants with ids that should be used for <see cref="IAssetsDatabase"/> as paths.
+    /// </summary>
     public static class Shaders
     {
         public const string StandardVertex = "BuiltIn/Shaders/Standard.vert";
+
         public const string StandardFragment = "BuiltIn/Shaders/Standard.frag";
     }
 
+    /// <summary>
+    /// Adds built-in assets to pre-baked importer.
+    /// </summary>
+    /// <param name="preBakedAssetsImporter">Pre-baked importer.</param>
     public static void Add(PreBakedAssetsImporter preBakedAssetsImporter)
     {
         AddShader(preBakedAssetsImporter, Shaders.StandardVertex);
@@ -23,25 +34,21 @@ public static class BuiltInAssets
             name,
             [
                 new Artifact(
-                    Guid.Empty,
                     name + " (dxil)",
                     new ArtifactTarget(null, GraphicDriver.Direct3d12),
                     ReadEmbeded(name + ".dxil")
                 ),
                 new Artifact(
-                    Guid.Empty,
                     Shaders.StandardVertex + " (glsl)",
                     new ArtifactTarget(null, GraphicDriver.OpenGl),
                     ReadEmbeded(name + ".glsl")
                 ),
                 new Artifact(
-                    Guid.Empty,
                     Shaders.StandardVertex + " (metal)",
                     new ArtifactTarget(null, GraphicDriver.Metal),
                     ReadEmbeded(name + ".msl")
                 ),
                 new Artifact(
-                    Guid.Empty,
                     Shaders.StandardVertex + " (spir-v)",
                     new ArtifactTarget(null, GraphicDriver.Vulkan),
                     ReadEmbeded(name + ".spv")

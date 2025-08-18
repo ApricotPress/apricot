@@ -2,6 +2,11 @@ using Apricot.Common;
 
 namespace Apricot.Assets;
 
+/// <summary>
+/// Struct representing what platforms artifact supports. Nul lvalue of param represents wildcard.
+/// </summary>
+/// <param name="Platform">Target runtime platform that artifact is suitable for.</param>
+/// <param name="GraphicDriver">Target graphic driver that artifact is suitable for.</param>
 public readonly record struct ArtifactTarget(
     RuntimePlatform? Platform,
     GraphicDriver? GraphicDriver

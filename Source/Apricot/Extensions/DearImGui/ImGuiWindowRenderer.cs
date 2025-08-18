@@ -14,9 +14,13 @@ using Apricot.Timing;
 using Apricot.Windows;
 using ImGuiNET;
 
-namespace Apricot.Extensions;
+namespace Apricot.Extensions.DearImGui;
 
-public unsafe class ImGuiWindowRenderer
+/// <summary>
+/// Class with <see cref="ITickHandler">tick handlers</see> that should be called before and after rendering to render
+/// ImGui. Designed to work with a single window.
+/// </summary>
+public sealed unsafe class ImGuiWindowRenderer
 {
     private readonly IntPtr _imGuiContext;
 
@@ -37,8 +41,14 @@ public unsafe class ImGuiWindowRenderer
     private readonly IRenderTarget _renderTarget;
     private readonly Material _material;
 
+    /// <summary>
+    /// Tick handler that is called before calling ImGui methods.
+    /// </summary>
     public ITickHandler BeginLayout { get; }
 
+    /// <summary>
+    /// Tick handler that is called after all work with ImGui for current window is done..
+    /// </summary>
     public ITickHandler EndLayout { get; }
 
     public ImGuiWindowRenderer(
@@ -55,20 +65,6 @@ public unsafe class ImGuiWindowRenderer
         _window = window;
         _time = time;
 
-        var shaderProgramFrag = graphics.CreateShaderProgram(
-            "Standard Fragment",
-            new ShaderProgramDescription
-            {
-                Code = assets.GetArtifact(
-                    BuiltInAssets.Shaders.StandardFragment,
-                    new ArtifactTarget(platform.Platform, platform.GraphicDriver)
-                ),
-                EntryPoint = "frag",
-                SamplerCount = 1,
-                UniformBufferCount = 0,
-                Stage = ShaderStage.Fragment
-            }
-        );
         var shaderProgramVert = graphics.CreateShaderProgram(
             "Standard Vertex",
             new ShaderProgramDescription
@@ -83,10 +79,24 @@ public unsafe class ImGuiWindowRenderer
                 Stage = ShaderStage.Vertex
             }
         );
+        var shaderProgramFrag = graphics.CreateShaderProgram(
+            "Standard Fragment",
+            new ShaderProgramDescription
+            {
+                Code = assets.GetArtifact(
+                    BuiltInAssets.Shaders.StandardFragment,
+                    new ArtifactTarget(platform.Platform, platform.GraphicDriver)
+                ),
+                EntryPoint = "frag",
+                SamplerCount = 1,
+                UniformBufferCount = 0,
+                Stage = ShaderStage.Fragment
+            }
+        );
 
 
         _renderTarget = graphics.GetWindowRenderTarget(window);
-        _material = new Material(shaderProgramFrag, shaderProgramVert);
+        _material = new Material(shaderProgramVert, shaderProgramFrag);
 
         ResizeVertexBuffer(2048);
         ResizeIndexBuffer(1024);
@@ -95,6 +105,9 @@ public unsafe class ImGuiWindowRenderer
         EndLayout = new EndHandler(this);
     }
 
+    /// <summary>
+    /// Rebuilds font atlas and uploads it to GPU.
+    /// </summary>
     public void RebuildFontAtlas()
     {
         var io = ImGui.GetIO();
@@ -114,7 +127,7 @@ public unsafe class ImGuiWindowRenderer
         io.Fonts.ClearTexData();
     }
 
-    public virtual IntPtr BindTexture(Texture texture)
+    private IntPtr BindTexture(Texture texture)
     {
         var id = new IntPtr(_texturesCount++);
 
@@ -123,7 +136,7 @@ public unsafe class ImGuiWindowRenderer
         return id;
     }
 
-    public virtual void UnbindTexture(IntPtr textureId)
+    private void UnbindTexture(IntPtr textureId)
     {
         _loadedTextures.Remove(textureId);
     }

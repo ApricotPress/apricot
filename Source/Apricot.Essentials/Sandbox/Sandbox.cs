@@ -1,13 +1,12 @@
 using System.Numerics;
 using Apricot.Assets;
-using Apricot.Extensions;
+using Apricot.Extensions.DearImGui;
 using Apricot.Graphics;
 using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Commands;
 using Apricot.Graphics.Materials;
 using Apricot.Graphics.Shaders;
 using Apricot.Graphics.Structs;
-using Apricot.Graphics.Vertices;
 using Apricot.Lifecycle.TickHandlers;
 using Apricot.Platform;
 using Apricot.Timing;
@@ -17,6 +16,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Apricot.Essentials.Sandbox;
 
+/// <summary>
+/// Simple class used as a sandbox used while developing.
+/// </summary>
 public class Sandbox(
     ITime time,
     IGraphics graphics,
@@ -42,22 +44,7 @@ public class Sandbox(
             3
         );
 
-    private readonly Material _mat = new(
-        graphics.CreateShaderProgram(
-            "Standard Fragment",
-            new ShaderProgramDescription
-            {
-                Code = assets.GetArtifact(
-                    BuiltInAssets.Shaders.StandardFragment,
-                    new ArtifactTarget(platform.Platform, platform.GraphicDriver)
-                ),
-                EntryPoint = "frag",
-                SamplerCount = 1,
-                UniformBufferCount = 0,
-                Stage = ShaderStage.Fragment
-            }
-        ),
-        graphics.CreateShaderProgram(
+    private readonly Material _mat = new(graphics.CreateShaderProgram(
             "Standard Vertex",
             new ShaderProgramDescription()
             {
@@ -70,8 +57,20 @@ public class Sandbox(
                 UniformBufferCount = 1,
                 Stage = ShaderStage.Vertex
             }
-        )
-    );
+        ), graphics.CreateShaderProgram(
+        "Standard Fragment",
+        new ShaderProgramDescription
+        {
+            Code = assets.GetArtifact(
+                BuiltInAssets.Shaders.StandardFragment,
+                new ArtifactTarget(platform.Platform, platform.GraphicDriver)
+            ),
+            EntryPoint = "frag",
+            SamplerCount = 1,
+            UniformBufferCount = 0,
+            Stage = ShaderStage.Fragment
+        }
+    ));
 
     // private float[] _samples = new float[256];
     // private int _writeIndex;

@@ -9,7 +9,7 @@ namespace Apricot.Assets.Tests;
 public class DatabaseTests<TAssets> where TAssets : class, IAssetsDatabase
 {
     private Mock<ILogger<TAssets>> _mockLogger;
-    private Mock<IAssetImporter> _mockImporter;
+    private Mock<IAssetsImporter> _mockImporter;
     private IAssetsDatabase _assetsDatabase;
 
     private readonly ImportSettings _defaultImportSettings = new(new ArtifactTarget(
@@ -23,11 +23,11 @@ public class DatabaseTests<TAssets> where TAssets : class, IAssetsDatabase
     public void Setup()
     {
         _mockLogger = new Mock<ILogger<TAssets>>();
-        _mockImporter = new Mock<IAssetImporter>();
+        _mockImporter = new Mock<IAssetsImporter>();
 
         var services = new ServiceCollection();
         services.AddSingleton<ILogger<TAssets>>(_ => _mockLogger.Object);
-        services.AddSingleton<IAssetImporter>(_ => _mockImporter.Object);
+        services.AddSingleton<IAssetsImporter>(_ => _mockImporter.Object);
         services.AddSingleton<IAssetsDatabase, TAssets>();
         _assetsDatabase = services
             .BuildServiceProvider()
@@ -57,8 +57,15 @@ public class DatabaseTests<TAssets> where TAssets : class, IAssetsDatabase
                 new ArtifactTarget(RuntimePlatform.Windows, null)
             ]);
         _mockImporter
-            .Setup(i => i.Import(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<ArtifactTarget>()))
-            .Returns((Guid id, string path, ArtifactTarget target) => new Artifact(id, "foo", target, id.ToByteArray()));
+            .Setup(i => i.Import(It.IsAny<string>(), It.IsAny<ArtifactTarget>()))
+            .Returns((string _, ArtifactTarget target) => new Artifact(
+                "foo",
+                target,
+                [
+                    target.GraphicDriver.HasValue ? (byte)target.GraphicDriver : (byte)255,
+                    target.Platform.HasValue ? (byte)target.Platform : (byte)255
+                ]
+            ));
 
         var id = _assetsDatabase.Import("some_asset", _allTargets);
 

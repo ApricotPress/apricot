@@ -1,5 +1,5 @@
 using Apricot.Events;
-using Apricot.Extensions;
+using Apricot.Extensions.DearImGui;
 using Apricot.Graphics;
 using Apricot.Graphics.GameLoop;
 using Apricot.Lifecycle.TickHandlers;

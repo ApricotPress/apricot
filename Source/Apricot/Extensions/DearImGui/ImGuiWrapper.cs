@@ -4,8 +4,12 @@ using Apricot.Platform;
 using Apricot.Timing;
 using Apricot.Windows;
 
-namespace Apricot.Extensions;
+namespace Apricot.Extensions.DearImGui;
 
+/// <summary>
+/// Simple wrapper around ImGui that creates <see cref="ImGuiWindowRenderer"/> for main window which then can be used in
+/// game loop.
+/// </summary>
 public class ImGuiWrapper(
     IGraphics graphics,
     IWindowsManager windows,

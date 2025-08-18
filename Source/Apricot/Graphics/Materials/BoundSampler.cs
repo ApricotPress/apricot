@@ -2,6 +2,7 @@ using Apricot.Graphics.Textures;
 
 namespace Apricot.Graphics.Materials;
 
+// todo: make texture non-nullable
 public readonly record struct BoundSampler(Texture? Texture, TextureSampler Sampler);
 
 public readonly record struct TextureSampler(

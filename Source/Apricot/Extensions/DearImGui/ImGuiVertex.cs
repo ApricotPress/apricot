@@ -3,8 +3,11 @@ using System.Runtime.InteropServices;
 using Apricot.Graphics.Structs;
 using Apricot.Graphics.Vertices;
 
-namespace Apricot.Extensions;
+namespace Apricot.Extensions.DearImGui;
 
+/// <summary>
+/// Vertex definition used by ImGui.
+/// </summary>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct ImGuiVertex(Vector2 pos, Vector2 uv, PackedColor color) : IVertex
 {

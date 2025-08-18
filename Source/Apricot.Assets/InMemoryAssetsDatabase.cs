@@ -2,15 +2,24 @@ using Microsoft.Extensions.Logging;
 
 namespace Apricot.Assets;
 
+/// <summary>
+/// Implementation of <see cref="IAssetsDatabase"/> that simply stores all artifacts in-memory after import as a very
+/// basic asset database.
+///
+/// Normalizes all provided paths before generating id.
+/// </summary>
+/// <param name="importers">List of all importers present in container.</param>
+/// <param name="logger">Logger.</param>
 public class InMemoryAssetsDatabase(
-    IEnumerable<IAssetImporter> importers,
+    IEnumerable<IAssetsImporter> importers,
     ILogger<InMemoryAssetsDatabase> logger
 ) : IAssetsDatabase
 {
-    private readonly IAssetImporter[] _importers = importers.ToArray();
+    private readonly IAssetsImporter[] _importers = importers.ToArray();
     private readonly Dictionary<string, Guid> _guidsCache = new();
     private readonly Dictionary<Guid, List<Artifact>> _artifacts = new();
 
+    /// <inheritdoc />
     public Guid Import(string path, ImportSettings settings)
     {
         logger.LogInformation("Importing {path}...", path);
@@ -28,7 +37,7 @@ public class InMemoryAssetsDatabase(
             {
                 if (!target.Matches(settings.Query)) continue;
 
-                artifacts.Add(importer.Import(id, path, target));
+                artifacts.Add(importer.Import(path, target));
             }
         }
 
@@ -45,6 +54,7 @@ public class InMemoryAssetsDatabase(
         return id;
     }
 
+    /// <inheritdoc />
     public Guid GetAssetId(string path)
     {
         var normalizedPath = NormalizePath(path);
@@ -56,11 +66,13 @@ public class InMemoryAssetsDatabase(
         return _guidsCache[normalizedPath] = id;
     }
 
+    /// <inheritdoc />
     public IReadOnlyCollection<Artifact> GetArtifacts(Guid assetId) =>
         _artifacts.TryGetValue(assetId, out var artifacts)
             ? artifacts
             : Array.Empty<Artifact>();
 
+    /// <inheritdoc />
     public byte[] GetArtifact(Guid assetId, ArtifactTarget query)
     {
         var artifacts = GetArtifacts(assetId);
