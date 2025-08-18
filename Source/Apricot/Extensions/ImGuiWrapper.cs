@@ -1,10 +1,18 @@
+using Apricot.Assets;
 using Apricot.Graphics;
+using Apricot.Platform;
 using Apricot.Timing;
 using Apricot.Windows;
 
 namespace Apricot.Extensions;
 
-public class ImGuiWrapper(IGraphics graphics, IWindowsManager windows, ITime time) : IJarLifecycleListener
+public class ImGuiWrapper(
+    IGraphics graphics,
+    IWindowsManager windows,
+    ITime time,
+    IAssetsDatabase assets,
+    IPlatformInfo platform
+) : IJarLifecycleListener
 {
     public ImGuiWindowRenderer? MainWindowRenderer { get; private set; }
 
@@ -13,7 +21,9 @@ public class ImGuiWrapper(IGraphics graphics, IWindowsManager windows, ITime tim
         MainWindowRenderer = new ImGuiWindowRenderer(
             graphics,
             windows.GetOrCreateDefaultWindow(),
-            time
+            time,
+            assets,
+            platform
         );
         MainWindowRenderer.RebuildFontAtlas();
     }

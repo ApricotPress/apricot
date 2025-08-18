@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Apricot.Assets;
 using Apricot.Extensions;
 using Apricot.Jobs;
 using Apricot.Lifecycle;
@@ -52,6 +53,9 @@ public static class Injection
         .AddSingleton<IPlatformInfo, DefaultPlatformInfo>()
         .AddSingleton<ITimeController, TimeController>()
         .AddSingleton<ITime, StopwatchTime>()
+        .AddSingleton<IAssetsDatabase, InMemoryAssetsDatabase>()
+        .AddSingleton<PreBakedAssetsImporter>()
+        .AddSingleton<IAssetImporter>(s => s.GetRequiredService<PreBakedAssetsImporter>())
         .AddSingleton<ImGuiWrapper>()
         .AddSingleton<IJarLifecycleListener>(s => s.GetRequiredService<ImGuiWrapper>())
         .AddSingleton<IGameLoopProvider, DefaultGameLoopProvider>()

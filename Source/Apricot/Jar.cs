@@ -1,3 +1,4 @@
+using Apricot.Assets;
 using Apricot.Graphics;
 using Apricot.Lifecycle;
 using Apricot.Jobs;
@@ -16,6 +17,7 @@ public class Jar(
     IWindowsManager windows,
     IScheduler scheduler,
     IGraphics graphics,
+    PreBakedAssetsImporter preBakedImporter,
     IEnumerable<IJarLifecycleListener> lifecycleListeners,
     IOptionsMonitor<JarOptions> jarOptions
 )
@@ -109,7 +111,7 @@ public class Jar(
         }
 
         graphics.Dispose();
-        
+
         logger.LogInformation("Stopping all background tasks");
 
         scheduler.StopBackground();
@@ -148,8 +150,8 @@ public class Jar(
     /// </summary>
     protected virtual void DoInitialization()
     {
+        BuiltInAssets.Add(preBakedImporter);
         graphics.Initialize(jarOptions.CurrentValue.PreferredDriver, jarOptions.CurrentValue.EnableGraphicsDebug);
-
         scheduler.StartBackground();
 
         var mainWindow = windows.GetOrCreateDefaultWindow();

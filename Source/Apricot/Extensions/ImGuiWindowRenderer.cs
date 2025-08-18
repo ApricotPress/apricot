@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Apricot.Assets;
 using Apricot.Graphics;
 using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Commands;
@@ -8,6 +9,7 @@ using Apricot.Graphics.Materials;
 using Apricot.Graphics.Shaders;
 using Apricot.Graphics.Textures;
 using Apricot.Lifecycle.TickHandlers;
+using Apricot.Platform;
 using Apricot.Timing;
 using Apricot.Windows;
 using ImGuiNET;
@@ -39,7 +41,13 @@ public unsafe class ImGuiWindowRenderer
 
     public ITickHandler EndLayout { get; }
 
-    public ImGuiWindowRenderer(IGraphics graphics, IWindow window, ITime time)
+    public ImGuiWindowRenderer(
+        IGraphics graphics,
+        IWindow window,
+        ITime time,
+        IAssetsDatabase assets,
+        IPlatformInfo platform
+    )
     {
         _imGuiContext = ImGui.CreateContext();
 
@@ -47,14 +55,14 @@ public unsafe class ImGuiWindowRenderer
         _window = window;
         _time = time;
 
-
-        var assetsPath = "/Users/yogurt/Developer/Projects/Apricot/Source/Apricot.Sample/bin/Debug/net9.0/";
-
         var shaderProgramFrag = graphics.CreateShaderProgram(
             "Standard Fragment",
             new ShaderProgramDescription
             {
-                Code = File.ReadAllBytes(assetsPath + "Assets/Shaders/Compiled/Standard.frag.msl"),
+                Code = assets.GetArtifact(
+                    BuiltInAssets.Shaders.StandardFragment,
+                    new ArtifactTarget(platform.Platform, platform.GraphicDriver)
+                ),
                 EntryPoint = "frag",
                 SamplerCount = 1,
                 UniformBufferCount = 0,
@@ -65,7 +73,10 @@ public unsafe class ImGuiWindowRenderer
             "Standard Vertex",
             new ShaderProgramDescription
             {
-                Code = File.ReadAllBytes(assetsPath + "Assets/Shaders/Compiled/Standard.vert.msl"),
+                Code = assets.GetArtifact(
+                    BuiltInAssets.Shaders.StandardVertex,
+                    new ArtifactTarget(platform.Platform, platform.GraphicDriver)
+                ),
                 EntryPoint = "vert",
                 SamplerCount = 0,
                 UniformBufferCount = 1,
@@ -159,9 +170,6 @@ public unsafe class ImGuiWindowRenderer
             globalVtxOffset += imList.VtxBuffer.Size;
             globalIdxOffset += imList.IdxBuffer.Size;
         }
-
-
-        _graphics.Submit(cmd);
     }
 
     private void RebuildBuffers(ImDrawDataPtr data)

@@ -1,0 +1,23 @@
+using Apricot.Common;
+
+namespace Apricot.Assets;
+
+public readonly record struct ArtifactTarget(
+    RuntimePlatform? Platform,
+    GraphicDriver? GraphicDriver
+)
+{
+    public bool Matches(ArtifactTarget query)
+    {
+        var platformMatch =
+            query.Platform is null
+            || Platform is null
+            || Platform == query.Platform.Value;
+        var graphicsMatch =
+            query.GraphicDriver is null
+            || GraphicDriver is null
+            || GraphicDriver == query.GraphicDriver.Value;
+
+        return platformMatch && graphicsMatch;
+    }
+}

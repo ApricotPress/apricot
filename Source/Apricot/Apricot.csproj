@@ -19,9 +19,37 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Apricot.Common\Apricot.Common.csproj" />
+        <ProjectReference Include="..\Apricot.Assets\Apricot.Assets.csproj"/>
+        <ProjectReference Include="..\Apricot.Common\Apricot.Common.csproj"/>
         <ProjectReference Include="..\Apricot.Jobs\Apricot.Jobs.csproj"/>
         <ProjectReference Include="..\Apricot.Utils\Apricot.Utils.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="BuiltInAssets\Shaders\Compiled\Standard.frag.dxil">
+          <LogicalName>BuiltIn/Shaders/Standard.frag.dxil</LogicalName>
+      </EmbeddedResource>
+      <EmbeddedResource Include="BuiltInAssets\Shaders\Compiled\Standard.frag.glsl">
+          <LogicalName>BuiltIn/Shaders/Standard.frag.glsl</LogicalName>
+      </EmbeddedResource>
+      <EmbeddedResource Include="BuiltInAssets\Shaders\Compiled\Standard.frag.msl">
+          <LogicalName>BuiltIn/Shaders/Standard.frag.msl</LogicalName>
+      </EmbeddedResource>
+      <EmbeddedResource Include="BuiltInAssets\Shaders\Compiled\Standard.frag.spv">
+          <LogicalName>BuiltIn/Shaders/Standard.frag.spv</LogicalName>
+      </EmbeddedResource>
+      <EmbeddedResource Include="BuiltInAssets\Shaders\Compiled\Standard.vert.dxil">
+          <LogicalName>BuiltIn/Shaders/Standard.vert.dxil</LogicalName>
+      </EmbeddedResource>
+      <EmbeddedResource Include="BuiltInAssets\Shaders\Compiled\Standard.vert.glsl">
+          <LogicalName>BuiltIn/Shaders/Standard.vert.glsl</LogicalName>
+      </EmbeddedResource>
+      <EmbeddedResource Include="BuiltInAssets\Shaders\Compiled\Standard.vert.msl">
+          <LogicalName>BuiltIn/Shaders/Standard.vert.msl</LogicalName>
+      </EmbeddedResource>
+      <EmbeddedResource Include="BuiltInAssets\Shaders\Compiled\Standard.vert.spv">
+          <LogicalName>BuiltIn/Shaders/Standard.vert.spv</LogicalName>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

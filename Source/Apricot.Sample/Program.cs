@@ -14,6 +14,12 @@ builder
     .AddSdlGpuGraphics()
     .AddSandbox();
 
+var resources = typeof(Jar)
+    .Assembly
+    .GetManifestResourceNames();
+
+Console.WriteLine($"Loaded resources: {string.Join(", ", resources)}");
+
 builder.Configuration
     .AddJsonFile("gameSettings.json", true, true)
     .AddEnvironmentVariables("APRICOT_")
