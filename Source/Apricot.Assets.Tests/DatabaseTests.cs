@@ -36,16 +36,16 @@ public class DatabaseTests<TAssets> where TAssets : class, IAssetsDatabase
 
     [TestCase("test_image.png")]
     [TestCase("test_shader.hlsl")]
-    public async Task GetAssetIdProducesSameId(string assetName)
+    public void GetAssetIdProducesSameId(string assetName)
     {
-        var id1 = await _assetsDatabase.ImportAssetAsync(assetName, _defaultImportSettings);
+        var id1 = _assetsDatabase.Import(assetName, _defaultImportSettings);
         var id2 = _assetsDatabase.GetAssetId(assetName);
 
         Assert.That(id1, Is.EqualTo(id2));
     }
 
     [Test]
-    public async Task ImporterCreatesArtifactForEachOs()
+    public void ImporterCreatesArtifactForEachOs()
     {
         _mockImporter
             .Setup(i => i.SupportsAsset(It.IsAny<string>()))
@@ -57,13 +57,13 @@ public class DatabaseTests<TAssets> where TAssets : class, IAssetsDatabase
                 new ArtifactTarget(RuntimePlatform.Windows, null)
             ]);
         _mockImporter
-            .Setup(i => i.ImportAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<ArtifactTarget>()).Result)
+            .Setup(i => i.Import(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<ArtifactTarget>()))
             .Returns((Guid id, string path, ArtifactTarget target) => new Artifact(id, "foo", target, id.ToByteArray()));
 
-        var id = await _assetsDatabase.ImportAssetAsync("some_asset", _allTargets);
+        var id = _assetsDatabase.Import("some_asset", _allTargets);
 
         var artifacts = _assetsDatabase.GetArtifacts(id);
-        var artifact = _assetsDatabase.GetArtifactAsync(
+        var artifact = _assetsDatabase.GetArtifact(
             id,
             new ArtifactTarget(RuntimePlatform.Windows, GraphicDriver.Direct3d12)
         );
