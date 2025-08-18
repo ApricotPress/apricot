@@ -1,9 +1,10 @@
-namespace Apricot;
+namespace Apricot.Common;
 
 public enum GraphicDriver
 {
     Unknown = -1,
-    Any = 0,
+    None = 0,
+
     OpenGl,
     Metal,
     Direct3d12,

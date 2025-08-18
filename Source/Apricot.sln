@@ -45,6 +45,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{AF257622
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apricot.Utils.SourceGenerators", "Apricot.Utils.SourceGenerators\Apricot.Utils.SourceGenerators.csproj", "{F7A9FE6E-4FDB-465B-ADE8-BDCAE8010ED8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apricot.Assets", "Apricot.Assets\Apricot.Assets.csproj", "{155D8F5C-244A-4001-AD30-E028B117D357}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apricot.Common", "Apricot.Common\Apricot.Common.csproj", "{3F049E05-F975-42F5-8854-B5559FA712A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apricot.Assets.Tests", "Apricot.Assets.Tests\Apricot.Assets.Tests.csproj", "{B67DD9D2-D57D-488F-8D5A-93D54C27533D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

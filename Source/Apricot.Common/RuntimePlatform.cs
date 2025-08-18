@@ -1,4 +1,4 @@
-namespace Apricot.Platform;
+namespace Apricot.Common;
 
 public enum RuntimePlatform
 {
@@ -8,5 +8,5 @@ public enum RuntimePlatform
     OSX,
     Windows,
     Linux,
-    Web,
+    Web
 }

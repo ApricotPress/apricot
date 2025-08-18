@@ -1,3 +1,5 @@
+using Apricot.Common;
+
 namespace Apricot.Platform;
 
 public interface IPlatformInfo
