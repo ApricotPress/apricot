@@ -1,4 +1,4 @@
-namespace Apricot.Common;
+namespace Apricot.Platform;
 
 public enum RuntimePlatform
 {

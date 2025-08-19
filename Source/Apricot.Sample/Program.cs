@@ -1,6 +1,8 @@
 ﻿using Apricot;
 using Apricot.Essentials;
+using Apricot.OpenGl;
 using Apricot.Sdl;
+using Apricot.Sdl.GlBinding;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,6 +14,8 @@ builder
     .AddApricot<Jar>(addHostedQuit: true, builder.Configuration)
     .AddSdl()
     .AddSdlGpuGraphics()
+    // .AddSdlGlPlatform()
+    // .AddOpenGl()
     .AddSandbox();
 
 var resources = typeof(Jar)

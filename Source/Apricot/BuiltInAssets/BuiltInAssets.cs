@@ -1,6 +1,7 @@
 using System.Reflection;
 using Apricot.Assets;
-using Apricot.Common;
+using Apricot.Graphics;
+using Apricot.Platform;
 
 namespace Apricot;
 

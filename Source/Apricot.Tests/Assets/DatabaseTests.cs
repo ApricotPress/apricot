@@ -1,4 +1,5 @@
-using Apricot.Common;
+using Apricot.Platform;
+using Apricot.Graphics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;

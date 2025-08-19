@@ -20,7 +20,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Apricot.Assets\Apricot.Assets.csproj"/>
-        <ProjectReference Include="..\Apricot.Common\Apricot.Common.csproj"/>
         <ProjectReference Include="..\Apricot.Jobs\Apricot.Jobs.csproj"/>
         <ProjectReference Include="..\Apricot.Utils\Apricot.Utils.csproj"/>
     </ItemGroup>

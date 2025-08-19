@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using Apricot.Common;
 using Apricot.Graphics;
 using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Commands;
@@ -33,7 +32,7 @@ public unsafe sealed class OpenGlGraphics(
     private Texture? _emptyTexture;
 
     public Texture EmptyTexture => _emptyTexture ?? throw new InvalidOperationException("Graphics is not initialized");
-    
+
     public GraphicDriver Driver => GraphicDriver.OpenGl;
 
     public void Initialize(GraphicDriver preferredDriver, bool enableDebug)

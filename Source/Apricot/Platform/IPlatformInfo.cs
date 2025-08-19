@@ -1,4 +1,4 @@
-using Apricot.Common;
+using Apricot.Graphics;
 
 namespace Apricot.Platform;
 

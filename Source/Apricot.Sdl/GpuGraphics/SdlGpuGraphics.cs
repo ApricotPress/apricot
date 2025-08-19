@@ -1,8 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using Apricot.Common;
 using Apricot.Graphics;
 using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Commands;

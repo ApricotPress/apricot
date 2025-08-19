@@ -1,4 +1,4 @@
-namespace Apricot.Common;
+namespace Apricot.Graphics;
 
 public enum GraphicDriver
 {

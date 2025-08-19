@@ -1,4 +1,5 @@
-using Apricot.Common;
+using Apricot.Graphics;
+using Apricot.Platform;
 
 namespace Apricot.Assets.Tests;
 
