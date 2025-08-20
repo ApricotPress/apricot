@@ -2,7 +2,6 @@ using Apricot.Assets;
 using Apricot.Graphics;
 using Apricot.Lifecycle;
 using Apricot.Jobs;
-using Apricot.Windows;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -12,17 +11,18 @@ namespace Apricot;
 /// Main class of Apricot. Holds all jam and rules application lifecycle.
 /// </summary>
 public class Jar(
-    ILogger<Jar> logger,
     IGameLoopProvider gameLoopProvider,
-    IWindowsManager windows,
     IScheduler scheduler,
     IGraphics graphics,
     PreBakedAssetsImporter preBakedImporter,
     IEnumerable<IJarLifecycleListener> lifecycleListeners,
-    IOptionsMonitor<JarOptions> jarOptions
+    IOptionsMonitor<JarOptions> jarOptions,
+    ILogger<Jar> logger
 )
 {
     private readonly IJarLifecycleListener[] _lifecycleListeners = lifecycleListeners.ToArray();
+
+    protected ILogger Logger { get; } = logger;
 
     /// <summary>
     /// Current state of jar indication what's going inside of it.
@@ -30,7 +30,7 @@ public class Jar(
     public JarState State { get; private set; } = JarState.Uninitialized;
 
     /// <summary>
-    /// Called to initialize subsystems and create a main window. 
+    /// Called to initialize subsystems.
     /// </summary>
     /// <seealso cref="IJarLifecycleListener.OnBeforeInitialization"/>
     /// <seealso cref="IJarLifecycleListener.OnAfterInitialization"/>
@@ -104,12 +104,7 @@ public class Jar(
             listener.OnBeforeQuit();
         }
 
-        logger.LogInformation("Closing all windows");
-        foreach (var window in windows.Windows)
-        {
-            window.Close();
-        }
-
+        logger.LogInformation("Disposing graphics");
         graphics.Dispose();
 
         logger.LogInformation("Stopping all background tasks");
@@ -145,25 +140,16 @@ public class Jar(
     }
 
     /// <summary>
-    /// Does actual initialization and called from <see cref="Init"/> after and before all lifecycle callbacks. Should
-    /// create main window and subscribe for its close event.
+    /// Does actual initialization and called from <see cref="Init"/> after and before all lifecycle callbacks.
+    ///
+    /// By default, it adds all built-in assets, initializes graphics and starts scheduler of background jobs. 
     /// </summary>
     protected virtual void DoInitialization()
     {
         BuiltInAssets.Add(preBakedImporter);
+        
         graphics.Initialize(jarOptions.CurrentValue.PreferredDriver, jarOptions.CurrentValue.EnableGraphicsDebug);
         scheduler.StartBackground();
-
-        var mainWindow = windows.GetOrCreateDefaultWindow();
-        mainWindow.OnClose += OnMainWindowClosed;
-    }
-
-    private void OnMainWindowClosed(IWindow mainWindow)
-    {
-        if (State != JarState.Running) return;
-
-        mainWindow.OnClose -= OnMainWindowClosed;
-        Quit();
     }
 
     private void ExecuteGameLoop(GameLoop loop)

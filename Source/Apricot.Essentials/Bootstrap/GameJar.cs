@@ -27,15 +27,17 @@ public class GameJar<TGame>(
     PreBakedAssetsImporter preBakedImporter,
     IEnumerable<IJarLifecycleListener> lifecycleListeners,
     IOptionsMonitor<JarOptions> jarOptions,
-    ILogger<Jar> logger
-) : Jar(logger, gameLoopProvider, windows, scheduler, graphics, preBakedImporter, lifecycleListeners, jarOptions),
+    ILogger<GameJar<TGame>> logger
+) : Jar(gameLoopProvider, scheduler, graphics, preBakedImporter, lifecycleListeners, jarOptions, logger),
     IUpdateHandler, IRenderHandler
     where TGame : Game
 {
     protected IWindowsManager Windows { get; } = windows;
+
     protected IGraphics Graphics { get; } = graphics;
 
     protected IWindow? MainWindow { get; private set; }
+
     protected TGame? Game { get; private set; }
 
     protected override void DoInitialization()
@@ -44,6 +46,19 @@ public class GameJar<TGame>(
 
         MainWindow = Windows.GetOrCreateDefaultWindow();
         Game = services.GetRequiredService<TGame>();
+
+        MainWindow.OnClose += OnMainWindowClosed;
+    }
+
+    public override void AfterRun()
+    {
+        Logger.LogInformation("Closing all windows");
+        foreach (var window in Windows.Windows)
+        {
+            window.Close();
+        }
+
+        base.AfterRun();
     }
 
     public virtual void Update()
@@ -62,5 +77,13 @@ public class GameJar<TGame>(
         Game.Render();
 
         Graphics.Present();
+    }
+
+    protected virtual void OnMainWindowClosed(IWindow mainWindow)
+    {
+        if (State != JarState.Running) return;
+
+        mainWindow.OnClose -= OnMainWindowClosed;
+        Quit();
     }
 }
