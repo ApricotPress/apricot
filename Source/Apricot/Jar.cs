@@ -8,7 +8,9 @@ using Microsoft.Extensions.Options;
 namespace Apricot;
 
 /// <summary>
-/// Main class of Apricot. Holds all jam and rules application lifecycle.
+/// Main class of Apricot. Holds all jam and rules application lifecycle. You can create your game by inheriting from it
+/// but much easier would be to use Essentials project and use Game class and GameJar from there to speed up
+/// development.
 /// </summary>
 public class Jar(
     IGameLoopProvider gameLoopProvider,
@@ -147,7 +149,7 @@ public class Jar(
     protected virtual void DoInitialization()
     {
         BuiltInAssets.Add(preBakedImporter);
-        
+
         graphics.Initialize(jarOptions.CurrentValue.PreferredDriver, jarOptions.CurrentValue.EnableGraphicsDebug);
         scheduler.StartBackground();
     }
