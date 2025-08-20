@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices.JavaScript;
 using Apricot;
 using Apricot.Essentials;
+using Apricot.Essentials.Sandbox;
 using Apricot.OpenGl;
 using Apricot.Sdl;
 using Apricot.Sdl.GlBinding;
@@ -44,11 +45,10 @@ public partial class Program
         builder.Services
             .AddLogging(static builder => builder.SetMinimumLevel(LogLevel.Information))
             .AddSingleton<ILoggerProvider, DumbConsoleLoggerProvider>()
-            .AddApricot<Jar>(addHostedQuit: false, builder.Configuration)
             .AddSdl()
             .AddSdlGlPlatform()
             .AddOpenGl()
-            .AddSandbox();
+            .AddGame<SandboxGame>(addHostedQuit: false, builder.Configuration);
 
         builder.Configuration.AddJsonFile("gameSettings.json", true, true);
         builder.Configuration.AddEnvironmentVariables("APRICOT_");

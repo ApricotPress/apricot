@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using Apricot.Graphics.Structs;
 using Apricot.Graphics.Vertices;
 
-namespace Apricot.Extensions.DearImGui;
+namespace Apricot.Essentials.DearImGui;
 
 /// <summary>
 /// Vertex definition used by ImGui.

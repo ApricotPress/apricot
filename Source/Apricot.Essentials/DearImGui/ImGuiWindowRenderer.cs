@@ -14,7 +14,7 @@ using Apricot.Timing;
 using Apricot.Windows;
 using ImGuiNET;
 
-namespace Apricot.Extensions.DearImGui;
+namespace Apricot.Essentials.DearImGui;
 
 /// <summary>
 /// Class with <see cref="ITickHandler">tick handlers</see> that should be called before and after rendering to render
@@ -40,17 +40,7 @@ public sealed unsafe class ImGuiWindowRenderer
 
     private readonly IRenderTarget _renderTarget;
     private readonly Material _material;
-
-    /// <summary>
-    /// Tick handler that is called before calling ImGui methods.
-    /// </summary>
-    public ITickHandler BeginLayout { get; }
-
-    /// <summary>
-    /// Tick handler that is called after all work with ImGui for current window is done..
-    /// </summary>
-    public ITickHandler EndLayout { get; }
-
+    
     public ImGuiWindowRenderer(
         IGraphics graphics,
         IWindow window,
@@ -100,9 +90,31 @@ public sealed unsafe class ImGuiWindowRenderer
 
         ResizeVertexBuffer(2048);
         ResizeIndexBuffer(1024);
+        RebuildFontAtlas();
+    }
+    
+    public void Begin()
+    {
+        ImGui.SetCurrentContext(_imGuiContext);
 
-        BeginLayout = new BeginHandler(this);
-        EndLayout = new EndHandler(this);
+        var io = ImGui.GetIO();
+
+        io.DeltaTime = _time.Delta;
+        io.DisplaySize = new Vector2(_window.Width, _window.Height);
+        io.DisplayFramebufferScale = Vector2.One;
+
+        ImGui.NewFrame();
+    }
+    
+    public void End()
+    {
+        ImGui.Render();
+
+        var data = ImGui.GetDrawData();
+
+        Render(data);
+
+        ImGui.SetCurrentContext(IntPtr.Zero);
     }
 
     /// <summary>
@@ -243,36 +255,5 @@ public sealed unsafe class ImGuiWindowRenderer
             IndexSize._2,
             capacity
         );
-    }
-
-    private class BeginHandler(ImGuiWindowRenderer renderer) : ITickHandler
-    {
-        public void Tick()
-        {
-            ImGui.SetCurrentContext(renderer._imGuiContext);
-
-            var io = ImGui.GetIO();
-            var window = renderer._window;
-
-            io.DeltaTime = renderer._time.Delta;
-            io.DisplaySize = new Vector2(window.Width, window.Height);
-            io.DisplayFramebufferScale = Vector2.One;
-
-            ImGui.NewFrame();
-        }
-    }
-
-    private class EndHandler(ImGuiWindowRenderer renderer) : ITickHandler
-    {
-        public void Tick()
-        {
-            ImGui.Render();
-
-            var data = ImGui.GetDrawData();
-
-            renderer.Render(data);
-
-            ImGui.SetCurrentContext(IntPtr.Zero);
-        }
     }
 }

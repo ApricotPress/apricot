@@ -1,13 +1,13 @@
 using System.Numerics;
 using Apricot.Assets;
-using Apricot.Extensions.DearImGui;
+using Apricot.Essentials.Bootstrap;
+using Apricot.Essentials.DearImGui;
 using Apricot.Graphics;
 using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Commands;
 using Apricot.Graphics.Materials;
 using Apricot.Graphics.Shaders;
 using Apricot.Graphics.Structs;
-using Apricot.Lifecycle.TickHandlers;
 using Apricot.Platform;
 using Apricot.Timing;
 using Apricot.Windows;
@@ -17,16 +17,16 @@ using Microsoft.Extensions.Logging;
 namespace Apricot.Essentials.Sandbox;
 
 /// <summary>
-/// Simple class used as a sandbox used while developing.
+/// Simple game used as a sandbox used while developing.
 /// </summary>
-public class Sandbox(
+public class SandboxGame(
     ITime time,
     IGraphics graphics,
     IWindowsManager windows,
     IAssetsDatabase assets,
     IPlatformInfo platform,
-    ILogger<Sandbox> logger
-) : IUpdateHandler, IDrawHandler, IJarLifecycleListener
+    ILogger<SandboxGame> logger
+) : Game
 {
     private readonly List<float> _lastDeltas = [];
     private readonly IRenderTarget _mainTarget = graphics.GetWindowRenderTarget(windows.GetOrCreateDefaultWindow());
@@ -38,6 +38,13 @@ public class Sandbox(
     // Layout one-time init
     private bool _first = true;
 
+    private readonly ImGuiWindowRenderer _imGuiRenderer = new(
+        graphics,
+        windows.GetOrCreateDefaultWindow(),
+        time,
+        assets,
+        platform
+    );
 
     private readonly VertexBuffer<ImGuiVertex> _triangleVertices = graphics
         .CreateVertexBuffer<ImGuiVertex>(
@@ -54,7 +61,7 @@ public class Sandbox(
 
     private readonly Material _mat = new(graphics.CreateShaderProgram(
         "Standard Vertex",
-        new ShaderProgramDescription()
+        new ShaderProgramDescription
         {
             Code = assets.GetArtifact(
                 BuiltInAssets.Shaders.StandardVertex,
@@ -80,7 +87,8 @@ public class Sandbox(
         }
     ));
 
-    public void Update()
+
+    public override void Update()
     {
         _lastDeltas.Add(time.Delta);
 
@@ -89,18 +97,13 @@ public class Sandbox(
             _lastDeltas.RemoveAt(0);
         }
 
-
-        logger.LogInformation("Average FPS: {Average:F}", 1f / _lastDeltas.Average());
+        ClearColor = Color.FromHsv(time.Time % 10f / 10f, 1, 0.5f);
     }
 
 
-    public void Draw()
+    public override void Render()
     {
         var t = time.Time;
-        var color = Color.FromHsv(t % 10f / 10f, 1, 0.5f);
-        
-        graphics.Clear(color);
-        
         var mat =
             Matrix4x4.CreateScale(100, 100, 1.0f)
             * Matrix4x4.CreateTranslation(50, 50, 0)
@@ -118,24 +121,22 @@ public class Sandbox(
             new ImGuiVertex(new Vector2(0, 1), new Vector2(0, 1), Color.Blue),
         ]);
 
-        
         graphics.Submit(new DrawCommand(_mainTarget, _mat, _triangleVertices)
         {
             IndexBuffer = _indices,
             IndicesCount = 3,
             VerticesCount = 3
         });
-        
-        if (_lastTime < 0) _lastTime = t;
-        float dt = (float)(t - _lastTime);
+
+        _imGuiRenderer.Begin();
         _lastTime = t;
-        
+
         // Animated value in [0..1]
         float v = 0.5f + 0.5f * (float)Math.Sin(t * 1.6f);
-        
+
         // Update sparkline
         _samples[_writeIndex++ % _samples.Length] = v;
-        
+
         // --- window setup (non-interactable) ---
         if (_first)
         {
@@ -143,32 +144,32 @@ public class Sandbox(
             ImGui.SetNextWindowPos(new Vector2(40, 40), ImGuiCond.FirstUseEver);
             _first = false;
         }
-        
-        var flags =
+
+        const ImGuiWindowFlags flags =
             ImGuiWindowFlags.NoCollapse |
             ImGuiWindowFlags.NoSavedSettings |
             ImGuiWindowFlags.NoBringToFrontOnFocus |
             ImGuiWindowFlags.NoInputs; // <- ignore all mouse/keyboard
-        
+
         if (ImGui.Begin("Non-Interactive Dashboard", flags))
         {
             // Also gray out everything visually
             ImGui.BeginDisabled(true);
-        
+
             // Header
             ImGui.TextColored(new Vector4(0.9f, 0.9f, 1.0f, 1), "Status Overview");
             ImGui.SameLine();
             ImGui.TextDisabled($"  (t = {t:0.00}s)");
-        
+
             ImGui.Separator();
-        
+
             // --- top row: animated progress + radial spinner ---
             {
                 ImGui.Text("Throughput");
                 ImGui.ProgressBar(v, new Vector2(-1, 0), $"{v * 100f:0}%");
-        
+
                 ImGui.SameLine();
-        
+
                 // Rotating arc "spinner" using the window draw list
                 var dl = ImGui.GetWindowDrawList();
                 Vector2 p = ImGui.GetCursorScreenPos();
@@ -182,10 +183,10 @@ public class Sandbox(
                 dl.PathStroke(col, ImDrawFlags.None, 4.0f);
                 ImGui.Dummy(new Vector2(size * 2, size)); // reserve space
             }
-        
+
             ImGui.Spacing();
             ImGui.Separator();
-        
+
             // --- middle row: metrics as a table ---
             if (ImGui.BeginTable("metrics", 3,
                     ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))
@@ -194,16 +195,16 @@ public class Sandbox(
                 ImGui.TableSetupColumn("Value");
                 ImGui.TableSetupColumn("Trend");
                 ImGui.TableHeadersRow();
-        
+
                 AddMetricRow("FPS", $"{ImGui.GetIO().Framerate:0}", (float)Math.Abs(Math.Sin(t * 0.7)));
                 AddMetricRow("Latency (ms)", $"{(18 + 10 * (1 - v)):0.0}", 1 - v);
                 AddMetricRow("Load (%)", $"{(35 + 60 * v):0}", v);
-        
+
                 ImGui.EndTable();
             }
-        
+
             ImGui.Spacing();
-        
+
             // --- sparkline / tiny plot (using PlotLines) ---
             ImGui.Text("Signal");
             unsafe
@@ -222,20 +223,20 @@ public class Sandbox(
                     );
                 }
             }
-        
+
             ImGui.Spacing();
             ImGui.Separator();
-        
+
             // --- "rich" widgets (but all disabled & non-interactable) ---
             ImGui.Text("Controls (display-only)");
             ImGui.Columns(3, "cols", false);
-        
+
             // Col 1
             ImGui.Text("Buttons");
             ImGui.Button("Run");
             ImGui.SameLine();
             ImGui.Button("Stop");
-        
+
             // Col 2
             ImGui.NextColumn();
             ImGui.Text("Sliders / Inputs");
@@ -243,7 +244,7 @@ public class Sandbox(
             ImGui.SliderFloat("Rate", ref fake, 0, 100);
             int fakesteps = (int)(3 + 2 * Math.Abs(Math.Sin(t * 0.5)));
             ImGui.SliderInt("Steps", ref fakesteps, 0, 10);
-        
+
             // Col 3
             ImGui.NextColumn();
             ImGui.Text("Toggles / Color");
@@ -251,13 +252,14 @@ public class Sandbox(
             ImGui.Checkbox("Enabled", ref fakeToggle);
             var colVec = new Vector4(0.1f + 0.9f * v, 0.4f, 0.9f - 0.9f * v, 1);
             ImGui.ColorEdit4("Tint", ref colVec, ImGuiColorEditFlags.NoInputs);
-        
+
             ImGui.Columns(1);
-        
+
             ImGui.EndDisabled();
         }
-        
+
         ImGui.End();
+        _imGuiRenderer.End();
     }
 
     private static void AddMetricRow(string name, string value, float trend01)

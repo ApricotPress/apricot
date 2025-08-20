@@ -5,7 +5,7 @@ namespace Apricot.Lifecycle.TickHandlers;
 /// <see cref="DefaultGameLoopProvider"/>.
 /// </summary>
 /// <seealso cref="Ids.Render"/>
-public interface IDrawHandler
+public interface IRenderHandler
 {
-    void Draw();
+    void Render();
 }

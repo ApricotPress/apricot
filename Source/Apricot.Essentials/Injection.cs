@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Apricot.Assets;
-using Apricot.Extensions.DearImGui;
+using Apricot.Essentials.Bootstrap;
+using Apricot.Essentials.DearImGui;
 using Apricot.Jobs;
 using Apricot.Lifecycle;
 using Apricot.Lifecycle.TickHandlers;
@@ -57,8 +58,6 @@ public static class Injection
         .AddSingleton<IAssetsDatabase, InMemoryAssetsDatabase>()
         .AddSingleton<PreBakedAssetsImporter>()
         .AddSingleton<IAssetsImporter>(s => s.GetRequiredService<PreBakedAssetsImporter>())
-        .AddSingleton<ImGuiWrapper>()
-        .AddSingleton<IJarLifecycleListener>(s => s.GetRequiredService<ImGuiWrapper>())
         .AddSingleton<IGameLoopProvider, DefaultGameLoopProvider>()
         .DoIf(addHostedQuit, s => s.AddHostedService<HostedQuit<TJar>>())
         .DoIf(rootConfiguration is not null, s => s
@@ -67,9 +66,16 @@ public static class Injection
             .Configure<MainWindowOptions>(rootConfiguration!.GetSection(nameof(MainWindowOptions)))
             .Configure<JarOptions>(rootConfiguration.GetSection(nameof(JarOptions)))
         );
-    
-    public static IServiceCollection AddSandbox(this IServiceCollection services) => services
-        .AddSingleton<Sandbox.Sandbox>()
-        .AddSingleton<IUpdateHandler>(s => s.GetRequiredService<Sandbox.Sandbox>())
-        .AddSingleton<IDrawHandler>(s => s.GetRequiredService<Sandbox.Sandbox>());
+
+    public static IServiceCollection AddGame<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGame
+    >(
+        this IServiceCollection services,
+        bool addHostedQuit = false,
+        IConfiguration? rootConfiguration = null
+    ) where TGame : Game => services
+        .AddSingleton<TGame>()
+        .AddApricot<GameJar<TGame>>(addHostedQuit, rootConfiguration)
+        .AddSingleton<IUpdateHandler>(s => s.GetRequiredService<GameJar<TGame>>())
+        .AddSingleton<IRenderHandler>(s => s.GetRequiredService<GameJar<TGame>>());
 }

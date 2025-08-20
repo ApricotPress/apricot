@@ -17,13 +17,5 @@ public static class Ids
 
 
     public const string Render = nameof(Render);
-    public const string PreRender = nameof(PreRender);
-    public const string PrepareMainWindow = nameof(PrepareMainWindow);
-    public const string ImGuiBeginLayout = nameof(ImGuiBeginLayout);
-
-    
-    public const string GenericDrawHandlers = nameof(GenericDrawHandlers);
-    
-    public const string ImGuiEndLayout = nameof(ImGuiEndLayout);
-    public const string PresentGraphics = nameof(PresentGraphics);
+    public const string GenericRenderHandlers = nameof(GenericRenderHandlers);
 }

@@ -16,4 +16,10 @@ public record struct GameLoop(
 )
 {
     public static GameLoop SimpleHandler(string id, ITickHandler? handler) => new(id, [], handler);
+
+    public override string ToString()
+    {
+        var handlerStar = Handler is null ? string.Empty : "*";
+        return $"GameLoop {Identifier}[{ChildGameLoops.Length}]{handlerStar}";
+    }
 }

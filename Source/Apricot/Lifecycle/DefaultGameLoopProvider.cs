@@ -1,10 +1,6 @@
 using Apricot.Events;
-using Apricot.Extensions.DearImGui;
-using Apricot.Graphics;
-using Apricot.Graphics.GameLoop;
 using Apricot.Lifecycle.TickHandlers;
 using Apricot.Timing;
-using Apricot.Windows;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Apricot.Lifecycle;
@@ -50,37 +46,9 @@ public class DefaultGameLoopProvider : IGameLoopProvider
             new GameLoop(
                 Ids.Render,
                 [
-                    new GameLoop(
-                        Ids.PreRender,
-                        [
-                            GameLoop.SimpleHandler(
-                                Ids.PrepareMainWindow,
-                                new PrepareRenderTickHandle(
-                                    _services.GetRequiredService<IGraphics>(),
-                                    _services.GetRequiredService<IWindowsManager>()
-                                )
-                            ),
-                            GameLoop.SimpleHandler(
-                                Ids.ImGuiBeginLayout,
-                                _services.GetRequiredService<ImGuiWrapper>().MainWindowRenderer?.BeginLayout
-                            )
-                        ]
-                    ),
                     GameLoop.SimpleHandler(
-                        Ids.GenericDrawHandlers,
-                        new DrawHandlersTickHandler(_services.GetServices<IDrawHandler>().ToArray())
-                    ),
-                    new GameLoop(
-                        Ids.PresentGraphics,
-                        [
-                            GameLoop.SimpleHandler(
-                                Ids.ImGuiEndLayout,
-                                _services.GetRequiredService<ImGuiWrapper>().MainWindowRenderer?.EndLayout
-                            )
-                        ],
-                        new PresentGraphicsTickHandle(
-                            _services.GetRequiredService<IGraphics>()
-                        )
+                        Ids.GenericRenderHandlers,
+                        new DrawHandlersTickHandler(_services.GetServices<IRenderHandler>().ToArray())
                     )
                 ]
             )
@@ -109,13 +77,13 @@ public class DefaultGameLoopProvider : IGameLoopProvider
         }
     }
 
-    private class DrawHandlersTickHandler(IDrawHandler[] handlers) : ITickHandler
+    private class DrawHandlersTickHandler(IRenderHandler[] handlers) : ITickHandler
     {
         public void Tick()
         {
             foreach (var updateHandler in handlers)
             {
-                updateHandler.Draw();
+                updateHandler.Render();
             }
         }
     }

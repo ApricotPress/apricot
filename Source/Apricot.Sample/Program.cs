@@ -1,8 +1,7 @@
 ﻿using Apricot;
 using Apricot.Essentials;
-using Apricot.OpenGl;
+using Apricot.Essentials.Sandbox;
 using Apricot.Sdl;
-using Apricot.Sdl.GlBinding;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,12 +10,11 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder
     .Services
-    .AddApricot<Jar>(addHostedQuit: true, builder.Configuration)
     .AddSdl()
     .AddSdlGpuGraphics()
     // .AddSdlGlPlatform()
     // .AddOpenGl()
-    .AddSandbox();
+    .AddGame<SandboxGame>(addHostedQuit: true, builder.Configuration);
 
 var resources = typeof(Jar)
     .Assembly
