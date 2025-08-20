@@ -154,7 +154,7 @@ public class Jar(
         scheduler.StartBackground();
     }
 
-    private void ExecuteGameLoop(GameLoop loop)
+    private static void ExecuteGameLoop(GameLoop loop)
     {
         foreach (var child in loop.ChildGameLoops)
         {

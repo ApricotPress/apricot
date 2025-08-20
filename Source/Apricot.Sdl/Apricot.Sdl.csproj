@@ -33,4 +33,10 @@
         <ProjectReference Include="..\Apricot\Apricot.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Include="..\..\External\SDL3-CS\SDL3\SDL3.Core.cs">
+        <Link>SDL3.Core.cs</Link>
+      </Compile>
+    </ItemGroup>
+
 </Project>

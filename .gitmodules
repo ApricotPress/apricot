@@ -1,0 +1,9 @@
+[submodule "Externals/SDL"]
+	path = Externals/SDL
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "External/SDL"]
+	path = External/SDL
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "External/SDL3-CS"]
+	path = External/SDL3-CS
+	url = https://github.com/flibitijibibo/SDL3-CS.git
