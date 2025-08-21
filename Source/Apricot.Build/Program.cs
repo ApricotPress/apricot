@@ -171,6 +171,7 @@ public sealed class RebuildShaderAssets : FrostingTask<BuildContext>
 {
     private readonly string[] _stages = ["vertex", "fragment"];
     private const string EssentialsProjDir = "Source/Apricot.Essentials/";
+    private const string EmbeddedItemGroupLabel = "Shader Assets"; 
 
     public override void Run(BuildContext context)
     {
@@ -237,12 +238,20 @@ public sealed class RebuildShaderAssets : FrostingTask<BuildContext>
 
         var itemGroup = projectDocument
             .Descendants(ns + "ItemGroup")
-            .FirstOrDefault(ig => (string?)ig.Attribute("Label") == "Shader Assets");
+            .FirstOrDefault(ig => (string?)ig.Attribute("Label") == EmbeddedItemGroupLabel);
 
         if (itemGroup == null)
         {
-            itemGroup = new XElement(ns + "ItemGroup", new XAttribute("Label", "Shader Assets"));
-            projectDocument.Root!.Add(itemGroup);
+            itemGroup = new XElement(ns + "ItemGroup", new XAttribute("Label", EmbeddedItemGroupLabel));
+            var root = projectDocument.Root!;
+            
+            // xml formatting in c# was created by psychopaths
+            root.Add(new XText("    "));
+            root.Add(new XComment("Auto-Generated XML node"));
+            root.Add(new XText("\n"));
+            root.Add(new XText("    "));
+            root.Add(itemGroup);
+            root.Add(new XText("\n"));
         }
 
         itemGroup.RemoveNodes();
@@ -254,10 +263,18 @@ public sealed class RebuildShaderAssets : FrostingTask<BuildContext>
                 .MakeAbsolute(context.Environment)
                 .GetRelativePath(compiled.Path.MakeAbsolute(context.Environment));
             var embedded = new XElement(ns + "EmbeddedResource", new XAttribute("Include", includePath.ToString()));
+            
+            // either I don't understand how to do it properly, and I am utterly deranged
+            // or whoever invented this is
+            embedded.Add(new XText("\n            "));
             embedded.Add(new XElement(ns + "LogicalName", compiled.LogicalName));
+            embedded.Add(new XText("\n        "));
 
+            itemGroup.Add(new XText("\n        "));
             itemGroup.Add(embedded);
         }
+        
+        itemGroup.Add(new XText("\n    "));
 
         var settings = new XmlWriterSettings
         {

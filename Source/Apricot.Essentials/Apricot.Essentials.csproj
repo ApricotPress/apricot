@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -17,5 +16,25 @@
         <ProjectReference Include="..\Apricot\Apricot.csproj" />
     </ItemGroup>
 
-    <ItemGroup Label="Shader Assets"><EmbeddedResource Include="Assets/Compiled/Shaders/Standard.vertex.spv"><LogicalName>Shaders/Standard.vertex.spv</LogicalName></EmbeddedResource><EmbeddedResource Include="Assets/Compiled/Shaders/Standard.vertex.msl"><LogicalName>Shaders/Standard.vertex.msl</LogicalName></EmbeddedResource><EmbeddedResource Include="Assets/Compiled/Shaders/Standard.vertex.dxil"><LogicalName>Shaders/Standard.vertex.dxil</LogicalName></EmbeddedResource><EmbeddedResource Include="Assets/Compiled/Shaders/Standard.fragment.spv"><LogicalName>Shaders/Standard.fragment.spv</LogicalName></EmbeddedResource><EmbeddedResource Include="Assets/Compiled/Shaders/Standard.fragment.msl"><LogicalName>Shaders/Standard.fragment.msl</LogicalName></EmbeddedResource><EmbeddedResource Include="Assets/Compiled/Shaders/Standard.fragment.dxil"><LogicalName>Shaders/Standard.fragment.dxil</LogicalName></EmbeddedResource></ItemGroup>
+    <!--Auto-Generated XML node-->
+    <ItemGroup Label="Shader Assets">
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.vertex.spv">
+            <LogicalName>Shaders/Standard.vertex.spv</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.vertex.msl">
+            <LogicalName>Shaders/Standard.vertex.msl</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.vertex.dxil">
+            <LogicalName>Shaders/Standard.vertex.dxil</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.fragment.spv">
+            <LogicalName>Shaders/Standard.fragment.spv</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.fragment.msl">
+            <LogicalName>Shaders/Standard.fragment.msl</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.fragment.dxil">
+            <LogicalName>Shaders/Standard.fragment.dxil</LogicalName>
+        </EmbeddedResource>
+    </ItemGroup>
 </Project>
