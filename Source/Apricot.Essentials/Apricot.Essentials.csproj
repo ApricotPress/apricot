@@ -8,13 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.8" />
-      <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
-      <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.8" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Apricot\Apricot.csproj" />
+        <ProjectReference Include="..\Apricot\Apricot.csproj" />
     </ItemGroup>
 
+    <ItemGroup Label="Shader Assets"><EmbeddedResource Include="Assets/Compiled/Shaders/Standard.vertex.spv"><LogicalName>Shaders/Standard.vertex.spv</LogicalName></EmbeddedResource><EmbeddedResource Include="Assets/Compiled/Shaders/Standard.vertex.msl"><LogicalName>Shaders/Standard.vertex.msl</LogicalName></EmbeddedResource><EmbeddedResource Include="Assets/Compiled/Shaders/Standard.vertex.dxil"><LogicalName>Shaders/Standard.vertex.dxil</LogicalName></EmbeddedResource><EmbeddedResource Include="Assets/Compiled/Shaders/Standard.fragment.spv"><LogicalName>Shaders/Standard.fragment.spv</LogicalName></EmbeddedResource><EmbeddedResource Include="Assets/Compiled/Shaders/Standard.fragment.msl"><LogicalName>Shaders/Standard.fragment.msl</LogicalName></EmbeddedResource><EmbeddedResource Include="Assets/Compiled/Shaders/Standard.fragment.dxil"><LogicalName>Shaders/Standard.fragment.dxil</LogicalName></EmbeddedResource></ItemGroup>
 </Project>

@@ -6,6 +6,7 @@ namespace Apricot.Graphics.Commands;
 
 public struct DrawCommand(IRenderTarget target, Material material, VertexBuffer vertexBuffer)
 {
+    // todo: remove SetRenderTarget as we have draw command render target?
     public IRenderTarget Target { get; set; } = target;
 
     public Material Material { get; set; } = material;
