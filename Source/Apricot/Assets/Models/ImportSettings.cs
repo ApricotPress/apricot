@@ -1,4 +1,4 @@
-namespace Apricot.Assets;
+namespace Apricot.Assets.Models;
 
 /// <summary>
 /// Settings for <see cref="IAssetsDatabase.Import"/> to use when importing.

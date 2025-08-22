@@ -6,6 +6,8 @@ using Cake.Core.Diagnostics;
 using Cake.Core.IO;
 using Cake.Frosting;
 
+namespace Apricot.Build;
+
 [TaskName("Rebuild shaders and add to project")]
 [IsDependentOn(typeof(BuildSdlShadercross))]
 public sealed class RebuildShaderAssets : FrostingTask<BuildContext>

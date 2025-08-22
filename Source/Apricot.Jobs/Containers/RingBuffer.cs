@@ -1,4 +1,4 @@
-namespace Apricot.Jobs;
+namespace Apricot.Jobs.Containers;
 
 public class RingBuffer<T>(int initialLength = 32)
 {

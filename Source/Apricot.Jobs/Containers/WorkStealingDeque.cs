@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Apricot.Jobs;
+namespace Apricot.Jobs.Containers;
 
 public class WorkStealingDeque<T>(int initialSize = 32)
 {

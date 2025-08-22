@@ -1,7 +1,5 @@
 namespace Apricot.Jobs.Tests;
 
-using NUnit;
-
 [TestFixture]
 public class SchedulerTest
 {

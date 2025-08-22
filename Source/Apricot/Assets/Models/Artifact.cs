@@ -1,4 +1,4 @@
-namespace Apricot.Assets;
+namespace Apricot.Assets.Models;
 
 /// <summary>
 /// Representation of platform-specific imported asset that is stored in assets database.

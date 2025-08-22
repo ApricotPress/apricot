@@ -1,3 +1,4 @@
+using Apricot.Graphics.Resources;
 using Apricot.Graphics.Structs;
 
 namespace Apricot.Graphics;

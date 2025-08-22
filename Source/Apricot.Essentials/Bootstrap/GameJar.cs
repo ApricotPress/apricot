@@ -1,4 +1,5 @@
 using Apricot.Assets;
+using Apricot.Configuration;
 using Apricot.Graphics;
 using Apricot.Jobs;
 using Apricot.Lifecycle;

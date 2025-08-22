@@ -20,6 +20,10 @@ namespace Apricot.Essentials.DearImGui;
 /// Class with <see cref="ITickHandler">tick handlers</see> that should be called before and after rendering to render
 /// ImGui. Designed to work with a single window.
 /// </summary>
+/// <remarks>
+/// Renderer assumes that resources and graphics were already initialized and would try to instantly create shaders and
+/// required resources.
+/// </remarks>
 public sealed unsafe class ImGuiWindowRenderer
 {
     private readonly IntPtr _imGuiContext;

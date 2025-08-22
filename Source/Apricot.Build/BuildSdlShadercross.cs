@@ -4,6 +4,8 @@ using Cake.Core.Diagnostics;
 using Cake.Frosting;
 using Cake.Git;
 
+namespace Apricot.Build;
+
 [TaskName("Build shader cross")]
 [IsDependentOn(typeof(UpdateGitSubModules))]
 [IsDependentOn(typeof(BuildSdlStandalone))]

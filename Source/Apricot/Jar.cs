@@ -1,4 +1,5 @@
 using Apricot.Assets;
+using Apricot.Configuration;
 using Apricot.Graphics;
 using Apricot.Lifecycle;
 using Apricot.Jobs;
@@ -148,7 +149,7 @@ public class Jar(
     /// </summary>
     protected virtual void DoInitialization()
     {
-        BuiltInAssets.Add(preBakedImporter);
+        BuiltInAssets.BuiltInAssets.Add(preBakedImporter);
 
         graphics.Initialize(jarOptions.CurrentValue.PreferredDriver, jarOptions.CurrentValue.EnableGraphicsDebug);
         scheduler.StartBackground();

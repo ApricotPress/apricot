@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
-using Apricot.Sdl.Windows;
 using Apricot.OpenGl;
+using Apricot.Sdl.Windows;
 using Apricot.Windows;
 using SDL3;
 

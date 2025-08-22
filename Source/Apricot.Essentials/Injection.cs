@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Apricot.Assets;
+using Apricot.Configuration;
 using Apricot.Essentials.Bootstrap;
-using Apricot.Essentials.DearImGui;
 using Apricot.Jobs;
 using Apricot.Lifecycle;
 using Apricot.Lifecycle.TickHandlers;

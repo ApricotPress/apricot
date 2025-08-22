@@ -1,7 +1,8 @@
+using Apricot.Assets.Models;
 using Apricot.Graphics;
 using Apricot.Platform;
 
-namespace Apricot.Assets.Tests;
+namespace Apricot.Tests.Assets;
 
 [TestFixture]
 public class ArtifactTargetTests

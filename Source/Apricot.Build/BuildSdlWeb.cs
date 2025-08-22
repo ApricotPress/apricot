@@ -2,6 +2,8 @@ using Cake.Core.Diagnostics;
 using Cake.Frosting;
 using Cake.Git;
 
+namespace Apricot.Build;
+
 [TaskName("Build SDL for Emscripten")]
 public sealed class BuildSdlWeb : FrostingTask<BuildContext>
 {

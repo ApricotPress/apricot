@@ -2,7 +2,7 @@ using Apricot.Graphics;
 using Apricot.Sdl.Windows;
 using SDL3;
 
-namespace Apricot.Sdl.Graphics;
+namespace Apricot.Sdl.GpuGraphics;
 
 /// <summary>
 /// Holds handle to window that then can be used to acquire its swapchain.<br/>

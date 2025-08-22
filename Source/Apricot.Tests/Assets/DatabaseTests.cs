@@ -1,10 +1,12 @@
-using Apricot.Platform;
+using Apricot.Assets;
+using Apricot.Assets.Models;
 using Apricot.Graphics;
+using Apricot.Platform;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Apricot.Assets.Tests;
+namespace Apricot.Tests.Assets;
 
 [TestFixture(typeof(InMemoryAssetsDatabase))]
 public class DatabaseTests<TAssets> where TAssets : class, IAssetsDatabase

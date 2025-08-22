@@ -1,3 +1,5 @@
+using Apricot.Graphics.Resources;
+
 namespace Apricot.Graphics.Buffers;
 
 public abstract class GraphicBuffer(

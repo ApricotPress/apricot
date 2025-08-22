@@ -3,6 +3,8 @@ using Cake.Common.Tools.DotNet.Build;
 using Cake.Core.IO;
 using Cake.Frosting;
 
+namespace Apricot.Build;
+
 [TaskName("Generate SDL3 bindings")]
 [IsDependentOn(typeof(UpdateGitSubModules))]
 public sealed class GenerateSdlBindings : FrostingTask<BuildContext>

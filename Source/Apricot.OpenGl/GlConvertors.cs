@@ -1,5 +1,4 @@
 using System;
-using System.Security.Cryptography.X509Certificates;
 using Apricot.Graphics.Textures;
 using Apricot.Graphics.Vertices;
 using Silk.NET.OpenGL;

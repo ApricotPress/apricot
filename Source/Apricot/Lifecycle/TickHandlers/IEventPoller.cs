@@ -1,6 +1,4 @@
-using Apricot.Lifecycle;
-
-namespace Apricot.Events;
+namespace Apricot.Lifecycle.TickHandlers;
 
 /// <summary>
 /// Handler that automatically being added to pre-update section of <see cref="GameLoop"/> by

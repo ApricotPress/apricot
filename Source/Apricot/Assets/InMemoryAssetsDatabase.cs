@@ -1,3 +1,4 @@
+using Apricot.Assets.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Apricot.Assets;

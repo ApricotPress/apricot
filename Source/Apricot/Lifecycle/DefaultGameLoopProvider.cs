@@ -1,4 +1,3 @@
-using Apricot.Events;
 using Apricot.Lifecycle.TickHandlers;
 using Apricot.Timing;
 using Microsoft.Extensions.DependencyInjection;

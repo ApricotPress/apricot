@@ -1,4 +1,3 @@
-using System;
 using Apricot.Graphics;
 using Apricot.Windows;
 using Silk.NET.OpenGL;

@@ -8,7 +8,7 @@ using Apricot.Utils.Collections;
 using Microsoft.Extensions.Logging;
 using SDL3;
 
-namespace Apricot.Sdl.Graphics;
+namespace Apricot.Sdl.GpuGraphics;
 
 public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILogger logger)
 {

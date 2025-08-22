@@ -1,4 +1,4 @@
-using Apricot.Events;
+using Apricot.Lifecycle.TickHandlers;
 using Microsoft.Extensions.Logging;
 using static SDL3.SDL;
 

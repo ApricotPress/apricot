@@ -6,7 +6,7 @@ using Apricot.Graphics.Vertices;
 using Apricot.Utils;
 using SDL3;
 
-namespace Apricot.Sdl.Graphics;
+namespace Apricot.Sdl.GpuGraphics;
 
 public static class ToSdlExtensions
 {

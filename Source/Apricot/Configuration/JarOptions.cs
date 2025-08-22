@@ -1,6 +1,6 @@
 using Apricot.Graphics;
 
-namespace Apricot;
+namespace Apricot.Configuration;
 
 /// <summary>
 /// Generic of Jar. 

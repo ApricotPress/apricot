@@ -1,7 +1,7 @@
 using Apricot.Graphics;
 using Apricot.Platform;
 
-namespace Apricot.Assets;
+namespace Apricot.Assets.Models;
 
 /// <summary>
 /// Struct representing what platforms artifact supports. Nul lvalue of param represents wildcard.

@@ -8,13 +8,13 @@ using Apricot.Graphics.Shaders;
 using Apricot.Graphics.Structs;
 using Apricot.Graphics.Textures;
 using Apricot.Graphics.Vertices;
-using Apricot.Utils.Collections;
 using Apricot.Sdl.Windows;
+using Apricot.Utils.Collections;
 using Apricot.Windows;
 using Microsoft.Extensions.Logging;
 using SDL3;
 
-namespace Apricot.Sdl.Graphics;
+namespace Apricot.Sdl.GpuGraphics;
 
 /// <summary>
 /// Implemnentation of <see cref="IGraphics"/> layer with SDL_gpu. 

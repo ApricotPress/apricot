@@ -1,6 +1,6 @@
-using Apricot.Events;
 using Apricot.Graphics;
-using Apricot.Sdl.Graphics;
+using Apricot.Lifecycle.TickHandlers;
+using Apricot.Sdl.GpuGraphics;
 using Apricot.Sdl.Windows;
 using Apricot.Windows;
 using Microsoft.Extensions.DependencyInjection;

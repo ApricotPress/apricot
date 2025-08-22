@@ -1,4 +1,4 @@
-namespace Apricot.Sdl.Graphics;
+namespace Apricot.Sdl.GpuGraphics;
 
 /// <summary>
 /// Holds data about swapchain texture acquired from SDL.

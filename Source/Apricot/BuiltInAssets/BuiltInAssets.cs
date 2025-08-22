@@ -1,8 +1,9 @@
 using System.Reflection;
 using Apricot.Assets;
+using Apricot.Assets.Models;
 using Apricot.Graphics;
 
-namespace Apricot;
+namespace Apricot.BuiltInAssets;
 
 /// <summary>
 /// Class for adding built-in embedded assets to <see cref="PreBakedAssetsImporter"/> and for accessing their ids.

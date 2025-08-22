@@ -1,4 +1,5 @@
-﻿using Cake.Frosting;
+﻿using Apricot.Build;
+using Cake.Frosting;
 
 return new CakeHost()
     .UseContext<BuildContext>()
