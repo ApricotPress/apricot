@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using Apricot.Assets;
+using Apricot.Essentials.Assets;
 using Apricot.Graphics;
 using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Commands;
@@ -9,7 +9,7 @@ using Apricot.Graphics.Materials;
 using Apricot.Graphics.Shaders;
 using Apricot.Graphics.Textures;
 using Apricot.Lifecycle.TickHandlers;
-using Apricot.Platform;
+using Apricot.Resources;
 using Apricot.Timing;
 using Apricot.Windows;
 using ImGuiNET;
@@ -44,13 +44,12 @@ public sealed unsafe class ImGuiWindowRenderer
 
     private readonly IRenderTarget _renderTarget;
     private readonly Material _material;
-    
+
     public ImGuiWindowRenderer(
         IGraphics graphics,
         IWindow window,
         ITime time,
-        IAssetsDatabase assets,
-        IPlatformInfo platform
+        IResources resources
     )
     {
         _imGuiContext = ImGui.CreateContext();
@@ -59,44 +58,17 @@ public sealed unsafe class ImGuiWindowRenderer
         _window = window;
         _time = time;
 
-        var shaderProgramVert = graphics.CreateShaderProgram(
-            "Standard Vertex",
-            new ShaderProgramDescription
-            {
-                Code = assets.GetArtifact(
-                    BuiltInAssets.Shaders.StandardVertex,
-                    new ArtifactTarget(platform.Platform, platform.GraphicDriver)
-                ),
-                EntryPoint = "vert",
-                SamplerCount = 0,
-                UniformBufferCount = 1,
-                Stage = ShaderStage.Vertex
-            }
-        );
-        var shaderProgramFrag = graphics.CreateShaderProgram(
-            "Standard Fragment",
-            new ShaderProgramDescription
-            {
-                Code = assets.GetArtifact(
-                    BuiltInAssets.Shaders.StandardFragment,
-                    new ArtifactTarget(platform.Platform, platform.GraphicDriver)
-                ),
-                EntryPoint = "frag",
-                SamplerCount = 1,
-                UniformBufferCount = 0,
-                Stage = ShaderStage.Fragment
-            }
-        );
-
-
         _renderTarget = graphics.GetWindowRenderTarget(window);
-        _material = new Material(shaderProgramVert, shaderProgramFrag);
+        _material = new Material(
+            resources.Load<ShaderProgram>(BuiltInAssets.Shaders.StandardVertex),
+            resources.Load<ShaderProgram>(BuiltInAssets.Shaders.StandardFragment)
+        );
 
         ResizeVertexBuffer(2048);
         ResizeIndexBuffer(1024);
         RebuildFontAtlas();
     }
-    
+
     public void Begin()
     {
         ImGui.SetCurrentContext(_imGuiContext);
@@ -109,7 +81,7 @@ public sealed unsafe class ImGuiWindowRenderer
 
         ImGui.NewFrame();
     }
-    
+
     public void End()
     {
         ImGui.Render();

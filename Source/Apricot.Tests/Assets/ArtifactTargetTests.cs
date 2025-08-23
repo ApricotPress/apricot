@@ -1,4 +1,4 @@
-using Apricot.Assets.Models;
+using Apricot.Assets.Artifacts;
 using Apricot.Graphics;
 using Apricot.Platform;
 

@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.InteropServices.JavaScript;
-using Apricot;
 using Apricot.Essentials;
 using Apricot.Essentials.Sandbox;
 using Apricot.OpenGl;
@@ -11,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+namespace Apricot.WebSample;
 
 public sealed class DumbConsoleLoggerProvider : ILoggerProvider
 {

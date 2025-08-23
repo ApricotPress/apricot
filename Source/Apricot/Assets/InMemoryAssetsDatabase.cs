@@ -1,93 +1,79 @@
 using Apricot.Assets.Models;
+using Apricot.Assets.Sources;
+using Apricot.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Apricot.Assets;
 
-/// <summary>
-/// Implementation of <see cref="IAssetsDatabase"/> that simply stores all artifacts in-memory after import as a very
-/// basic asset database.
-///
-/// Normalizes all provided paths before generating id.
-/// </summary>
-/// <param name="importers">List of all importers present in container.</param>
-/// <param name="logger">Logger.</param>
 public class InMemoryAssetsDatabase(
-    IEnumerable<IAssetsImporter> importers,
+    IEnumerable<IAssetsSource> sources,
     ILogger<InMemoryAssetsDatabase> logger
 ) : IAssetsDatabase
 {
-    private readonly IAssetsImporter[] _importers = importers.ToArray();
-    private readonly Dictionary<string, Guid> _guidsCache = new();
-    private readonly Dictionary<Guid, List<Artifact>> _artifacts = new();
+    private readonly IAssetsSource[] _sources = sources.ToArray();
+    private readonly Dictionary<Uri, Guid> _guidsCache = new();
+    private readonly Dictionary<Guid, Asset> _assets = new();
 
-    /// <inheritdoc />
-    public Guid Import(string path, ImportSettings settings)
+    public void BuildDatabase()
     {
-        logger.LogInformation("Importing {path}...", path);
+        logger.LogInformation("Building assets database...");
 
-        var id = GetAssetId(path);
-        var artifacts = new List<Artifact>();
-
-        foreach (var importer in _importers)
+        foreach (var source in _sources)
         {
-            if (!importer.SupportsAsset(path)) continue;
+            logger.LogInformation("Listing assets present under {scheme} scheme", source.Scheme);
 
-            var targets = importer.GetSupportedTargets(path);
+            var assets = source.ListAssetsPaths("", ListAssetsType.Recursive);
 
-            foreach (var target in targets)
+            foreach (var assetLocalPath in assets)
             {
-                if (!target.Matches(settings.Query)) continue;
+                logger.LogInformation("Registering {scheme}:{asset}...", source.Scheme, assetLocalPath);
 
-                artifacts.Add(importer.Import(path, target));
+                var fullPath = new Uri($"{source.Scheme}:{assetLocalPath}");
+                var assetId = GetOrCreateId(fullPath);
+
+                var asset = new Asset(
+                    Path.GetFileNameWithoutExtension(assetLocalPath),
+                    assetId
+                );
+
+                _assets[assetId] = asset;
             }
         }
 
-        if (artifacts.Count == 0)
-        {
-            logger.LogWarning("No importers were found for {path} with specified settings", path);
-        }
+        logger.LogInformation("Loaded {count} assets", _assets.Count);
+    }
 
-        if (!_artifacts.ContainsKey(id)) _artifacts[id] = [];
+    public Asset GetAsset(Uri assetPath)
+    {
+        var id = GetAssetId(assetPath);
 
-        _artifacts[id].RemoveAll(a => a.Target.Matches(settings.Query));
-        _artifacts[id].AddRange(artifacts);
+        if (id is null) throw NotFoundException();
 
-        return id;
+        return _assets.TryGetValue(id.Value, out var asset)
+            ? asset
+            : throw NotFoundException();
+
+        AssetNotFoundException NotFoundException() => new($"Asset {assetPath} was not found.");
     }
 
     /// <inheritdoc />
-    public Guid GetAssetId(string path)
+    public Guid? GetAssetId(Uri path)
     {
-        var normalizedPath = NormalizePath(path);
+        var normalized = UriUtils.NormalizeAssetsUri(path);
 
-        if (_guidsCache.TryGetValue(normalizedPath, out var guid)) return guid;
+        return _guidsCache.TryGetValue(normalized, out var guid)
+            ? guid
+            : null;
+    }
+
+    private Guid GetOrCreateId(Uri path)
+    {
+        if (GetAssetId(path) is { } guid) return guid;
+
+        var normalized = UriUtils.NormalizeAssetsUri(path);
 
         var id = Guid.NewGuid();
-        logger.LogInformation("Assigning Asset id {id} to {path}", id, normalizedPath);
-        return _guidsCache[normalizedPath] = id;
+        logger.LogInformation("Assigning Asset id {id} to {path}", id, normalized);
+        return _guidsCache[normalized] = id;
     }
-
-    /// <inheritdoc />
-    public IReadOnlyCollection<Artifact> GetArtifacts(Guid assetId) =>
-        _artifacts.TryGetValue(assetId, out var artifacts)
-            ? artifacts
-            : Array.Empty<Artifact>();
-
-    /// <inheritdoc />
-    public byte[] GetArtifact(Guid assetId, ArtifactTarget query)
-    {
-        var artifacts = GetArtifacts(assetId);
-        var artifact = artifacts.FirstOrDefault(a => a.Target.Matches(query));
-
-        if (artifact is null)
-        {
-            throw new Exception($"Artifact {assetId} with query {query} was not found");
-        }
-
-        return artifact.Data;
-    }
-
-    private static string NormalizePath(string path) => Path
-        .GetFullPath(path)
-        .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 }

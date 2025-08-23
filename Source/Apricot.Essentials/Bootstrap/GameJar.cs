@@ -25,11 +25,11 @@ public class GameJar<TGame>(
     IWindowsManager windows,
     IScheduler scheduler,
     IGraphics graphics,
-    PreBakedAssetsImporter preBakedImporter,
+    IAssetsDatabase assets,
     IEnumerable<IJarLifecycleListener> lifecycleListeners,
     IOptionsMonitor<JarOptions> jarOptions,
     ILogger<GameJar<TGame>> logger
-) : Jar(gameLoopProvider, scheduler, graphics, preBakedImporter, lifecycleListeners, jarOptions, logger),
+) : Jar(gameLoopProvider, scheduler, graphics, assets, lifecycleListeners, jarOptions, logger),
     IUpdateHandler, IRenderHandler
     where TGame : Game
 {

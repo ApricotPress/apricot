@@ -1,5 +1,5 @@
 using System.Numerics;
-using Apricot.Assets;
+using Apricot.Essentials.Assets;
 using Apricot.Essentials.Bootstrap;
 using Apricot.Essentials.DearImGui;
 using Apricot.Graphics;
@@ -8,7 +8,7 @@ using Apricot.Graphics.Commands;
 using Apricot.Graphics.Materials;
 using Apricot.Graphics.Shaders;
 using Apricot.Graphics.Structs;
-using Apricot.Platform;
+using Apricot.Resources;
 using Apricot.Timing;
 using Apricot.Windows;
 using ImGuiNET;
@@ -23,17 +23,15 @@ public class SandboxGame(
     ITime time,
     IGraphics graphics,
     IWindowsManager windows,
-    IAssetsDatabase assets,
-    IPlatformInfo platform,
+    IResources resources,
     ILogger<SandboxGame> logger
 ) : Game
 {
     private readonly List<float> _lastDeltas = [];
     private readonly IRenderTarget _mainTarget = graphics.GetWindowRenderTarget(windows.GetOrCreateDefaultWindow());
 
-    private float[] _samples = new float[256];
+    private readonly float[] _samples = new float[256];
     private int _writeIndex;
-    private double _lastTime = -1;
 
     // Layout one-time init
     private bool _first = true;
@@ -42,8 +40,7 @@ public class SandboxGame(
         graphics,
         windows.GetOrCreateDefaultWindow(),
         time,
-        assets,
-        platform
+        resources
     );
 
     private readonly VertexBuffer<ImGuiVertex> _triangleVertices = graphics
@@ -59,34 +56,10 @@ public class SandboxGame(
             3
         );
 
-    private readonly Material _mat = new(graphics.CreateShaderProgram(
-        "Standard Vertex",
-        new ShaderProgramDescription
-        {
-            Code = assets.GetArtifact(
-                BuiltInAssets.Shaders.StandardVertex,
-                new ArtifactTarget(platform.Platform, platform.GraphicDriver)
-            ),
-            EntryPoint = "vert",
-            SamplerCount = 0,
-            UniformBufferCount = 1,
-            Stage = ShaderStage.Vertex
-        }
-    ), graphics.CreateShaderProgram(
-        "Standard Fragment",
-        new ShaderProgramDescription
-        {
-            Code = assets.GetArtifact(
-                BuiltInAssets.Shaders.StandardFragment,
-                new ArtifactTarget(platform.Platform, platform.GraphicDriver)
-            ),
-            EntryPoint = "frag",
-            SamplerCount = 1,
-            UniformBufferCount = 0,
-            Stage = ShaderStage.Fragment
-        }
-    ));
-
+    private readonly Material _mat = new(
+        resources.Load<ShaderProgram>(BuiltInAssets.Shaders.StandardVertex),
+        resources.Load<ShaderProgram>(BuiltInAssets.Shaders.StandardFragment)
+    );
 
     public override void Update()
     {
@@ -129,7 +102,6 @@ public class SandboxGame(
         });
 
         _imGuiRenderer.Begin();
-        _lastTime = t;
 
         // Animated value in [0..1]
         float v = 0.5f + 0.5f * (float)Math.Sin(t * 1.6f);

@@ -17,7 +17,7 @@ public class Jar(
     IGameLoopProvider gameLoopProvider,
     IScheduler scheduler,
     IGraphics graphics,
-    PreBakedAssetsImporter preBakedImporter,
+    IAssetsDatabase assets,
     IEnumerable<IJarLifecycleListener> lifecycleListeners,
     IOptionsMonitor<JarOptions> jarOptions,
     ILogger<Jar> logger
@@ -149,8 +149,7 @@ public class Jar(
     /// </summary>
     protected virtual void DoInitialization()
     {
-        BuiltInAssets.BuiltInAssets.Add(preBakedImporter);
-
+        assets.BuildDatabase();
         graphics.Initialize(jarOptions.CurrentValue.PreferredDriver, jarOptions.CurrentValue.EnableGraphicsDebug);
         scheduler.StartBackground();
     }

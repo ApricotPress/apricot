@@ -16,25 +16,49 @@
         <ProjectReference Include="..\Apricot\Apricot.csproj" />
     </ItemGroup>
 
+    <ItemGroup Label="Assets">
+        <EmbeddedResource Include="Assets\Shaders\Standard.hlsl">
+            <LogicalName>Assets/Shaders/Standard.hlsl</LogicalName>
+        </EmbeddedResource>
+    </ItemGroup>
+
     <!--Auto-Generated XML node-->
-    <ItemGroup Label="Shader Assets">
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.vertex.spv">
-            <LogicalName>Shaders/Standard.vertex.spv</LogicalName>
+    <ItemGroup Label="Shader Artifacts">
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Vertex.spv.artifact">
+            <LogicalName>Artifacts/Shaders/Standard.Vertex.spv</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.vertex.msl">
-            <LogicalName>Shaders/Standard.vertex.msl</LogicalName>
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Vertex.spv.emanifest">
+            <LogicalName>Manifests/Artifacts/Shaders/Standard.Vertex.spv.emanifest</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.vertex.dxil">
-            <LogicalName>Shaders/Standard.vertex.dxil</LogicalName>
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Vertex.msl.artifact">
+            <LogicalName>Artifacts/Shaders/Standard.Vertex.msl</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.fragment.spv">
-            <LogicalName>Shaders/Standard.fragment.spv</LogicalName>
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Vertex.msl.emanifest">
+            <LogicalName>Manifests/Artifacts/Shaders/Standard.Vertex.msl.emanifest</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.fragment.msl">
-            <LogicalName>Shaders/Standard.fragment.msl</LogicalName>
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Vertex.dxil.artifact">
+            <LogicalName>Artifacts/Shaders/Standard.Vertex.dxil</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.fragment.dxil">
-            <LogicalName>Shaders/Standard.fragment.dxil</LogicalName>
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Vertex.dxil.emanifest">
+            <LogicalName>Manifests/Artifacts/Shaders/Standard.Vertex.dxil.emanifest</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Fragment.spv.artifact">
+            <LogicalName>Artifacts/Shaders/Standard.Fragment.spv</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Fragment.spv.emanifest">
+            <LogicalName>Manifests/Artifacts/Shaders/Standard.Fragment.spv.emanifest</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Fragment.msl.artifact">
+            <LogicalName>Artifacts/Shaders/Standard.Fragment.msl</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Fragment.msl.emanifest">
+            <LogicalName>Manifests/Artifacts/Shaders/Standard.Fragment.msl.emanifest</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Fragment.dxil.artifact">
+            <LogicalName>Artifacts/Shaders/Standard.Fragment.dxil</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Fragment.dxil.emanifest">
+            <LogicalName>Manifests/Artifacts/Shaders/Standard.Fragment.dxil.emanifest</LogicalName>
         </EmbeddedResource>
     </ItemGroup>
 </Project>

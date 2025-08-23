@@ -10,6 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="ImGui.NET" Version="1.91.6.1"/>
+        <PackageReference Include="MessagePack" Version="3.1.4" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.8"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8"/>
@@ -22,30 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="BuiltInAssets\Shaders\Compiled\Standard.frag.dxil">
-          <LogicalName>BuiltIn/Shaders/Standard.frag.dxil</LogicalName>
-      </EmbeddedResource>
-      <EmbeddedResource Include="BuiltInAssets\Shaders\Compiled\Standard.frag.glsl">
-          <LogicalName>BuiltIn/Shaders/Standard.frag.glsl</LogicalName>
-      </EmbeddedResource>
-      <EmbeddedResource Include="BuiltInAssets\Shaders\Compiled\Standard.frag.msl">
-          <LogicalName>BuiltIn/Shaders/Standard.frag.msl</LogicalName>
-      </EmbeddedResource>
-      <EmbeddedResource Include="BuiltInAssets\Shaders\Compiled\Standard.frag.spv">
-          <LogicalName>BuiltIn/Shaders/Standard.frag.spv</LogicalName>
-      </EmbeddedResource>
-      <EmbeddedResource Include="BuiltInAssets\Shaders\Compiled\Standard.vert.dxil">
-          <LogicalName>BuiltIn/Shaders/Standard.vert.dxil</LogicalName>
-      </EmbeddedResource>
-      <EmbeddedResource Include="BuiltInAssets\Shaders\Compiled\Standard.vert.glsl">
-          <LogicalName>BuiltIn/Shaders/Standard.vert.glsl</LogicalName>
-      </EmbeddedResource>
-      <EmbeddedResource Include="BuiltInAssets\Shaders\Compiled\Standard.vert.msl">
-          <LogicalName>BuiltIn/Shaders/Standard.vert.msl</LogicalName>
-      </EmbeddedResource>
-      <EmbeddedResource Include="BuiltInAssets\Shaders\Compiled\Standard.vert.spv">
-          <LogicalName>BuiltIn/Shaders/Standard.vert.spv</LogicalName>
-      </EmbeddedResource>
+      <Folder Include="Serialization\" />
     </ItemGroup>
 
 </Project>

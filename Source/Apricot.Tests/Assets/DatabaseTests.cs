@@ -1,6 +1,7 @@
 using Apricot.Assets;
+using Apricot.Assets.Artifacts;
+using Apricot.Assets.Importing;
 using Apricot.Assets.Models;
-using Apricot.Graphics;
 using Apricot.Platform;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -41,47 +42,9 @@ public class DatabaseTests<TAssets> where TAssets : class, IAssetsDatabase
     [TestCase("test_shader.hlsl")]
     public void GetAssetIdProducesSameId(string assetName)
     {
-        var id1 = _assetsDatabase.Import(assetName, _defaultImportSettings);
-        var id2 = _assetsDatabase.GetAssetId(assetName);
+        var id1 = _assetsDatabase.GetAssetId(new Uri(assetName));
+        var id2 = _assetsDatabase.GetAssetId(new Uri(assetName));
 
         Assert.That(id1, Is.EqualTo(id2));
-    }
-
-    [Test]
-    public void ImporterCreatesArtifactForEachOs()
-    {
-        _mockImporter
-            .Setup(i => i.SupportsAsset(It.IsAny<string>()))
-            .Returns(true);
-        _mockImporter
-            .Setup(i => i.GetSupportedTargets(It.IsAny<string>()))
-            .Returns([
-                new ArtifactTarget(RuntimePlatform.Linux, null),
-                new ArtifactTarget(RuntimePlatform.Windows, null)
-            ]);
-        _mockImporter
-            .Setup(i => i.Import(It.IsAny<string>(), It.IsAny<ArtifactTarget>()))
-            .Returns((string _, ArtifactTarget target) => new Artifact(
-                "foo",
-                target,
-                [
-                    target.GraphicDriver.HasValue ? (byte)target.GraphicDriver : (byte)255,
-                    target.Platform.HasValue ? (byte)target.Platform : (byte)255
-                ]
-            ));
-
-        var id = _assetsDatabase.Import("some_asset", _allTargets);
-
-        var artifacts = _assetsDatabase.GetArtifacts(id);
-        var artifact = _assetsDatabase.GetArtifact(
-            id,
-            new ArtifactTarget(RuntimePlatform.Windows, GraphicDriver.Direct3d12)
-        );
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(artifacts, Has.Count.EqualTo(2));
-            Assert.That(artifact, Is.Not.Null);
-        });
     }
 }

@@ -13,4 +13,8 @@
       <PackageReference Include="Cake.Git" Version="5.0.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Apricot\Apricot.csproj" />
+    </ItemGroup>
+
 </Project>

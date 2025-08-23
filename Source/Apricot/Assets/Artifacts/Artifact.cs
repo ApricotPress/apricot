@@ -1,9 +1,15 @@
-namespace Apricot.Assets.Models;
+using MessagePack;
+
+namespace Apricot.Assets.Artifacts;
 
 /// <summary>
 /// Representation of platform-specific imported asset that is stored in assets database.
 /// </summary>
-/// <param name="Name"></param>
 /// <param name="Target"></param>
 /// <param name="Data"></param>
-public record Artifact(string Name, ArtifactTarget Target, byte[] Data);
+[MessagePackObject(true)]
+public record Artifact(
+    Guid AssetId,
+    ArtifactTarget Target,
+    object Data
+);

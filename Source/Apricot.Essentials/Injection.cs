@@ -1,11 +1,16 @@
 using System.Diagnostics.CodeAnalysis;
 using Apricot.Assets;
+using Apricot.Assets.Artifacts;
+using Apricot.Assets.Embedded;
+using Apricot.Assets.Sources;
 using Apricot.Configuration;
 using Apricot.Essentials.Bootstrap;
+using Apricot.Graphics.Shaders;
 using Apricot.Jobs;
 using Apricot.Lifecycle;
 using Apricot.Lifecycle.TickHandlers;
 using Apricot.Platform;
+using Apricot.Resources;
 using Apricot.Timing;
 using Apricot.Utils;
 using Apricot.Windows;
@@ -56,8 +61,11 @@ public static class Injection
         .AddSingleton<ITimeController, TimeController>()
         .AddSingleton<ITime, StopwatchTime>()
         .AddSingleton<IAssetsDatabase, InMemoryAssetsDatabase>()
-        .AddSingleton<PreBakedAssetsImporter>()
-        .AddSingleton<IAssetsImporter>(s => s.GetRequiredService<PreBakedAssetsImporter>())
+        .AddSingleton<IAssetsSource, EmbeddedAssetsSource>()
+        .AddSingleton<IArtifactsDatabase, CachedArtifactsDatabase>()
+        .AddSingleton<IArtifactsCache, EmbeddedArtifactsCache>()
+        .AddSingleton<IResources, Resources.Resources>()
+        .AddSingleton<IResourceFactory<ShaderProgram, Uri>, ShadersFactory>()
         .AddSingleton<IGameLoopProvider, DefaultGameLoopProvider>()
         .DoIf(addHostedQuit, s => s.AddHostedService<HostedQuit<TJar>>())
         .DoIf(rootConfiguration is not null, s => s

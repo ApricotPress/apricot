@@ -1,3 +1,5 @@
+using Apricot.Assets.Artifacts;
+
 namespace Apricot.Assets.Models;
 
 /// <summary>
