@@ -1,12 +1,6 @@
-[submodule "Externals/SDL"]
-	path = Externals/SDL
-	url = https://github.com/libsdl-org/SDL.git
-[submodule "External/SDL"]
-	path = External/SDL
-	url = https://github.com/libsdl-org/SDL.git
 [submodule "External/SDL3-CS"]
 	path = External/SDL3-CS
 	url = https://github.com/flibitijibibo/SDL3-CS.git
-[submodule "External/SDL_shadercross"]
-	path = External/SDL_shadercross
-	url = https://github.com/libsdl-org/SDL_shadercross.git
+[submodule "External/apricot.native"]
+	path = External/apricot.native
+	url = https://github.com/ApricotPress/apricot.native
