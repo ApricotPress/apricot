@@ -40,7 +40,7 @@ public class EmbeddedAssetsSource : IAssetsSource
 
             if (assembly is null)
             {
-                throw new FileNotFoundException($"Could not find assembly {assemblyName}");
+                throw new AssetNotFoundException($"Could not find assembly {assemblyName}");
             }
 
             foreach (var assetsPath in ListAssetsPaths(assembly, logicalName, listType))

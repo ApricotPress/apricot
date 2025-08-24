@@ -153,16 +153,6 @@ public sealed class RebuildShaderAssets : FrostingTask<BuildContext>
                 .MakeAbsolute(context.Environment)
                 .GetRelativePath(compiled.Path.MakeAbsolute(context.Environment));
 
-            var manifest = new EmbeddedArtifactManifest(
-                compiled.AssetUri,
-                null,
-                compiled.CompiledLogicalName
-            );
-
-            var manifestBytes = MessagePackSerializer.Serialize(manifest);
-            var manifestPath = includePath + "." + EmbeddedArtifactsCache.ManifestExtension;
-            File.WriteAllBytes(EssentialsProjDir + manifestPath, manifestBytes);
-
             var shaderBytes = File.ReadAllBytes(EssentialsProjDir + includePath);
             var programInfo = new ShaderProgramDescription(
                 shaderBytes,
@@ -177,11 +167,27 @@ public sealed class RebuildShaderAssets : FrostingTask<BuildContext>
                 programInfo
             );
             var artifactBytes = EmbeddedArtifactsCache.SerializeArtifact(artifact);
-            var artifactPath = includePath + "." + EmbeddedArtifactsCache.ManifestExtension;
+            var artifactPath = includePath + ".artifact";
             File.WriteAllBytes(EssentialsProjDir + artifactPath, artifactBytes);
+            
+            var manifest = new EmbeddedArtifactManifest(
+                compiled.AssetUri,
+                null,
+                compiled.CompiledLogicalName
+            );
+
+            var manifestBytes = MessagePackSerializer.Serialize(manifest);
+            var manifestPath = artifactPath + "." + EmbeddedArtifactsCache.ManifestExtension;
+            File.WriteAllBytes(EssentialsProjDir + manifestPath, manifestBytes);
+
 
             AddEmbedded(artifactPath, compiled.CompiledLogicalName, ns, itemGroup);
-            AddEmbedded(manifestPath, "Manifests/" + compiled.CompiledLogicalName + ".emanifest", ns, itemGroup);
+            AddEmbedded(
+                manifestPath,
+                "Manifests/" + artifactPath + "." + EmbeddedArtifactsCache.ManifestExtension,
+                ns,
+                itemGroup
+            );
         }
 
         itemGroup.Add(new XText("\n    "));
