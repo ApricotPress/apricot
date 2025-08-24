@@ -5,10 +5,11 @@ using MessagePack;
 namespace Apricot.Assets.Artifacts;
 
 /// <summary>
-/// Struct representing what platforms artifact supports. Nul lvalue of param represents wildcard.
+/// Struct representing what platforms artifact supports. Null value (or empty arrays) of param represents wildcard.
 /// </summary>
 /// <param name="Platform">Target runtime platform that artifact is suitable for.</param>
 /// <param name="GraphicDriver">Target graphic driver that artifact is suitable for.</param>
+/// <param name="Tags">List of tags produced on asset import.</param>
 [MessagePackObject(true)]
 public readonly record struct ArtifactTarget(
     RuntimePlatform? Platform,
@@ -16,8 +17,10 @@ public readonly record struct ArtifactTarget(
     string[] Tags
 )
 {
-    public ArtifactTarget(RuntimePlatform? platform, GraphicDriver? driver) : this(platform, driver, []) { }
-
+    /// <summary>
+    /// Check whether target matches query. To match platform and driver should be either null in query or target or
+    /// equal. For tags it would check that each tag from query exists in current target. 
+    /// </summary>
     public bool Matches(ArtifactTarget query)
     {
         var platformMatch =

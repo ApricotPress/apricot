@@ -12,8 +12,8 @@ public class ArtifactTargetTests
     [TestCase(RuntimePlatform.OSX, GraphicDriver.Direct3d12)]
     public void EmptyArtifactTargetMatchesAll(RuntimePlatform? platform, GraphicDriver? gpu)
     {
-        var target = new ArtifactTarget(platform, gpu);
-        var allTargets = new ArtifactTarget(null, null);
+        var target = new ArtifactTarget(platform, gpu, []);
+        var allTargets = new ArtifactTarget(null, null, []);
 
         var matches = allTargets.Matches(target);
 
@@ -29,8 +29,8 @@ public class ArtifactTargetTests
         GraphicDriver? queryGraphics
     )
     {
-        var target = new ArtifactTarget(targetOs, null);
-        var query = new ArtifactTarget(queryOs, queryGraphics);
+        var target = new ArtifactTarget(targetOs, null, []);
+        var query = new ArtifactTarget(queryOs, queryGraphics, []);
 
         return target.Matches(query);
     }

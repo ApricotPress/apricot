@@ -5,7 +5,7 @@ using Cake.Core.Diagnostics;
 using Cake.Frosting;
 using Cake.Git;
 
-namespace Apricot.Build;
+namespace Apricot.Build.Tasks;
 
 [TaskName("Build SDL standalone")]
 [IsDependentOn(typeof(UpdateGitSubModules))]

@@ -1,4 +1,4 @@
-﻿using Apricot.Build;
+﻿using Apricot.Build.Tasks;
 using Cake.Frosting;
 
 return new CakeHost()

@@ -22,8 +22,4 @@
         <ProjectReference Include="..\Apricot.Utils\Apricot.Utils.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Serialization\" />
-    </ItemGroup>
-
 </Project>

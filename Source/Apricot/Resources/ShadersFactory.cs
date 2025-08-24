@@ -1,14 +1,17 @@
 using Apricot.Assets;
 using Apricot.Assets.Artifacts;
-using Apricot.Assets.Models;
 using Apricot.Graphics;
 using Apricot.Graphics.Shaders;
 using Apricot.Platform;
 
 namespace Apricot.Resources;
 
+/// <summary>
+/// Loads <see cref="ShaderProgramDescription"/> from artifact associated with shader program and creates
+/// <see cref="ShaderProgram"/> from it using active <see cref="IGraphics"/>. 
+/// </summary>
 public class ShadersFactory(
-    IAssetsDatabase assets,
+    IAssetDatabase assets,
     IArtifactsDatabase artifacts,
     IPlatformInfo platform,
     IGraphics graphics

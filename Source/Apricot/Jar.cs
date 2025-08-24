@@ -17,7 +17,7 @@ public class Jar(
     IGameLoopProvider gameLoopProvider,
     IScheduler scheduler,
     IGraphics graphics,
-    IAssetsDatabase assets,
+    IAssetDatabase assets,
     IEnumerable<IJarLifecycleListener> lifecycleListeners,
     IOptionsMonitor<JarOptions> jarOptions,
     ILogger<Jar> logger

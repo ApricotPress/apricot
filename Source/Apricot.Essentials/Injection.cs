@@ -60,7 +60,7 @@ public static class Injection
         .AddSingleton<IPlatformInfo, DefaultPlatformInfo>()
         .AddSingleton<ITimeController, TimeController>()
         .AddSingleton<ITime, StopwatchTime>()
-        .AddSingleton<IAssetsDatabase, InMemoryAssetsDatabase>()
+        .AddSingleton<IAssetDatabase, InMemoryAssetDatabase>()
         .AddSingleton<IAssetsSource, EmbeddedAssetsSource>()
         .AddSingleton<IArtifactsDatabase, CachedArtifactsDatabase>()
         .AddSingleton<IArtifactsCache, EmbeddedArtifactsCache>()

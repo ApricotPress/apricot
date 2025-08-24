@@ -11,15 +11,17 @@ namespace Apricot.Assets.Embedded;
 /// name. Both manifests and artifacts are expected to be serialized using Message Pack. <br/>
 /// <br/>
 ///
-/// To locate manifest file it is expected to end with <code>.emanifest</code> in its logical name.
+/// To locate manifest file it is expected to use <see cref="ManifestExtension"/> as file extension in its logical name.
 /// </summary>
 public class EmbeddedArtifactsCache : IArtifactsCache
 {
-    private readonly IAssetsDatabase _assets;
+    public const string ManifestExtension = "eman";
+    
+    private readonly IAssetDatabase _assets;
     private readonly ILogger<EmbeddedArtifactsCache> _logger;
     private readonly List<(Assembly, EmbeddedArtifactManifest)> _manifests = [];
 
-    public EmbeddedArtifactsCache(IAssetsDatabase assets, ILogger<EmbeddedArtifactsCache> logger)
+    public EmbeddedArtifactsCache(IAssetDatabase assets, ILogger<EmbeddedArtifactsCache> logger)
     {
         _assets = assets;
         _logger = logger;
@@ -44,7 +46,7 @@ public class EmbeddedArtifactsCache : IArtifactsCache
 
         foreach (var logicalName in files)
         {
-            if (!logicalName.EndsWith(".emanifest")) continue;
+            if (!logicalName.EndsWith("." + ManifestExtension)) continue;
 
             using var manifestStream = assembly.GetManifestResourceStream(logicalName);
 

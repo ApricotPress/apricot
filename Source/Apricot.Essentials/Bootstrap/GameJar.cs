@@ -25,7 +25,7 @@ public class GameJar<TGame>(
     IWindowsManager windows,
     IScheduler scheduler,
     IGraphics graphics,
-    IAssetsDatabase assets,
+    IAssetDatabase assets,
     IEnumerable<IJarLifecycleListener> lifecycleListeners,
     IOptionsMonitor<JarOptions> jarOptions,
     ILogger<GameJar<TGame>> logger

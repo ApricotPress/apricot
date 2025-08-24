@@ -2,7 +2,7 @@ using Cake.Common;
 using Cake.Core;
 using Cake.Frosting;
 
-namespace Apricot.Build;
+namespace Apricot.Build.Tasks;
 
 public class BuildContext(ICakeContext context) : FrostingContext(context)
 {

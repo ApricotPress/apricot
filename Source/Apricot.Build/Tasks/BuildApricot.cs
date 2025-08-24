@@ -1,6 +1,6 @@
 using Cake.Frosting;
 
-namespace Apricot.Build;
+namespace Apricot.Build.Tasks;
 
 [TaskName("Default")]
 [IsDependentOn(typeof(BuildSdlStandalone))]

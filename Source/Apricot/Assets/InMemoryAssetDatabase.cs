@@ -1,19 +1,19 @@
-using Apricot.Assets.Models;
 using Apricot.Assets.Sources;
 using Apricot.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Apricot.Assets;
 
-public class InMemoryAssetsDatabase(
+public class InMemoryAssetDatabase(
     IEnumerable<IAssetsSource> sources,
-    ILogger<InMemoryAssetsDatabase> logger
-) : IAssetsDatabase
+    ILogger<InMemoryAssetDatabase> logger
+) : IAssetDatabase
 {
     private readonly IAssetsSource[] _sources = sources.ToArray();
     private readonly Dictionary<Uri, Guid> _guidsCache = new();
     private readonly Dictionary<Guid, Asset> _assets = new();
 
+    /// <inheritdoc />
     public void BuildDatabase()
     {
         logger.LogInformation("Building assets database...");
@@ -28,12 +28,13 @@ public class InMemoryAssetsDatabase(
             {
                 logger.LogInformation("Registering {scheme}:{asset}...", source.Scheme, assetLocalPath);
 
-                var fullPath = new Uri($"{source.Scheme}:{assetLocalPath}");
-                var assetId = GetOrCreateId(fullPath);
+                var assetUri = new Uri($"{source.Scheme}:{assetLocalPath}");
+                var assetId = GetOrCreateId(assetUri);
 
                 var asset = new Asset(
                     Path.GetFileNameWithoutExtension(assetLocalPath),
-                    assetId
+                    assetId,
+                    assetUri
                 );
 
                 _assets[assetId] = asset;
@@ -43,6 +44,7 @@ public class InMemoryAssetsDatabase(
         logger.LogInformation("Loaded {count} assets", _assets.Count);
     }
 
+    /// <inheritdoc />
     public Asset GetAsset(Uri assetPath)
     {
         var id = GetAssetId(assetPath);

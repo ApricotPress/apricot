@@ -1,5 +1,4 @@
 using System.Reflection;
-using Apricot.Assets.Models;
 using Apricot.Assets.Sources;
 using Apricot.Utils;
 

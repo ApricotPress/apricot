@@ -4,7 +4,7 @@ using Cake.Core.Diagnostics;
 using Cake.Core.IO;
 using Cake.Frosting;
 
-namespace Apricot.Build;
+namespace Apricot.Build.Tasks;
 
 [TaskName("Fetch sub-SubModules")]
 public sealed class UpdateGitSubModules : FrostingTask<BuildContext>

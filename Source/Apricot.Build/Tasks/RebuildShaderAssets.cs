@@ -13,7 +13,7 @@ using Cake.Core.IO;
 using Cake.Frosting;
 using MessagePack;
 
-namespace Apricot.Build;
+namespace Apricot.Build.Tasks;
 
 [TaskName("Rebuild shaders and add to project")]
 [IsDependentOn(typeof(BuildSdlShadercross))]
@@ -160,7 +160,7 @@ public sealed class RebuildShaderAssets : FrostingTask<BuildContext>
             );
 
             var manifestBytes = MessagePackSerializer.Serialize(manifest);
-            var manifestPath = includePath + ".emanifest";
+            var manifestPath = includePath + "." + EmbeddedArtifactsCache.ManifestExtension;
             File.WriteAllBytes(EssentialsProjDir + manifestPath, manifestBytes);
 
             var shaderBytes = File.ReadAllBytes(EssentialsProjDir + includePath);
@@ -177,7 +177,7 @@ public sealed class RebuildShaderAssets : FrostingTask<BuildContext>
                 programInfo
             );
             var artifactBytes = EmbeddedArtifactsCache.SerializeArtifact(artifact);
-            var artifactPath = includePath + ".artifact";
+            var artifactPath = includePath + "." + EmbeddedArtifactsCache.ManifestExtension;
             File.WriteAllBytes(EssentialsProjDir + artifactPath, artifactBytes);
 
             AddEmbedded(artifactPath, compiled.CompiledLogicalName, ns, itemGroup);

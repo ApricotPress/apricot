@@ -2,6 +2,9 @@ using System.Text.Json.Serialization;
 
 namespace Apricot.Build.Models;
 
+/// <summary>
+/// Represents JSON output of SDL_shadercross.
+/// </summary>
 public class SdlShaderProgramInfo
 {
     [JsonPropertyName("samplers")]
