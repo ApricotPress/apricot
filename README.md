@@ -1,6 +1,7 @@
 # Apricot
-
-![apricot logo](./logo.png)
+<p align="center">
+  <img src="logo.png" width="300px" />
+</p>
 
 Apricot is my game engine I decided to make in free time out of boredom. If I succeed it should be usable for creation
 of simple 2d games for game jams. Core concepts I want to follow during development:
