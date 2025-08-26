@@ -45,9 +45,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Include="..\..\External\SDL3-CS\SDL3\SDL3.Core.cs">
-            <Link>SDL3.Core.cs</Link>
-        </Compile>
+      <Compile Include="..\..\External\SDL3-CS\SDL3\SDL3.Core.cs">
+        <Link>Bindings\SDL3.Core.cs</Link>
+      </Compile>
     </ItemGroup>
 
 </Project>
