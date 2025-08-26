@@ -1,5 +1,7 @@
 # Apricot
 
+![apricot logo](./logo.png)
+
 Apricot is my game engine I decided to make in free time out of boredom. If I succeed it should be usable for creation
 of simple 2d games for game jams. Core concepts I want to follow during development:
 - Engine should support extreme fast iteration speed, meaning support of .NET hot reload and general flexibility
