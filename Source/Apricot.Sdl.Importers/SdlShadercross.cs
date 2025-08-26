@@ -9,6 +9,42 @@ namespace SDL3.ShaderCross;
 
 public static unsafe partial class SdlShaderCross
 {
+    // had to copy it not to disable runtime marshalling
+    // Taken from https://github.com/ppy/SDL3-CS
+    // C# bools are not blittable, so we need this workaround
+    public readonly record struct SDLBool
+    {
+        private readonly byte value;
+
+        internal const byte FALSE_VALUE = 0;
+        internal const byte TRUE_VALUE = 1;
+
+        internal SDLBool(byte value)
+        {
+            this.value = value;
+        }
+
+        public static implicit operator bool(SDLBool b)
+        {
+            return b.value != FALSE_VALUE;
+        }
+
+        public static implicit operator SDLBool(bool b)
+        {
+            return new SDLBool(b ? TRUE_VALUE : FALSE_VALUE);
+        }
+
+        public bool Equals(SDLBool other)
+        {
+            return other.value == value;
+        }
+
+        public override int GetHashCode()
+        {
+            return value.GetHashCode();
+        }
+    }
+
     private const string nativeLibName = "SDL3_shadercross";
 
     public const int SDL_SHADERCROSS_MAJOR_VERSION = 3;
@@ -86,7 +122,7 @@ public static unsafe partial class SdlShaderCross
         public nuint bytecode_size; // size_t
         public byte* entrypoint; // const char* (UTF-8)
         public SDL_ShaderCross_ShaderStage shader_stage;
-        public SDL.SDLBool enable_debug; // bool
+        public SDLBool enable_debug; // bool
         public byte* name; // const char* (UTF-8) or NULL
         public uint props; // SDL_PropertiesID (uint)
     }
@@ -106,14 +142,14 @@ public static unsafe partial class SdlShaderCross
         public byte* include_dir; // const char* or NULL
         public SDL_ShaderCross_HLSL_Define* defines; // array terminated by a fully NULL struct, or NULL
         public SDL_ShaderCross_ShaderStage shader_stage;
-        public SDL.SDLBool enable_debug;
+        public SDLBool enable_debug;
         public byte* name; // const char* or NULL
         public uint props;
     }
-    
+
     [LibraryImport(nativeLibName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial SDL.SDLBool SDL_ShaderCross_Init();
+    public static partial SDLBool SDL_ShaderCross_Init();
 
     [LibraryImport(nativeLibName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -128,14 +164,14 @@ public static unsafe partial class SdlShaderCross
     [return: MarshalUsing(typeof(SDL.CallerOwnedStringMarshaller))]
     public static partial string SDL_ShaderCross_TranspileMSLFromSPIRV(
         in SDL_ShaderCross_SPIRV_Info info
-    ); 
+    );
 
     [LibraryImport(nativeLibName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalUsing(typeof(SDL.CallerOwnedStringMarshaller))]
     public static partial string SDL_ShaderCross_TranspileHLSLFromSPIRV(
         in SDL_ShaderCross_SPIRV_Info info
-    ); 
+    );
 
     [LibraryImport(nativeLibName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -175,7 +211,7 @@ public static unsafe partial class SdlShaderCross
         byte* bytecode,
         nuint bytecode_size,
         uint props
-    ); 
+    );
 
     [LibraryImport(nativeLibName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

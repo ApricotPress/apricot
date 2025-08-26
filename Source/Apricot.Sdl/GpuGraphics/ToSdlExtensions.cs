@@ -1,6 +1,7 @@
 using Apricot.Graphics.Buffers;
 using Apricot.Graphics.Commands;
 using Apricot.Graphics.Materials;
+using Apricot.Graphics.Shaders;
 using Apricot.Graphics.Textures;
 using Apricot.Graphics.Vertices;
 using Apricot.Utils;
@@ -168,5 +169,12 @@ public static class ToSdlExtensions
         FilterMode.Nearest => SDL.SDL_GPUFilter.SDL_GPU_FILTER_NEAREST,
         FilterMode.Linear => SDL.SDL_GPUFilter.SDL_GPU_FILTER_LINEAR,
         _ => throw new ArgumentOutOfRangeException(nameof(filterMode), filterMode, null)
+    };
+
+    public static SDL.SDL_GPUShaderStage ToSdl(this ShaderStage stage) => stage switch
+    {
+        ShaderStage.Vertex => SDL.SDL_GPUShaderStage.SDL_GPU_SHADERSTAGE_VERTEX,
+        ShaderStage.Fragment => SDL.SDL_GPUShaderStage.SDL_GPU_SHADERSTAGE_FRAGMENT,
+        _ => throw new ArgumentOutOfRangeException(nameof(stage), stage, null)
     };
 }

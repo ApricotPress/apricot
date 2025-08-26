@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <None Include="..\..\External\apricot.native\Artifacts\Linux\SDL\*"
+              CopyToOutputDirectory="PreserveNewest"
+              Visible="false"
+              TargetPath="runtimes/linux-x64/native/%(Filename)%(Extension)"/>
+
+        <None Include="..\..\External\apricot.native\Artifacts\OSX\SDL_shadercross\*"
+              CopyToOutputDirectory="PreserveNewest"
+              Visible="false"
+              TargetPath="runtimes/osx/native/%(Filename)%(Extension)"/>
+
+        <None Include="..\..\External\apricot.native\Artifacts\Linux\SDL_shadercross\*"
+              CopyToOutputDirectory="PreserveNewest"
+              Visible="false"
+              TargetPath="runtimes/linux-x64/native/%(Filename)%(Extension)"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\Apricot.Sdl\Apricot.Sdl.csproj" />
+    </ItemGroup>
+</Project>
