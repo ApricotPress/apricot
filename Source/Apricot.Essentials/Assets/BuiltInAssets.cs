@@ -1,3 +1,5 @@
+using Apricot.Assets;
+
 namespace Apricot.Essentials.Assets;
 
 /// <summary>
@@ -7,8 +9,10 @@ public static class BuiltInAssets
 {
     public static class Shaders
     {
-        public static readonly Uri StandardVertex = new("embedded:Apricot.Essentials/Shaders/Standard.hlsl#Vertex");
+        public static readonly Uri StandardVertex =
+            new("embedded:Apricot.Essentials/Shaders/Standard.hlsl#" + AssetUtils.VertexTag);
 
-        public static readonly Uri StandardFragment = new("embedded:Apricot.Essentials/Shaders/Standard.hlsl#Fragment");
+        public static readonly Uri StandardFragment =
+            new("embedded:Apricot.Essentials/Shaders/Standard.hlsl#" + AssetUtils.FragmentTag);
     }
 }
