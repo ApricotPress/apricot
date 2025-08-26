@@ -7,26 +7,31 @@
         <LangVersion>preview</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
-    
+
     <ItemGroup>
-        <Content Include="..\..\External\apricot.native\Artifacts\OSX\libSDL3.dylib" Visible="false">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <PackagePath>runtimes\win-x64\native</PackagePath>
-            <Pack>True</Pack>
-            <Link>%(Filename)%(Extension)</Link>
-        </Content>
-        <Content Include="..\..\External\apricot.native\Artifacts\Linux\libSDL3.so" Visible="false">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <PackagePath>runtimes\linux-x64\native</PackagePath>
-            <Pack>True</Pack>
-            <Link>%(Filename)%(Extension)</Link>
-        </Content>
-        <Content Include="...\..\External\apricot.native\Artifacts\Windows\SDL3.dll" Visible="false">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <PackagePath>runtimes\osx\native</PackagePath>
-            <Pack>True</Pack>
-            <Link>%(Filename)%(Extension)</Link>
-        </Content>
+        <None Include="..\..\External\apricot.native\Artifacts\OSX\SDL\*"
+              CopyToOutputDirectory="PreserveNewest"
+              TargetPath="runtimes/osx/native/%(Filename)%(Extension)" />
+        
+        <None Include="..\..\External\apricot.native\Artifacts\OSX\SDL_shadercross\*"
+              CopyToOutputDirectory="PreserveNewest"
+              TargetPath="runtimes/osx/native/%(Filename)%(Extension)" />
+
+        <None Include="..\..\External\apricot.native\Artifacts\Windows\SDL\*"
+              CopyToOutputDirectory="PreserveNewest"
+              TargetPath="runtimes/win-x64/native/%(Filename)%(Extension)" />
+
+        <None Include="..\..\External\apricot.native\Artifacts\Windows\SDL_shadercross\*"
+              CopyToOutputDirectory="PreserveNewest"
+              TargetPath="runtimes/win-x64/native/%(Filename)%(Extension)" />
+
+        <None Include="..\..\External\apricot.native\Artifacts\Linux\SDL\*"
+              CopyToOutputDirectory="PreserveNewest"
+              TargetPath="runtimes/linux-x64/native/%(Filename)%(Extension)" />
+
+        <None Include="..\..\External\apricot.native\Artifacts\Linux\SDL_shadercross\*"
+              CopyToOutputDirectory="PreserveNewest"
+              TargetPath="runtimes/linux-x64/native/%(Filename)%(Extension)" />
     </ItemGroup>
 
     <ItemGroup>
@@ -34,9 +39,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Include="..\..\External\SDL3-CS\SDL3\SDL3.Core.cs">
-        <Link>SDL3.Core.cs</Link>
-      </Compile>
+        <Compile Include="..\..\External\SDL3-CS\SDL3\SDL3.Core.cs">
+            <Link>SDL3.Core.cs</Link>
+        </Compile>
     </ItemGroup>
 
 </Project>
