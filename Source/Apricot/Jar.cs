@@ -150,6 +150,7 @@ public class Jar(
     protected virtual void DoInitialization()
     {
         assets.BuildDatabase();
+        assets.ImportAssets();
         graphics.Initialize(jarOptions.CurrentValue.PreferredDriver, jarOptions.CurrentValue.EnableGraphicsDebug);
         scheduler.StartBackground();
     }

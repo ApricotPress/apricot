@@ -12,9 +12,18 @@ namespace Apricot.Assets.Embedded;
 /// </summary>
 public class EmbeddedAssetsSource : IAssetsSource
 {
-    public static string Scheme => "embedded";
+    private const string Prefix = "Assets/";
     
+    public static string Scheme => "embedded";
+
     string IAssetsSource.Scheme => Scheme;
+
+    /// <inheritdoc />
+    public event Action<string> OnAssetChange // embedded assets are never updated, those we need no implementation
+    {
+        add { }
+        remove { }
+    }
 
     public IEnumerable<string> ListAssetsPaths(string localPath, ListAssetsType listType)
     {
@@ -50,12 +59,20 @@ public class EmbeddedAssetsSource : IAssetsSource
         }
     }
 
-    /// <summary>
-    /// Opens stream to asset located at path.
-    /// </summary>
-    /// <param name="localPath">Path to asset (without scheme).</param>
-    /// <returns></returns>
-    /// <exception cref="FileNotFoundException"></exception>
+    public bool Exists(string localPath)
+    {
+        var (assemblyName, logicalName) = ParseLocalPath(localPath);
+        var assembly = FindAssembly(assemblyName);
+
+        if (assembly is null)
+        {
+            throw new AssetNotFoundException($"Could not find assembly {assemblyName}");
+        }
+
+        return assembly.GetManifestResourceNames().Contains($"{Prefix}{logicalName}");
+    }
+
+    /// <inheritdoc />
     public Stream Open(string localPath)
     {
         var (assemblyName, logicalName) = ParseLocalPath(localPath);
@@ -66,7 +83,7 @@ public class EmbeddedAssetsSource : IAssetsSource
             throw new AssetNotFoundException($"Could not find assembly {assemblyName}");
         }
 
-        var fileStream = assembly.GetManifestResourceStream(logicalName);
+        var fileStream = assembly.GetManifestResourceStream($"{Prefix}{logicalName}");
 
         if (fileStream is null)
         {
@@ -78,11 +95,10 @@ public class EmbeddedAssetsSource : IAssetsSource
         return fileStream;
     }
 
-    private static IEnumerable<string> ListAssetsPaths(Assembly assembly, string prefix, ListAssetsType listType)
+    private static IEnumerable<string> ListAssetsPaths(Assembly assembly, string rootPath, ListAssetsType listType)
     {
         var filePaths = assembly.GetManifestResourceNames();
-        var actualPrefix = PathUtils.NormalizePath($"Assets/{prefix}");
-        var substringIndex = "Assets/".Length;
+        var actualPrefix = PathUtils.NormalizePath($"{Prefix}{rootPath}");
         var assemblyName = assembly.GetName().Name;
 
         foreach (var path in filePaths)
@@ -93,7 +109,7 @@ public class EmbeddedAssetsSource : IAssetsSource
             {
                 if (purePath.StartsWith(actualPrefix))
                 {
-                    yield return $"{assemblyName}/{path[substringIndex..]}";
+                    yield return $"{assemblyName}/{path[Prefix.Length..]}";
                 }
             }
             else
@@ -101,7 +117,7 @@ public class EmbeddedAssetsSource : IAssetsSource
                 var parentDir = PathUtils.GetParent(purePath);
                 if (actualPrefix == parentDir)
                 {
-                    yield return $"{assemblyName}/{path[substringIndex..]}";
+                    yield return $"{assemblyName}/{path[Prefix.Length..]}";
                 }
             }
         }

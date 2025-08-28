@@ -1,5 +1,4 @@
 using Apricot.Assets.Artifacts;
-using Apricot.Assets.Importing;
 using Apricot.Assets.Sources;
 
 namespace Apricot.Assets;
@@ -23,6 +22,11 @@ public interface IAssetDatabase
     void BuildDatabase();
 
     /// <summary>
+    /// Imports all assets and produces artifacts.
+    /// </summary>
+    void ImportAssets();
+
+    /// <summary>
     /// Gets asset from provided URI.
     /// </summary>
     Asset GetAsset(Uri assetUri);
@@ -31,4 +35,9 @@ public interface IAssetDatabase
     /// Gets asset id for specified path. If no asset is present would return null.
     /// </summary>
     Guid? GetAssetId(Uri assetUri);
+
+    /// <summary>
+    /// Opens stream to read asset located at <paramref name="assetUri"/>.
+    /// </summary>
+    Stream OpenAsset(Uri assetUri);
 }

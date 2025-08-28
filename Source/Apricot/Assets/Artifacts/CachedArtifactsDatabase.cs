@@ -12,11 +12,14 @@ public class CachedArtifactsDatabase(IEnumerable<IArtifactsCache> caches) : IArt
     private IArtifactsCache MainCache => _caches[0];
 
     /// <inheritdoc />
-    public Artifact FindArtifact(Guid assetId, ArtifactTarget query)
+    public void Add(Artifact artifact) => MainCache.Add(artifact);
+
+    /// <inheritdoc />
+    public Artifact? FindArtifact(Asset asset, ArtifactTarget query)
     {
         foreach (var cache in _caches)
         {
-            var artifacts = cache.GetArtifacts(assetId);
+            var artifacts = cache.GetArtifacts(asset);
 
             foreach (var artifact in artifacts)
             {
@@ -27,6 +30,6 @@ public class CachedArtifactsDatabase(IEnumerable<IArtifactsCache> caches) : IArt
             }
         }
 
-        throw new ArtifactNotFoundException(assetId, query);
+        return null;
     }
 }

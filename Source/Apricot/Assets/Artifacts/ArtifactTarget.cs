@@ -9,7 +9,7 @@ namespace Apricot.Assets.Artifacts;
 /// </summary>
 /// <param name="Platform">Target runtime platform that artifact is suitable for.</param>
 /// <param name="GraphicDriver">Target graphic driver that artifact is suitable for.</param>
-/// <param name="Tags">List of tags produced on asset import.</param>
+/// <param name="Tags">List of tags produced on asset import. E.g. Vertex for vertex shader. Should be connected to artifact, but not to platform itself.</param>
 [MessagePackObject(true)]
 public readonly record struct ArtifactTarget(
     RuntimePlatform? Platform,
@@ -35,4 +35,8 @@ public readonly record struct ArtifactTarget(
 
         return platformMatch && graphicsMatch && tagsMatch;
     }
+
+    /// <inheritdoc />
+    public override string ToString() =>
+        $"ArtifactTarget<{Platform?.ToString() ?? "Any"}, {GraphicDriver?.ToString() ?? "Any"}, {string.Join(", ", Tags)}>";
 }

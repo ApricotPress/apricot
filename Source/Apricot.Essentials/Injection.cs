@@ -14,9 +14,11 @@ using Apricot.Resources;
 using Apricot.Timing;
 using Apricot.Utils;
 using Apricot.Windows;
+using LiteDB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Apricot.Essentials;
 
@@ -56,13 +58,18 @@ public static class Injection
     ) where TJar : Jar => services
         .AddSingleton<IScheduler>(s => new Scheduler(Environment.ProcessorCount - 1))
         .AddSingleton<TJar>()
-        .DoIf(typeof(TJar) != typeof(Jar), s => s.AddSingleton<Jar>(s => s.GetRequiredService<TJar>()))
+        .DoIf(typeof(TJar) != typeof(Jar), s => s.AddSingleton<Jar>(s_ => s_.GetRequiredService<TJar>()))
         .AddSingleton<IPlatformInfo, DefaultPlatformInfo>()
         .AddSingleton<ITimeController, TimeController>()
         .AddSingleton<ITime, StopwatchTime>()
         .AddSingleton<IAssetDatabase, InMemoryAssetDatabase>()
+        .AddSingleton<IAssetsSource>(new FilesAssetsSource("file", "Assets"))
         .AddSingleton<IAssetsSource, EmbeddedAssetsSource>()
         .AddSingleton<IArtifactsDatabase, CachedArtifactsDatabase>()
+        .AddSingleton<IArtifactsCache>(s => new LiteDbArtifactsCache(
+            s.GetRequiredService<ILogger<LiteDbArtifactsCache>>(),
+            new ConnectionString("Filename=artifacts.litedb"))
+        )
         .AddSingleton<IArtifactsCache, EmbeddedArtifactsCache>()
         .AddSingleton<IResources, Resources.Resources>()
         .AddSingleton<IResourceFactory<ShaderProgram, Uri>, ShadersFactory>()

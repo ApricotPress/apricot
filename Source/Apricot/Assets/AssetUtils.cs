@@ -4,5 +4,5 @@ public static class AssetUtils
 {
     public const string VertexTag = "Vertex";
 
-    public const string FragmentTag = "Vertex";
+    public const string FragmentTag = "Fragment";
 }

@@ -23,10 +23,16 @@ public abstract class AssetBasedFactory<T>(
             ? assetUri.Fragment[1..].Split(",")
             : [];
 
+        var artifactTarget = new ArtifactTarget(platform.Platform, platform.GraphicDriver, tags);
         var artifact = artifacts.FindArtifact(
-            asset.Id,
-            new ArtifactTarget(platform.Platform, platform.GraphicDriver, tags)
+            asset,
+            artifactTarget
         );
+
+        if (artifact is null)
+        {
+            throw new ArtifactNotFoundException(asset.Id, artifactTarget);
+        }
 
         return Construct(asset, artifact);
     }

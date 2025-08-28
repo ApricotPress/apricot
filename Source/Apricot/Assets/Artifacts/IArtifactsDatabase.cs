@@ -6,8 +6,13 @@ namespace Apricot.Assets.Artifacts;
 public interface IArtifactsDatabase
 {
     /// <summary>
-    /// Looks for artifact associated with <paramref name="assetId"/> that matches provided <paramref name="query"/>.
+    /// Adds artifact to database.
     /// </summary>
-    /// <exception cref="ArtifactNotFoundException">If no artifact were found</exception>
-    Artifact FindArtifact(Guid assetId, ArtifactTarget query);
+    void Add(Artifact artifact);
+    
+    /// <summary>
+    /// Looks for artifact associated with <paramref name="asset"/> that matches provided <paramref name="query"/> or
+    /// null of no such artifacts exist in database.
+    /// </summary>
+    Artifact? FindArtifact(Asset asset, ArtifactTarget query);
 }

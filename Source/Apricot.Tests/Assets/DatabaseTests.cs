@@ -1,6 +1,5 @@
 using Apricot.Assets;
 using Apricot.Assets.Artifacts;
-using Apricot.Assets.Importing;
 using Apricot.Platform;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -14,14 +13,6 @@ public class DatabaseTests<TAssets> where TAssets : class, IAssetDatabase
     private Mock<ILogger<TAssets>> _mockLogger;
     private Mock<IAssetsImporter> _mockImporter;
     private IAssetDatabase _assetDatabase;
-
-    private readonly ImportSettings _defaultImportSettings = new(new ArtifactTarget(
-        RuntimePlatform.Linux,
-        null,
-        []
-    ));
-
-    private readonly ImportSettings _allTargets = new(new ArtifactTarget(null, null, []));
 
     [SetUp]
     public void Setup()

@@ -6,7 +6,12 @@ namespace Apricot.Assets.Artifacts;
 public interface IArtifactsCache
 {
     /// <summary>
-    /// Returns enumerable with matched artifacts for <paramref name="assetId"/>.
+    /// Adds artifact to cache.
     /// </summary>
-    IEnumerable<Artifact> GetArtifacts(Guid assetId);
+    void Add(Artifact artifact);
+
+    /// <summary>
+    /// Returns enumerable with matched artifacts for <paramref name="asset"/>.
+    /// </summary>
+    IEnumerable<Artifact> GetArtifacts(Asset asset);
 }
