@@ -39,7 +39,7 @@ public class EmbeddedArtifactsCache : IArtifactsCache
             Assembly = assembly
         });
 
-        _logger.LogInformation("Loading manifests from {assemblyName}", assembly.FullName);
+        _logger.LogDebug("Loading manifests from {assemblyName}", assembly.FullName);
 
         // note: EmbeddedArtifactManifest has nothing to do with assembly manifest resources
         var files = assembly.GetManifestResourceNames();

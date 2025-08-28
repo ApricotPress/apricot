@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Apricot.Assets;
 using Apricot.Assets.Artifacts;
 using Apricot.Assets.Embedded;
+using Apricot.Assets.InMemory;
 using Apricot.Assets.Sources;
 using Apricot.Configuration;
 using Apricot.Essentials.Bootstrap;
@@ -66,10 +67,7 @@ public static class Injection
         .AddSingleton<IAssetsSource>(new FilesAssetsSource("file", "Assets"))
         .AddSingleton<IAssetsSource, EmbeddedAssetsSource>()
         .AddSingleton<IArtifactsDatabase, CachedArtifactsDatabase>()
-        .AddSingleton<IArtifactsCache>(s => new LiteDbArtifactsCache(
-            s.GetRequiredService<ILogger<LiteDbArtifactsCache>>(),
-            new ConnectionString("Filename=artifacts.litedb"))
-        )
+        .AddSingleton<IArtifactsCache, InMemoryArtifactsCache>()
         .AddSingleton<IArtifactsCache, EmbeddedArtifactsCache>()
         .AddSingleton<IResources, Resources.Resources>()
         .AddSingleton<IResourceFactory<ShaderProgram, Uri>, ShadersFactory>()

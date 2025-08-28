@@ -1,5 +1,6 @@
 using Apricot.Assets;
 using Apricot.Assets.Artifacts;
+using Apricot.Assets.InMemory;
 using Apricot.Platform;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

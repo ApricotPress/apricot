@@ -33,7 +33,7 @@ public class LiteDbArtifactsCache : IArtifactsCache, IDisposable
     public void Add(Artifact artifact)
     {
         _logger.LogInformation(
-            "Added artifact for asset {asset} with target {target}",
+            "Adding artifact for asset {asset} with target {target}",
             artifact.AssetId,
             artifact.Target
         );

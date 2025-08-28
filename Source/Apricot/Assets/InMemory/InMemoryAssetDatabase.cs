@@ -4,7 +4,7 @@ using Apricot.Assets.Sources;
 using Apricot.Utils;
 using Microsoft.Extensions.Logging;
 
-namespace Apricot.Assets;
+namespace Apricot.Assets.InMemory;
 
 public class InMemoryAssetDatabase(
     IEnumerable<IAssetsSource> sources,
