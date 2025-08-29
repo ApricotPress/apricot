@@ -5,17 +5,14 @@
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
-
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.8" />
         <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.8" />
     </ItemGroup>
-
     <ItemGroup>
         <ProjectReference Include="..\Apricot\Apricot.csproj" />
     </ItemGroup>
-
     <ItemGroup Label="Assets">
         <EmbeddedResource Include="Assets\Shaders\Standard.hlsl">
             <LogicalName>Assets/Shaders/Standard.hlsl</LogicalName>
@@ -23,41 +20,41 @@
     </ItemGroup>
     <!--Auto-Generated XML node-->
     <ItemGroup Label="Shader Artifacts">
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Vertex.spv.artifact">
-            <LogicalName>Artifacts/Shaders/Standard.Vertex.spv</LogicalName>
+        <EmbeddedResource Include="Artifacts/58/5803a65d-65f0-46a5-917f-78a427436323.art">
+            <LogicalName>Artifacts/5803a65d-65f0-46a5-917f-78a427436323</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Vertex.spv.artifact.eman">
-            <LogicalName>Manifests/Assets/Compiled/Shaders/Standard.Vertex.spv.artifact.eman</LogicalName>
+        <EmbeddedResource Include="Artifacts/58/5803a65d-65f0-46a5-917f-78a427436323.eman">
+            <LogicalName>Manifests/5803a65d-65f0-46a5-917f-78a427436323.eman</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Vertex.msl.artifact">
-            <LogicalName>Artifacts/Shaders/Standard.Vertex.msl</LogicalName>
+        <EmbeddedResource Include="Artifacts/26/26bc1181-c075-4d96-abd7-f8c38f24af46.art">
+            <LogicalName>Artifacts/26bc1181-c075-4d96-abd7-f8c38f24af46</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Vertex.msl.artifact.eman">
-            <LogicalName>Manifests/Assets/Compiled/Shaders/Standard.Vertex.msl.artifact.eman</LogicalName>
+        <EmbeddedResource Include="Artifacts/26/26bc1181-c075-4d96-abd7-f8c38f24af46.eman">
+            <LogicalName>Manifests/26bc1181-c075-4d96-abd7-f8c38f24af46.eman</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Vertex.dxil.artifact">
-            <LogicalName>Artifacts/Shaders/Standard.Vertex.dxil</LogicalName>
+        <EmbeddedResource Include="Artifacts/a1/a16d6c68-cd71-42ca-a705-199434883016.art">
+            <LogicalName>Artifacts/a16d6c68-cd71-42ca-a705-199434883016</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Vertex.dxil.artifact.eman">
-            <LogicalName>Manifests/Assets/Compiled/Shaders/Standard.Vertex.dxil.artifact.eman</LogicalName>
+        <EmbeddedResource Include="Artifacts/a1/a16d6c68-cd71-42ca-a705-199434883016.eman">
+            <LogicalName>Manifests/a16d6c68-cd71-42ca-a705-199434883016.eman</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Fragment.spv.artifact">
-            <LogicalName>Artifacts/Shaders/Standard.Fragment.spv</LogicalName>
+        <EmbeddedResource Include="Artifacts/8c/8c1d4c00-d3de-4785-a8ec-819110582391.art">
+            <LogicalName>Artifacts/8c1d4c00-d3de-4785-a8ec-819110582391</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Fragment.spv.artifact.eman">
-            <LogicalName>Manifests/Assets/Compiled/Shaders/Standard.Fragment.spv.artifact.eman</LogicalName>
+        <EmbeddedResource Include="Artifacts/8c/8c1d4c00-d3de-4785-a8ec-819110582391.eman">
+            <LogicalName>Manifests/8c1d4c00-d3de-4785-a8ec-819110582391.eman</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Fragment.msl.artifact">
-            <LogicalName>Artifacts/Shaders/Standard.Fragment.msl</LogicalName>
+        <EmbeddedResource Include="Artifacts/c4/c4340775-8b2d-4608-95d7-37a581b2b592.art">
+            <LogicalName>Artifacts/c4340775-8b2d-4608-95d7-37a581b2b592</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Fragment.msl.artifact.eman">
-            <LogicalName>Manifests/Assets/Compiled/Shaders/Standard.Fragment.msl.artifact.eman</LogicalName>
+        <EmbeddedResource Include="Artifacts/c4/c4340775-8b2d-4608-95d7-37a581b2b592.eman">
+            <LogicalName>Manifests/c4340775-8b2d-4608-95d7-37a581b2b592.eman</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Fragment.dxil.artifact">
-            <LogicalName>Artifacts/Shaders/Standard.Fragment.dxil</LogicalName>
+        <EmbeddedResource Include="Artifacts/39/3998ed6f-c054-4651-9c1e-6ee34c3160a8.art">
+            <LogicalName>Artifacts/3998ed6f-c054-4651-9c1e-6ee34c3160a8</LogicalName>
         </EmbeddedResource>
-        <EmbeddedResource Include="Assets/Compiled/Shaders/Standard.Fragment.dxil.artifact.eman">
-            <LogicalName>Manifests/Assets/Compiled/Shaders/Standard.Fragment.dxil.artifact.eman</LogicalName>
+        <EmbeddedResource Include="Artifacts/39/3998ed6f-c054-4651-9c1e-6ee34c3160a8.eman">
+            <LogicalName>Manifests/3998ed6f-c054-4651-9c1e-6ee34c3160a8.eman</LogicalName>
         </EmbeddedResource>
     </ItemGroup>
 </Project>

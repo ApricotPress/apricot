@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Apricot.Assets;
 using Apricot.Assets.Artifacts;
 using Apricot.Assets.Embedded;
@@ -15,7 +16,6 @@ using Apricot.Resources;
 using Apricot.Timing;
 using Apricot.Utils;
 using Apricot.Windows;
-using LiteDB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -68,7 +68,11 @@ public static class Injection
         .AddSingleton<IAssetsSource, EmbeddedAssetsSource>()
         .AddSingleton<IArtifactsDatabase, CachedArtifactsDatabase>()
         .AddSingleton<IArtifactsCache, InMemoryArtifactsCache>()
-        .AddSingleton<IArtifactsCache, EmbeddedArtifactsCache>()
+        .AddSingleton<IArtifactsCache, EmbeddedArtifactsCache>(s => new EmbeddedArtifactsCache(
+            Assembly.GetExecutingAssembly(),
+            null,
+            s.GetRequiredService<ILogger<EmbeddedArtifactsCache>>()
+        ))
         .AddSingleton<IResources, Resources.Resources>()
         .AddSingleton<IResourceFactory<ShaderProgram, Uri>, ShadersFactory>()
         .AddSingleton<IGameLoopProvider, DefaultGameLoopProvider>()

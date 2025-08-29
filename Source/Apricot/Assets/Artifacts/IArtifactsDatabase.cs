@@ -8,7 +8,7 @@ public interface IArtifactsDatabase
     /// <summary>
     /// Adds artifact to database.
     /// </summary>
-    void Add(Artifact artifact);
+    void Add(Asset asset, Artifact artifact);
     
     /// <summary>
     /// Looks for artifact associated with <paramref name="asset"/> that matches provided <paramref name="query"/> or

@@ -57,8 +57,8 @@ public class SandboxGame(
         );
 
     private readonly Material _mat = new(
-        resources.Load<ShaderProgram>(BuiltInAssets.Shaders.StandardVertex),
-        resources.Load<ShaderProgram>(BuiltInAssets.Shaders.StandardFragment)
+        resources.Load<ShaderProgram>(EssentialsIds.Shaders.StandardVertex),
+        resources.Load<ShaderProgram>(EssentialsIds.Shaders.StandardFragment)
     );
 
     public override void Update()

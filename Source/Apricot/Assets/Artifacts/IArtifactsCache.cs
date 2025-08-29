@@ -8,7 +8,7 @@ public interface IArtifactsCache
     /// <summary>
     /// Adds artifact to cache.
     /// </summary>
-    void Add(Artifact artifact);
+    void Add(Asset asset, Artifact artifact);
 
     /// <summary>
     /// Returns enumerable with matched artifacts for <paramref name="asset"/>.

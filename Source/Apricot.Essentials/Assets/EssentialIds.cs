@@ -5,7 +5,7 @@ namespace Apricot.Essentials.Assets;
 /// <summary>
 /// Ids of built-in assets that are shipped with essentials.
 /// </summary>
-public static class BuiltInAssets
+public static class EssentialsIds
 {
     public static class Shaders
     {

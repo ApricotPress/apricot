@@ -1,4 +1,4 @@
-#include <metal_stdlib>
+ƒ§AssetIdÙ$e68b8fb8-19fc-4699-b98f-270c63232317¦Targetƒ¨PlatformÀ­GraphicDriver¤Tags‘¦Vertex¤DataÈ®dÙqApricot.Graphics.Shaders.ShaderProgramDescription, Apricot, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null…¤CodeÅù#include <metal_stdlib>
 #include <simd/simd.h>
 
 using namespace metal;
@@ -31,3 +31,4 @@ vertex vert_out vert(vert_in in [[stage_in]], constant type_UniformBlock& Unifor
     return out;
 }
 
+¬SamplerCount²UniformBufferCount¥StageªEntryPoint¤vert

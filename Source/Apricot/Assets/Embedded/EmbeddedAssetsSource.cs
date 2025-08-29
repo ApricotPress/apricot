@@ -7,7 +7,7 @@ namespace Apricot.Assets.Embedded;
 /// <summary>
 /// Loads embedded assets by their logical names. As a first segment in path excepts assembly name. <br/>
 /// <br/>
-/// Not to make readable all embedded files in every assebly it expects that all assets are stored with Assets/ at the
+/// Not to make readable all embedded files in every assembly it expects that all assets are stored with Assets/ at the
 /// beginning.
 /// </summary>
 public class EmbeddedAssetsSource : IAssetsSource

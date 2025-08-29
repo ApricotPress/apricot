@@ -11,9 +11,12 @@
       <PackageReference Include="Cake.CMake" Version="1.4.0" />
       <PackageReference Include="Cake.Frosting" Version="5.0.0" />
       <PackageReference Include="Cake.Git" Version="5.0.1" />
+      <PackageReference Include="JetBrains.Annotations" Version="2025.2.0" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Apricot.Essentials\Apricot.Essentials.csproj" />
+      <ProjectReference Include="..\Apricot.Sdl.Importers\Apricot.Sdl.Importers.csproj" />
       <ProjectReference Include="..\Apricot\Apricot.csproj" />
     </ItemGroup>
 

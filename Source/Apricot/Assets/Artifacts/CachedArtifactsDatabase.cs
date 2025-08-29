@@ -12,7 +12,7 @@ public class CachedArtifactsDatabase(IEnumerable<IArtifactsCache> caches) : IArt
     private IArtifactsCache MainCache => _caches[0];
 
     /// <inheritdoc />
-    public void Add(Artifact artifact) => MainCache.Add(artifact);
+    public void Add(Asset asset, Artifact artifact) => MainCache.Add(asset, artifact);
 
     /// <inheritdoc />
     public Artifact? FindArtifact(Asset asset, ArtifactTarget query)

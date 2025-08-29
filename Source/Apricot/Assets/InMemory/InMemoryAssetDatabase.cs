@@ -6,6 +6,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Apricot.Assets.InMemory;
 
+/// <summary>Database that stores all assets data in memory.</summary>
+/// <remarks>
+/// Use carefully because if you try to use it with persistent artifacts
+/// database it would be filled with new artifacts each time you launch Jar, as each launch it would reset ids cache. 
+/// </remarks>
 public class InMemoryAssetDatabase(
     IEnumerable<IAssetsSource> sources,
     IArtifactsDatabase artifactsDatabase,
@@ -73,11 +78,11 @@ public class InMemoryAssetDatabase(
                         );
                         continue;
                     }
-                    
+
                     var artifact = importer.Import(asset, OpenAsset(asset.Uri), artifactTarget);
-                    
+
                     Debug.Assert(artifact.AssetId == asset.Id);
-                    artifactsDatabase.Add(artifact);
+                    artifactsDatabase.Add(asset, artifact);
                 }
             }
         }

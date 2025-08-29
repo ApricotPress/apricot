@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Apricot.Assets.Artifacts;
 using LiteDB;
 using Microsoft.Extensions.Logging;
@@ -7,7 +8,7 @@ namespace Apricot.Assets;
 /// <summary>
 /// Cache of artifacts that uses LiteDb as a cache.
 /// </summary>
-public class LiteDbArtifactsCache : IArtifactsCache, IDisposable
+public sealed class LiteDbArtifactsCache : IArtifactsCache, IDisposable
 {
     private readonly ILogger<LiteDbArtifactsCache> _logger;
     private readonly LiteDatabase _database;
@@ -30,8 +31,10 @@ public class LiteDbArtifactsCache : IArtifactsCache, IDisposable
 
     public IEnumerable<Artifact> GetArtifacts(Asset asset) => _artifactsCollection.Find(a => a.AssetId == asset.Id);
 
-    public void Add(Artifact artifact)
+    public void Add(Asset asset, Artifact artifact)
     {
+        Debug.Assert(asset.Id == artifact.AssetId);
+
         _logger.LogInformation(
             "Adding artifact for asset {asset} with target {target}",
             artifact.AssetId,

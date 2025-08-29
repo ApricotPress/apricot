@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Apricot.Assets.Artifacts;
 using Microsoft.Extensions.Logging;
 
@@ -7,8 +8,10 @@ public class InMemoryArtifactsCache(ILogger<InMemoryArtifactsCache> logger) : IA
 {
     private readonly Dictionary<Guid, List<Artifact>> _artifacts = new();
 
-    public void Add(Artifact artifact)
+    public void Add(Asset asset, Artifact artifact)
     {
+        Debug.Assert(asset.Id == artifact.AssetId);
+
         logger.LogInformation(
             "Adding artifact for asset {asset} with target {target}",
             artifact.AssetId,

@@ -60,8 +60,8 @@ public sealed unsafe class ImGuiWindowRenderer
 
         _renderTarget = graphics.GetWindowRenderTarget(window);
         _material = new Material(
-            resources.Load<ShaderProgram>(BuiltInAssets.Shaders.StandardVertex),
-            resources.Load<ShaderProgram>(BuiltInAssets.Shaders.StandardFragment)
+            resources.Load<ShaderProgram>(EssentialsIds.Shaders.StandardVertex),
+            resources.Load<ShaderProgram>(EssentialsIds.Shaders.StandardFragment)
         );
 
         ResizeVertexBuffer(2048);
