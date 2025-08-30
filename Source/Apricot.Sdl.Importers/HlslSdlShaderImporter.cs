@@ -36,6 +36,7 @@ public unsafe class HlslSdlShaderImporter(ILogger<HlslSdlShaderImporter> logger)
     /// <inheritdoc />
     public Artifact Import(Asset asset, Stream stream, ArtifactTarget target)
     {
+        // todo: traverse all of them
         if (target.Tags is not [{ } stageTag])
         {
             throw new NotSupportedException("No stage tag were provided on import");

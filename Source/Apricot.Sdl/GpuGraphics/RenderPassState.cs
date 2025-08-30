@@ -52,7 +52,7 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
             _ => throw new NotSupportedException($"Not supported render target: {target}")
         };
 
-        if (targetInfo is null) // swapchain wasnt acquired, we should skip pass
+        if (targetInfo is null) // swapchain wasn't acquired, we should skip pass
         {
             _currentRenderTarget = target;
             _handle = IntPtr.Zero;
