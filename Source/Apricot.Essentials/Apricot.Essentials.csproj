@@ -6,6 +6,7 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="ImGui.NET" Version="1.91.6.1" />
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.8" />
         <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.8" />
@@ -56,5 +57,9 @@
         <EmbeddedResource Include="Artifacts/39/3998ed6f-c054-4651-9c1e-6ee34c3160a8.eman">
             <LogicalName>Manifests/3998ed6f-c054-4651-9c1e-6ee34c3160a8.eman</LogicalName>
         </EmbeddedResource>
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Assets\Textures\" />
+      <Folder Include="Importers\" />
     </ItemGroup>
 </Project>
