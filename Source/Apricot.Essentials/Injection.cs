@@ -67,7 +67,7 @@ public static class Injection
         .AddSingleton<ITimeController, TimeController>()
         .AddSingleton<ITime, StopwatchTime>()
         .AddSingleton<IAssetDatabase, InMemoryAssetDatabase>()
-        .AddSingleton<IAssetsSource>(new FilesAssetsSource("file", "Assets"))
+        .DoIf(Directory.Exists("Assets"), s => s.AddSingleton<IAssetsSource>(new FilesAssetsSource("file", "Assets")))
         .AddSingleton<IAssetsSource, EmbeddedAssetsSource>()
         .AddSingleton<IAssetsImporter, ImageImporter>()
         .AddSingleton<IArtifactsDatabase, CachedArtifactsDatabase>()
