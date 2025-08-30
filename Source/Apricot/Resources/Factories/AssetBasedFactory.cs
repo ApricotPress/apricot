@@ -24,6 +24,8 @@ public abstract class AssetBasedFactory<T>(
             : [];
 
         var artifactTarget = new ArtifactTarget(platform.Platform, platform.GraphicDriver, tags);
+        
+        // todo: should be auto-imported if not found and not stored in database all the time to avoid memory "leaks"
         var artifact = artifacts.FindArtifact(
             asset,
             artifactTarget
