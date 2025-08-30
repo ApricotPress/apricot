@@ -10,6 +10,7 @@
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.8" />
         <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.8" />
+        <PackageReference Include="StbImageSharp" Version="2.30.15" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Apricot\Apricot.csproj" />
