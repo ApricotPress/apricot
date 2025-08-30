@@ -13,6 +13,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Apricot.Build.Tasks;
 
+/// <remarks>
+/// We could pack images here and other assets but they are easily bakeable on runtime and would take much more space on
+/// disk.
+/// </remarks>
 [TaskName("Build artifacts and embedded to essentials")]
 public sealed class BuildArtifactsWithSdl : FrostingTask<BuildContext>
 {
