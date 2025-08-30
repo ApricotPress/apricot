@@ -398,7 +398,7 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
             this,
             name ?? nativeShader.ToString(),
             nativeShader,
-            description
+            description.Stage
         );
 
         lock (_loadedShaders) _loadedShaders.Add(shader);

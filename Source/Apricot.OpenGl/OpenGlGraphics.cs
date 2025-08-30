@@ -331,7 +331,7 @@ public unsafe sealed class OpenGlGraphics(
             this,
             name ?? shader.ToString(),
             new IntPtr(shader),
-            description
+            description.Stage
         );
     }
 

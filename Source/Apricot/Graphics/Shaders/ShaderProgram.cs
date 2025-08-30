@@ -6,14 +6,14 @@ public sealed class ShaderProgram(
     IGraphics graphics,
     string name,
     IntPtr handle,
-    ShaderProgramDescription description
+    ShaderStage stage
 ) : IGraphicsResource
 {
     public string Name { get; } = $"Shader <{name}>";
 
     public IntPtr Handle { get; } = handle;
 
-    public ShaderProgramDescription Description { get; } = description;
+    public ShaderStage Stage { get; } = stage;
 
     public bool IsDisposed { get; private set; }
 
