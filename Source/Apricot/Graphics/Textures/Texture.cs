@@ -23,7 +23,7 @@ public sealed class Texture(
 
     public TextureFormat Format { get; } = format;
 
-    public void SetData(Span<byte> data)
+    public void SetData(in ReadOnlySpan<byte> data)
     {
         if (IsDisposed) throw new InvalidOperationException("Texture was disposed and cannot have new data.");
 
