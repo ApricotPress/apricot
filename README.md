@@ -28,8 +28,9 @@ Clone repository with
 git clone --recursive git@github.com:ApricotPress/apricot.git
 ```
 
-And simply use dotnet build to build. At the moment building of assets is broken, but later would be implemented using 
-cake build system located in Apricot.Build project
+If new assets added to essentials you may want to tun Apricot.Build project from repository root to bake new assets. As
+otherwise you will need to ensure you have all importers shipped with game (HLSL compiler is over 75 megabytes, so I 
+would not recommend  it :D)
 
 # Some other notes 
 - I mainly work with Unity yet have experience of various game engines for inspiration. Although, I don't hesitate to 
