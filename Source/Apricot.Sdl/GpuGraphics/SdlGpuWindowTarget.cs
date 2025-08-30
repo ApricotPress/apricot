@@ -18,9 +18,9 @@ public sealed class SdlGpuWindowTarget : IRenderTarget
     /// </summary>
     public SdlWindow Window { get; }
 
-    public int Width => Window.Width;
+    public int Width => Window.PixelWidth;
 
-    public int Height => Window.Height;
+    public int Height => Window.PixelHeight;
 
     public string Name => $"SDL Window Target <{Window}>";
 

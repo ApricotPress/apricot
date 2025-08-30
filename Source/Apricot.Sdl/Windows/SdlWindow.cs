@@ -60,6 +60,14 @@ public class SdlWindow : IWindow
         }
     }
 
+    public int PixelWidth => SDL_GetWindowSizeInPixels(Handle, out var w, out _)
+        ? w
+        : throw SdlException.GetFromLatest(nameof(SDL_GetWindowSizeInPixels));
+
+    public int PixelHeight => SDL_GetWindowSizeInPixels(Handle, out _, out var h)
+        ? h
+        : throw SdlException.GetFromLatest(nameof(SDL_GetWindowSizeInPixels));
+
     public bool IsFullscreen
     {
         get => SDL_GetWindowFlags(Handle).HasFlag(SDL_WindowFlags.SDL_WINDOW_FULLSCREEN);
@@ -113,7 +121,12 @@ public class SdlWindow : IWindow
         using var _ = logger.BeginScope("SdlWindow.ctor");
         logger.LogInformation("Creating window with title {Title} ({W}x{H}:{Flags})", title, width, height, flags);
 
-        var sdlFlags = SDL_WindowFlags.SDL_WINDOW_HIGH_PIXEL_DENSITY;
+        SDL_WindowFlags sdlFlags = default;
+
+        if (flags.Has(WindowCreationFlags.HiDpi))
+        {
+            sdlFlags |= SDL_WindowFlags.SDL_WINDOW_HIGH_PIXEL_DENSITY;
+        }
 
         if (flags.Has(WindowCreationFlags.Fullscreen))
         {

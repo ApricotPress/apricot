@@ -13,9 +13,9 @@ public sealed class GlWindowTarget(IWindow window, IGlPlatform glPlatform) : IRe
 
     public string Name => $"OpenGL Window Target <{Window}>";
 
-    public int Width => Window.Width;
+    public int Width => Window.PixelWidth;
     
-    public int Height => Window.Height;
+    public int Height => Window.PixelHeight;
 
     public bool IsDisposed { get; private set; }
 
