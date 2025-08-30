@@ -51,7 +51,7 @@ public class LogoView(
     public override void Render()
     {
         var mat =
-            Matrix4x4.CreateScale(100, 100, 1.0f)
+            Matrix4x4.CreateScale(300, 300, 1.0f)
             * Matrix4x4.CreateTranslation(_mainTarget.Width / 2f, _mainTarget.Height / 2f, 0)
             * Matrix4x4.CreateOrthographicOffCenter(0, _mainTarget.Width, _mainTarget.Height, 0, 0.1f, 1000.0f);
         _indices.UploadData([0, 1, 2, 0, 2, 3]);
