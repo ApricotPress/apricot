@@ -7,7 +7,9 @@ using Apricot.Assets.InMemory;
 using Apricot.Assets.Sources;
 using Apricot.Configuration;
 using Apricot.Essentials.Bootstrap;
+using Apricot.Essentials.Importers;
 using Apricot.Graphics.Shaders;
+using Apricot.Graphics.Textures;
 using Apricot.Jobs;
 using Apricot.Lifecycle;
 using Apricot.Lifecycle.TickHandlers;
@@ -67,6 +69,7 @@ public static class Injection
         .AddSingleton<IAssetDatabase, InMemoryAssetDatabase>()
         .AddSingleton<IAssetsSource>(new FilesAssetsSource("file", "Assets"))
         .AddSingleton<IAssetsSource, EmbeddedAssetsSource>()
+        .AddSingleton<IAssetsImporter, ImageImporter>()
         .AddSingleton<IArtifactsDatabase, CachedArtifactsDatabase>()
         .AddSingleton<IArtifactsCache, InMemoryArtifactsCache>()
         .AddSingleton<IArtifactsCache, EmbeddedArtifactsCache>(s => new EmbeddedArtifactsCache(
@@ -76,6 +79,7 @@ public static class Injection
         ))
         .AddSingleton<IResourcesLoader, ResourcesLoader>()
         .AddSingleton<IResourceFactory<ShaderProgram, Uri>, ShadersFactory>()
+        .AddSingleton<IResourceFactory<Texture, Uri>, TexturesFactory>()
         .AddSingleton<IGameLoopProvider, DefaultGameLoopProvider>()
         .DoIf(addHostedQuit, s => s.AddHostedService<HostedQuit<TJar>>())
         .DoIf(rootConfiguration is not null, s => s
