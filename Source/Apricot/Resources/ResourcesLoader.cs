@@ -3,9 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Apricot.Resources;
 
 /// <inheritdoc />
-public class Resources(
-    IServiceProvider services
-) : IResources
+public class ResourcesLoader(IServiceProvider services) : IResourcesLoader
 {
     /// <inheritdoc />
     public T Load<T, TArg>(TArg arg)

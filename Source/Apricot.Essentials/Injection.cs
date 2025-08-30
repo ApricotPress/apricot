@@ -74,7 +74,7 @@ public static class Injection
             null,
             s.GetRequiredService<ILogger<EmbeddedArtifactsCache>>()
         ))
-        .AddSingleton<IResources, Resources.Resources>()
+        .AddSingleton<IResourcesLoader, ResourcesLoader>()
         .AddSingleton<IResourceFactory<ShaderProgram, Uri>, ShadersFactory>()
         .AddSingleton<IGameLoopProvider, DefaultGameLoopProvider>()
         .DoIf(addHostedQuit, s => s.AddHostedService<HostedQuit<TJar>>())

@@ -3,7 +3,7 @@ namespace Apricot.Resources;
 /// <summary>
 /// Orchestrates <see cref="IResourceFactory{T,TArg}">resource factories</see> to load any asked resource.  
 /// </summary>
-public interface IResources
+public interface IResourcesLoader
 {
     /// <summary>
     /// Tries to find factory for resources of type T that would load it out of provided argument.  

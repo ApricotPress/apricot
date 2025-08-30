@@ -49,7 +49,7 @@ public sealed unsafe class ImGuiWindowRenderer
         IGraphics graphics,
         IWindow window,
         ITime time,
-        IResources resources
+        IResourcesLoader resources
     )
     {
         _imGuiContext = ImGui.CreateContext();

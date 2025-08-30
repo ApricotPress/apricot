@@ -23,7 +23,7 @@ public class SandboxGame(
     ITime time,
     IGraphics graphics,
     IWindowsManager windows,
-    IResources resources,
+    IResourcesLoader resources,
     ILogger<SandboxGame> logger
 ) : Game
 {
