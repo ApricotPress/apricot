@@ -19,6 +19,9 @@
         <EmbeddedResource Include="Assets\Shaders\Standard.hlsl">
             <LogicalName>Assets/Shaders/Standard.hlsl</LogicalName>
         </EmbeddedResource>
+        <EmbeddedResource Include="Assets\Textures\ApricotLogo.png">
+            <LogicalName>Assets/Textures/ApricotLogo.png</LogicalName>
+        </EmbeddedResource>
     </ItemGroup>
     <!--Auto-Generated XML node-->
     <ItemGroup Label="Shader Artifacts">
@@ -58,9 +61,5 @@
         <EmbeddedResource Include="Artifacts/39/3998ed6f-c054-4651-9c1e-6ee34c3160a8.eman">
             <LogicalName>Manifests/3998ed6f-c054-4651-9c1e-6ee34c3160a8.eman</LogicalName>
         </EmbeddedResource>
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Assets\Textures\" />
-      <Folder Include="Importers\" />
     </ItemGroup>
 </Project>
