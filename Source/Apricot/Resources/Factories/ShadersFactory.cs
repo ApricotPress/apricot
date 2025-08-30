@@ -4,7 +4,7 @@ using Apricot.Graphics;
 using Apricot.Graphics.Shaders;
 using Apricot.Platform;
 
-namespace Apricot.Resources;
+namespace Apricot.Resources.Factories;
 
 /// <summary>
 /// Loads <see cref="ShaderProgramDescription"/> from artifact associated with shader program and creates

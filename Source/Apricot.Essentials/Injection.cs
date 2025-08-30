@@ -13,6 +13,7 @@ using Apricot.Lifecycle;
 using Apricot.Lifecycle.TickHandlers;
 using Apricot.Platform;
 using Apricot.Resources;
+using Apricot.Resources.Factories;
 using Apricot.Timing;
 using Apricot.Utils;
 using Apricot.Windows;

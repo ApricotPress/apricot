@@ -2,7 +2,7 @@ using Apricot.Assets;
 using Apricot.Assets.Artifacts;
 using Apricot.Platform;
 
-namespace Apricot.Resources;
+namespace Apricot.Resources.Factories;
 
 /// <summary>
 /// Generic factory that loads artifact associated with current running platform and graphic device. Uses assets URI
