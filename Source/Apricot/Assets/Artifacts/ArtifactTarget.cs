@@ -14,9 +14,14 @@ namespace Apricot.Assets.Artifacts;
 public readonly record struct ArtifactTarget(
     RuntimePlatform? Platform,
     GraphicDriver? GraphicDriver,
-    string[] Tags
+    IReadOnlyList<string> Tags
 )
 {
+    /// <summary>
+    /// Artifact taget that matches all possible systems.
+    /// </summary>
+    public static ArtifactTarget Any { get; } = new(null, null, []);
+    
     /// <summary>
     /// Check whether target matches query. To match platform and driver should be either null in query or target or
     /// equal. For tags it would check that each tag from query exists in current target. 

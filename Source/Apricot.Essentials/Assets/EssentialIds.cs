@@ -15,4 +15,9 @@ public static class EssentialsIds
         public static readonly Uri StandardFragment =
             new("embedded:Apricot.Essentials/Shaders/Standard.hlsl#" + AssetUtils.FragmentTag);
     }
+
+    public static class Textures
+    {
+        public static readonly Uri ApricotLogo = new("embedded:Apricot.Essentials/Textures/ApricotLogo.png");
+    }
 }

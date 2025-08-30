@@ -1,3 +1,5 @@
+using MessagePack;
+
 namespace Apricot.Graphics.Structs;
 
 /// <summary>
@@ -9,6 +11,7 @@ namespace Apricot.Graphics.Structs;
 /// <param name="g">Green component of color.</param>
 /// <param name="b">Blue component of color.</param>
 /// <param name="a">Alpha channel of a color.</param>
+[MessagePackObject]
 public struct Color(float r, float g, float b, float a = 1) : IEquatable<Color>
 {
     public static Color Black { get; } = new(0, 0, 0);
@@ -18,12 +21,16 @@ public struct Color(float r, float g, float b, float a = 1) : IEquatable<Color>
     public static Color Blue { get; } = new(0, 0, 1);
     public static Color Transparent { get; } = new(0, 0, 0, 0);
 
+    [Key("R")]
     public float R { get; set; } = r;
 
+    [Key("G")]
     public float G { get; set; } = g;
 
+    [Key("B")]
     public float B { get; set; } = b;
 
+    [Key("A")]
     public float A { get; set; } = a;
 
     public Color WithAlpha(float alpha) => new(R, G, B, alpha);
