@@ -22,3 +22,7 @@ This file holds more of "strategical" TODOs I wish to implement eventually.
   are unused. Eventually it needs to be updated to work properly
 
 - Add support for ome type of bundles with compression
+
+- ASTC support for textures
+
+- Import settings nearby asset files 
