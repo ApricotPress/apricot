@@ -154,24 +154,35 @@ public unsafe class HlslSdlShaderImporter(ILogger<HlslSdlShaderImporter> logger)
                 case GraphicDriver.OpenGl:
                     logger.LogDebug("Building GLSL from SPIR-V using spirv-cross");
 
-                    Spvc.spvc_context_create(out var spirvContext).ThrowIfError(spirvContext);
+                    // todo: do not create all resources each time and initialize it with class
+                    Spvc.spvc_context_create(out var spirvCtx).ThrowIfError(spirvCtx);
 
                     Spvc.spvc_context_parse_spirv(
-                        spirvContext,
+                        spirvCtx,
                         (uint*)spirVPtr,
                         spirVSize / sizeof(uint),
                         out var parsedIr
-                    ).ThrowIfError(spirvContext);
+                    ).ThrowIfError(spirvCtx);
 
                     Spvc.spvc_context_create_compiler(
-                        spirvContext, SpvcBackend.Glsl, parsedIr, SpvcCaptureMode.TakeOwnership, out var compiler
-                    ).ThrowIfError(spirvContext);
-                    Spvc.spvc_compiler_build_combined_image_samplers(compiler).ThrowIfError(spirvContext);
+                        spirvCtx, SpvcBackend.Glsl, parsedIr, SpvcCaptureMode.TakeOwnership, out var compiler
+                    ).ThrowIfError(spirvCtx);
+                    Spvc.spvc_compiler_build_combined_image_samplers(compiler).ThrowIfError(spirvCtx);
 
-                    Spvc.spvc_compiler_compile(compiler, out var glslPtr).ThrowIfError(spirvContext);
+                    Spvc.spvc_compiler_create_compiler_options(compiler, out var opts).ThrowIfError(spirvCtx);
+                    Spvc.spvc_compiler_options_set_uint(opts, CompilerOption.GlslVersion, 410)
+                        .ThrowIfError(spirvCtx);
+                    Spvc.spvc_compiler_options_set_bool(opts, CompilerOption.GlslEs, 0).ThrowIfError(spirvCtx);
+                    Spvc.spvc_compiler_options_set_bool(opts, CompilerOption.GlslEnable420PackExtension, 0)
+                        .ThrowIfError(spirvCtx);
+                    Spvc.spvc_compiler_options_set_bool(opts, CompilerOption.GlslVulkanSemantics, 0)
+                        .ThrowIfError(spirvCtx);
+                    Spvc.spvc_compiler_install_compiler_options(compiler, opts).ThrowIfError(spirvCtx);
+
+                    Spvc.spvc_compiler_compile(compiler, out var glslPtr).ThrowIfError(spirvCtx);
                     var glsl = Marshal.PtrToStringUTF8(glslPtr)!;
-                    Spvc.spvc_context_release_allocations(spirvContext);
-                    Spvc.spvc_context_destroy(spirvContext);
+                    Spvc.spvc_context_release_allocations(spirvCtx);
+                    Spvc.spvc_context_destroy(spirvCtx);
 
                     shaderCode = Encoding.UTF8.GetBytes(glsl);
                     SDL.SDL_free(spirVPtr);
