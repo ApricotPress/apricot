@@ -28,6 +28,8 @@ public class SdlWindow : IWindow
         }
     }
 
+    // todo: add pixel density property
+
     public int Width
     {
         get => SDL_GetWindowSize(Handle, out var w, out _)

@@ -1,3 +1,4 @@
+using Apricot.Jobs;
 using Apricot.Lifecycle.TickHandlers;
 using Apricot.Timing;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,6 +38,10 @@ public class DefaultGameLoopProvider : IGameLoopProvider
                 Ids.Update,
                 [
                     GameLoop.SimpleHandler(
+                        Ids.ScheduledUpdates,
+                        new RunScheduledJobs(_services.GetRequiredService<IScheduler>())
+                    ), 
+                    GameLoop.SimpleHandler(
                         Ids.GenricUpdateHandlers,
                         new UpdateHandlersTickHandler(_services.GetServices<IUpdateHandler>().ToArray())
                     )
@@ -63,6 +68,11 @@ public class DefaultGameLoopProvider : IGameLoopProvider
                 updateHandler.Poll();
             }
         }
+    }
+
+    private class RunScheduledJobs(IScheduler scheduler) : ITickHandler
+    {
+        public void Tick() => scheduler.RunMainThread();
     }
 
     private class UpdateHandlersTickHandler(IUpdateHandler[] handlers) : ITickHandler

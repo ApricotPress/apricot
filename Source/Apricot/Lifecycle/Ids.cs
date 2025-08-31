@@ -13,6 +13,7 @@ public static class Ids
 
 
     public const string Update = nameof(Update);
+    public const string ScheduledUpdates = nameof(ScheduledUpdates);
     public const string GenricUpdateHandlers = nameof(GenricUpdateHandlers);
 
 
