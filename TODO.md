@@ -16,8 +16,6 @@ This file holds more of "strategical" TODOs I wish to implement eventually.
   and may be rewritten to source generators. I also was thinking of producing SPIR-V directly from C# but have not yet
   figured out where to find proper examples and docs for that idea.
 
-- GLSL generation
-
 # Asset importing
 
 - Asset import is very robust, produces artifacts for all platforms and then stores them in memory even when they

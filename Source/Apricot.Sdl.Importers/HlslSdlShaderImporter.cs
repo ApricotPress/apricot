@@ -4,6 +4,7 @@ using Apricot.Assets;
 using Apricot.Assets.Artifacts;
 using Apricot.Graphics;
 using Apricot.Graphics.Shaders;
+using Apricot.Sdl.Importers.Bindings;
 using Microsoft.Extensions.Logging;
 using SDL3;
 using SDL3.ShaderCross;
@@ -31,6 +32,8 @@ public unsafe class HlslSdlShaderImporter(ILogger<HlslSdlShaderImporter> logger)
         new(null, GraphicDriver.Metal, [AssetUtils.FragmentTag]),
         new(null, GraphicDriver.Vulkan, [AssetUtils.VertexTag]),
         new(null, GraphicDriver.Vulkan, [AssetUtils.FragmentTag]),
+        new(null, GraphicDriver.OpenGl, [AssetUtils.VertexTag]),
+        new(null, GraphicDriver.OpenGl, [AssetUtils.FragmentTag]),
     ];
 
     /// <inheritdoc />
@@ -143,8 +146,36 @@ public unsafe class HlslSdlShaderImporter(ILogger<HlslSdlShaderImporter> logger)
 
                     var metal = SdlShaderCross.SDL_ShaderCross_TranspileMSLFromSPIRV(spirVInfo);
                     logger.LogDebug("Built metal shader of length {len}", metal.Length);
+                    SDL.SDL_free(spirVPtr);
 
                     shaderCode = Encoding.UTF8.GetBytes(metal);
+                    break;
+
+                case GraphicDriver.OpenGl:
+                    logger.LogDebug("Building GLSL from SPIR-V using spirv-cross");
+
+                    Spvc.spvc_context_create(out var spirvContext).ThrowIfError(spirvContext);
+
+                    Spvc.spvc_context_parse_spirv(
+                        spirvContext,
+                        (uint*)spirVPtr,
+                        spirVSize / sizeof(uint),
+                        out var parsedIr
+                    ).ThrowIfError(spirvContext);
+
+                    Spvc.spvc_context_create_compiler(
+                        spirvContext, SpvcBackend.Glsl, parsedIr, SpvcCaptureMode.TakeOwnership, out var compiler
+                    ).ThrowIfError(spirvContext);
+                    Spvc.spvc_compiler_build_combined_image_samplers(compiler).ThrowIfError(spirvContext);
+
+                    Spvc.spvc_compiler_compile(compiler, out var glslPtr).ThrowIfError(spirvContext);
+                    var glsl = Marshal.PtrToStringUTF8(glslPtr)!;
+                    Spvc.spvc_context_release_allocations(spirvContext);
+                    Spvc.spvc_context_destroy(spirvContext);
+
+                    shaderCode = Encoding.UTF8.GetBytes(glsl);
+                    SDL.SDL_free(spirVPtr);
+
                     break;
 
                 default:
