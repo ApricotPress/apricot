@@ -61,5 +61,17 @@
         <EmbeddedResource Include="Artifacts/39/3998ed6f-c054-4651-9c1e-6ee34c3160a8.eman">
             <LogicalName>Manifests/3998ed6f-c054-4651-9c1e-6ee34c3160a8.eman</LogicalName>
         </EmbeddedResource>
+        <EmbeddedResource Include="Artifacts/80/80309ce8-bef1-4fc5-9327-c0855d4871a7.art">
+            <LogicalName>Artifacts/80309ce8-bef1-4fc5-9327-c0855d4871a7</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Artifacts/80/80309ce8-bef1-4fc5-9327-c0855d4871a7.eman">
+            <LogicalName>Manifests/80309ce8-bef1-4fc5-9327-c0855d4871a7.eman</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Artifacts/4d/4d828c87-2a15-424a-9641-2926597dce7d.art">
+            <LogicalName>Artifacts/4d828c87-2a15-424a-9641-2926597dce7d</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Artifacts/4d/4d828c87-2a15-424a-9641-2926597dce7d.eman">
+            <LogicalName>Manifests/4d828c87-2a15-424a-9641-2926597dce7d.eman</LogicalName>
+        </EmbeddedResource>
     </ItemGroup>
 </Project>
