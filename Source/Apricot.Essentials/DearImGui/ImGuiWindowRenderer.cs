@@ -76,7 +76,7 @@ public sealed unsafe class ImGuiWindowRenderer
         var io = ImGui.GetIO();
 
         io.DeltaTime = _time.Delta;
-        io.DisplaySize = new Vector2(_window.Width, _window.Height);
+        io.DisplaySize = new Vector2(_window.PixelWidth, _window.PixelHeight);
         io.DisplayFramebufferScale = Vector2.One;
 
         ImGui.NewFrame();
@@ -141,7 +141,7 @@ public sealed unsafe class ImGuiWindowRenderer
 
         var mat =
             Matrix4x4.CreateScale(data.FramebufferScale.X, data.FramebufferScale.Y, 1.0f) *
-            Matrix4x4.CreateOrthographicOffCenter(0, _window.Width, _window.Height, 0, 0.1f, 1000.0f);
+            Matrix4x4.CreateOrthographicOffCenter(0, _window.PixelWidth, _window.PixelHeight, 0, 0.1f, 1000.0f);
         _material.VertexStage.SetUniformBuffer(mat);
 
         var globalVtxOffset = 0;
