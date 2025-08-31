@@ -46,7 +46,7 @@ public class SilkApricotGlContext(
 
     public void Clear()
     {
-        // todo: what is that?
+        // todo: what is that method used for? implement properly
     }
 
     public void Dispose() => glPlatform.DeleteContext(Handle);
