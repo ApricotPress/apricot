@@ -179,22 +179,16 @@ public class SandboxGame(
 
             // --- sparkline / tiny plot (using PlotLines) ---
             ImGui.Text("Signal");
-            unsafe
-            {
-                fixed (float* ptr = &_samples[0])
-                {
-                    ImGui.PlotLines(
-                        "##",
-                        ref _samples[0],
-                        _samples.Length,
-                        _writeIndex,
-                        "animated sine",
-                        0,
-                        1,
-                        new Vector2(-1, 80)
-                    );
-                }
-            }
+            ImGui.PlotLines(
+                "##",
+                ref _samples[0],
+                _samples.Length,
+                _writeIndex,
+                "animated sine",
+                0,
+                1,
+                new Vector2(-1, 80)
+            );
 
             ImGui.Spacing();
             ImGui.Separator();
