@@ -31,8 +31,6 @@ public unsafe class HlslSdlShaderImporter(ILogger<HlslSdlShaderImporter> logger)
         new(null, GraphicDriver.Metal, [AssetUtils.FragmentTag]),
         new(null, GraphicDriver.Vulkan, [AssetUtils.VertexTag]),
         new(null, GraphicDriver.Vulkan, [AssetUtils.FragmentTag]),
-        new(null, GraphicDriver.OpenGl, [AssetUtils.VertexTag]),
-        new(null, GraphicDriver.OpenGl, [AssetUtils.FragmentTag]),
     ];
 
     /// <inheritdoc />
