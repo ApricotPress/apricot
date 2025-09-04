@@ -4,7 +4,6 @@ using Apricot.Assets;
 using Apricot.Assets.Artifacts;
 using Apricot.Graphics;
 using Apricot.Graphics.Shaders;
-using Apricot.Sdl.Importers.Bindings;
 using Microsoft.Extensions.Logging;
 using SDL3;
 using SDL3.ShaderCross;
@@ -149,44 +148,6 @@ public unsafe class HlslSdlShaderImporter(ILogger<HlslSdlShaderImporter> logger)
                     SDL.SDL_free(spirVPtr);
 
                     shaderCode = Encoding.UTF8.GetBytes(metal);
-                    break;
-
-                case GraphicDriver.OpenGl:
-                    logger.LogDebug("Building GLSL from SPIR-V using spirv-cross");
-
-                    // todo: do not create all resources each time and initialize it with class
-                    Spvc.spvc_context_create(out var spirvCtx).ThrowIfError(spirvCtx);
-
-                    Spvc.spvc_context_parse_spirv(
-                        spirvCtx,
-                        (uint*)spirVPtr,
-                        spirVSize / sizeof(uint),
-                        out var parsedIr
-                    ).ThrowIfError(spirvCtx);
-
-                    Spvc.spvc_context_create_compiler(
-                        spirvCtx, SpvcBackend.Glsl, parsedIr, SpvcCaptureMode.TakeOwnership, out var compiler
-                    ).ThrowIfError(spirvCtx);
-                    Spvc.spvc_compiler_build_combined_image_samplers(compiler).ThrowIfError(spirvCtx);
-
-                    Spvc.spvc_compiler_create_compiler_options(compiler, out var opts).ThrowIfError(spirvCtx);
-                    Spvc.spvc_compiler_options_set_uint(opts, CompilerOption.GlslVersion, 410)
-                        .ThrowIfError(spirvCtx);
-                    Spvc.spvc_compiler_options_set_bool(opts, CompilerOption.GlslEs, 0).ThrowIfError(spirvCtx);
-                    Spvc.spvc_compiler_options_set_bool(opts, CompilerOption.GlslEnable420PackExtension, 0)
-                        .ThrowIfError(spirvCtx);
-                    Spvc.spvc_compiler_options_set_bool(opts, CompilerOption.GlslVulkanSemantics, 0)
-                        .ThrowIfError(spirvCtx);
-                    Spvc.spvc_compiler_install_compiler_options(compiler, opts).ThrowIfError(spirvCtx);
-
-                    Spvc.spvc_compiler_compile(compiler, out var glslPtr).ThrowIfError(spirvCtx);
-                    var glsl = Marshal.PtrToStringUTF8(glslPtr)!;
-                    Spvc.spvc_context_release_allocations(spirvCtx);
-                    Spvc.spvc_context_destroy(spirvCtx);
-
-                    shaderCode = Encoding.UTF8.GetBytes(glsl);
-                    SDL.SDL_free(spirVPtr);
-
                     break;
 
                 default:
