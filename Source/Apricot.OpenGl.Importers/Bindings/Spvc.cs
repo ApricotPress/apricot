@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Apricot.Sdl.Importers.Bindings;
+namespace Apricot.OpenGl.Importers.Bindings;
 
 public enum SpvcResult
 {
