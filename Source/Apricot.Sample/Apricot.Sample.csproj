@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Apricot.OpenGl.Importers\Apricot.OpenGl.Importers.csproj" />
       <ProjectReference Include="..\Apricot.OpenGl\Apricot.OpenGl.csproj" />
       <ProjectReference Include="..\Apricot.Sdl.GlBinding\Apricot.Sdl.GlBinding.csproj" />
       <ProjectReference Include="..\Apricot.Sdl.Importers\Apricot.Sdl.Importers.csproj" />
