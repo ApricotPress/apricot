@@ -1,7 +1,7 @@
 using Apricot.Assets.Artifacts;
 using Apricot.Resources;
 
-namespace Apricot.Assets;
+namespace Apricot.Assets.Importing;
 
 /// <summary>
 /// Importer of assets that converts raw asset data to engine ready and platform specific data called artifact. Which is

@@ -1,4 +1,4 @@
-using Apricot.Assets;
+using Apricot.Assets.Importing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Apricot.Sdl.Importers;

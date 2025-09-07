@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Apricot.Assets;
 using Apricot.Assets.Artifacts;
+using Apricot.Assets.Importing;
 using Apricot.Graphics;
 using Apricot.Graphics.Shaders;
 using Microsoft.Extensions.Logging;

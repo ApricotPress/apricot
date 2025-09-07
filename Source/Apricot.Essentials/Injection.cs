@@ -3,6 +3,7 @@ using System.Reflection;
 using Apricot.Assets;
 using Apricot.Assets.Artifacts;
 using Apricot.Assets.Embedded;
+using Apricot.Assets.Importing;
 using Apricot.Assets.InMemory;
 using Apricot.Assets.Sources;
 using Apricot.Configuration;

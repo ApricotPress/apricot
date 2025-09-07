@@ -1,5 +1,6 @@
 using Apricot.Assets;
 using Apricot.Assets.Artifacts;
+using Apricot.Assets.Importing;
 using Apricot.Graphics;
 using Apricot.Graphics.Structs;
 using StbImageSharp;

@@ -1,4 +1,5 @@
 using Apricot.Assets.Artifacts;
+using Apricot.Assets.Importing;
 using Apricot.Assets.Sources;
 
 namespace Apricot.Assets;
@@ -16,6 +17,8 @@ namespace Apricot.Assets;
 /// <seealso cref="IAssetsSource"/>
 public interface IAssetDatabase
 {
+    public const string TagFileExtension = "tag";
+    
     /// <summary>
     /// Loads list of all assets, imports them, and assigns ids to them for later use.
     /// </summary>

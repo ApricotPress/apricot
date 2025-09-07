@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using System.Text.Json;
 using Apricot.Assets.Artifacts;
+using Apricot.Assets.Importing;
 using Apricot.Assets.Sources;
 using Apricot.Utils;
 using Microsoft.Extensions.Logging;
@@ -22,6 +24,7 @@ public class InMemoryAssetDatabase(
     private readonly IAssetsSource[] _sources = sources.ToArray();
     private readonly Dictionary<Uri, Guid> _guidsCache = new();
     private readonly Dictionary<Guid, Asset> _assets = new();
+    private readonly Dictionary<Guid, AssetTag> _tags = new();
 
     /// <inheritdoc />
     public void BuildDatabase()
@@ -36,18 +39,24 @@ public class InMemoryAssetDatabase(
 
             foreach (var assetLocalPath in assets)
             {
+                if (PathUtils.HasExtension(assetLocalPath, IAssetDatabase.TagFileExtension)) continue;
+
                 logger.LogInformation("Registering {scheme}:{asset}...", source.Scheme, assetLocalPath);
 
+                var assetTag = GetAssetTag(source, assetLocalPath);
+                var id = assetTag.Id ?? Guid.NewGuid();
                 var assetUri = new UriBuilder(source.Scheme, null, 0, assetLocalPath).Uri;
-                var assetId = GetOrCreateId(assetUri);
+
 
                 var asset = new Asset(
                     Path.GetFileNameWithoutExtension(assetLocalPath),
-                    assetId,
+                    id,
                     assetUri
                 );
 
-                _assets[assetId] = asset;
+                _assets[id] = asset;
+                _tags[id] = assetTag;
+                _guidsCache[UriUtils.NormalizeAssetsUri(assetUri)] = id;
             }
         }
 
@@ -128,8 +137,10 @@ public class InMemoryAssetDatabase(
         }
         else
         {
-            var source =
-                _sources.FirstOrDefault(s => s.Scheme.Equals(scheme, StringComparison.InvariantCultureIgnoreCase));
+            var source = _sources.FirstOrDefault(s => s.Scheme.Equals(
+                scheme,
+                StringComparison.InvariantCultureIgnoreCase
+            ));
 
             if (source is null)
             {
@@ -140,14 +151,18 @@ public class InMemoryAssetDatabase(
         }
     }
 
-    private Guid GetOrCreateId(Uri path)
+    private static AssetTag GetAssetTag(IAssetsSource source, string assetLocalPath)
     {
-        if (GetAssetId(path) is { } guid) return guid;
+        var path = $"{assetLocalPath}.{IAssetDatabase.TagFileExtension}";
 
-        var normalized = UriUtils.NormalizeAssetsUri(path);
+        if (!source.Exists(path)) return CreateEmpty();
 
-        var id = Guid.NewGuid();
-        logger.LogInformation("Assigning Asset id {id} to {path}", id, normalized);
-        return _guidsCache[normalized] = id;
+        using var stream = source.Open(path);
+
+        var tag = JsonSerializer.Deserialize<AssetTag>(stream, JsonImport.DefaultOptions);
+
+        return tag ?? CreateEmpty();
+
+        AssetTag CreateEmpty() => new(null);
     }
 }

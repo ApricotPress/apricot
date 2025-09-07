@@ -13,12 +13,12 @@ public interface IAssetsSource
     // todo: add proper callbacks for asset delete
 
     /// <summary>
-    /// Event that is triggered when asset has changed or craeted. Provides local path to asset as an argument.
+    /// Event that is triggered when asset has changed or created. Provides local path to asset as an argument.
     /// </summary>
     event Action<string> OnAssetChange;
 
     /// <summary>
-    /// Listing of all assets under provided path. Path should omit scheme (those, called local). 
+    /// Listing of all assets under provided path. Path should omit scheme (those, called local).
     /// </summary>
     IEnumerable<string> ListAssetsPaths(string localPath, ListAssetsType listType);
 

@@ -19,6 +19,9 @@
         <EmbeddedResource Include="Assets\Shaders\Standard.hlsl">
             <LogicalName>Assets/Shaders/Standard.hlsl</LogicalName>
         </EmbeddedResource>
+        <EmbeddedResource Include="Assets\Shaders\Standard.hlsl.tag">
+            <LogicalName>Assets/Shaders/Standard.hlsl.tag</LogicalName>
+        </EmbeddedResource>
         <EmbeddedResource Include="Assets\Textures\ApricotLogo.png">
             <LogicalName>Assets/Textures/ApricotLogo.png</LogicalName>
         </EmbeddedResource>
