@@ -12,9 +12,14 @@ public partial class Glslang
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial IntPtr ShaderCreate(in Input input);
 
+
+    [LibraryImport(LibName, EntryPoint = "glslang_shader_set_entry_point", StringMarshalling = StringMarshalling.Utf8)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void ShaderSetEntryPoint(IntPtr shader, string entryPoint);
+
     [LibraryImport(LibName, EntryPoint = "glslang_shader_preprocess")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial GlslangBool ShaderPreprocess(IntPtr shader, in Input input);
+    public static partial int ShaderPreprocess(IntPtr shader, in Input input);
 
     [LibraryImport(LibName, EntryPoint = "glslang_shader_parse")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -57,6 +62,10 @@ public partial class Glslang
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static unsafe partial void ProgramSpirvGenerate(IntPtr program, Stage stage);
 
+    [LibraryImport(LibName, EntryPoint = "glslang_program_SPIRV_generate_with_options")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static unsafe partial void ProgramSpirvGenerate(IntPtr program, Stage stage, SpvOptions options);
+
     [LibraryImport(LibName, EntryPoint = "glslang_program_SPIRV_get_size")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static unsafe partial nuint ProgramSpirvGetSize(IntPtr program);
@@ -95,12 +104,12 @@ public partial class Glslang
 
     public readonly record struct GlslangBool
     {
-        private readonly byte _value;
+        private readonly int _value;
 
-        private const byte FalseValue = 0;
-        private const byte TrueValue = 1;
+        private const int FalseValue = 0;
+        private const int TrueValue = 1;
 
-        internal GlslangBool(byte value) => _value = value;
+        internal GlslangBool(int value) => _value = value;
 
         public static implicit operator bool(GlslangBool b) => b._value != FalseValue;
 
@@ -208,14 +217,19 @@ public partial class Glslang
         ValidateCrossStageIoBit = 1 << 19,
     }
 
-    public enum ResourceType
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SpvOptions
     {
-        Sampler,
-        Texture,
-        Image,
-        Ubo,
-        Ssbo,
-        Uav
+        public int generateDebugInfo;
+        public int stripDebugInfo;
+        public int disableOptimizer;
+        public int optimizeSize;
+        public int disassemble;
+        public int validate;
+        public int emitNonsemanticShaderDebugInfo;
+        public int emitNonsemanticShaderDebugSource;
+        public int compileOnly;
+        public int optimizeAllowExpandedIdBound;
     }
 
     [StructLayout(LayoutKind.Sequential)]

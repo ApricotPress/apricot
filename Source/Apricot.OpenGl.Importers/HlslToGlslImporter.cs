@@ -39,7 +39,8 @@ public unsafe class HlslToGlslImporter(ILogger<HlslToGlslImporter> logger) : IAs
 
         var spirvCode = CreateSpirVProgram(stream, stage);
         var glslCode = SpirvToGlsl(spirvCode);
-        
+
+        logger.LogDebug("{glsl}", glslCode);
 
         return new Artifact(asset.Id, target, new ShaderProgramDescription
         {
@@ -69,14 +70,14 @@ public unsafe class HlslToGlslImporter(ILogger<HlslToGlslImporter> logger) : IAs
             input = new Glslang.Input
             {
                 language = Glslang.SourceType.Hlsl,
-                stage = stage == ShaderStage.Fragment ? Glslang.Stage.Fragment : Glslang.Stage.Vertex,
+                stage = stage.ToGlslang(),
                 client = Glslang.Client.Vulkan,
                 client_version = Glslang.TargetClientVersion.Vulkan12,
                 target_language = Glslang.TargetLanguage.Spirv,
                 target_language_version = Glslang.TargetLanguageVersion.Spirv16,
                 code = (char*)srcBytesPtr,
                 default_version = 100,
-                default_profile = Glslang.Profile.Core,
+                default_profile = Glslang.Profile.Es,
                 force_default_version_and_profile = 0,
                 forward_compatible = 0,
                 messages = Glslang.Messages.DefaultBit,
@@ -86,9 +87,16 @@ public unsafe class HlslToGlslImporter(ILogger<HlslToGlslImporter> logger) : IAs
 
         var shader = Glslang.ShaderCreate(input);
 
+        if (shader == IntPtr.Zero)
+        {
+            throw new Exception("Could not create Glslang shader");
+        }
+
+        Glslang.ShaderSetEntryPoint(shader, stage == ShaderStage.Fragment ? "frag" : "vert");
+
         try
         {
-            if (!Glslang.ShaderPreprocess(shader, input))
+            if (Glslang.ShaderPreprocess(shader, input) != 1)
             {
                 logger.LogError("{InfoLog}", Glslang.ShaderGetInfoLog(shader));
                 logger.LogError("{DebugLog}", Glslang.ShaderGetInfoDebugLog(shader));
@@ -113,7 +121,7 @@ public unsafe class HlslToGlslImporter(ILogger<HlslToGlslImporter> logger) : IAs
             {
                 Glslang.ProgramAddShader(program, shader);
 
-                if (!Glslang.ProgramLink(program, Glslang.Messages.DefaultBit))
+                if (!Glslang.ProgramLink(program, Glslang.Messages.SpvRulesBit | Glslang.Messages.VulkanRulesBit))
                 {
                     logger.LogError("Error linking shader ro program");
                     logger.LogError("Info: {InfoLog}", Glslang.ProgramGetInfoLog(program));
@@ -122,7 +130,15 @@ public unsafe class HlslToGlslImporter(ILogger<HlslToGlslImporter> logger) : IAs
                     throw new Exception("Error linking program");
                 }
 
-                Glslang.ProgramSpirvGenerate(program, input.stage);
+                var generateOptions = new Glslang.SpvOptions
+                {
+                    generateDebugInfo = 1,
+                    disableOptimizer = 0,
+                    stripDebugInfo = 0,
+                    validate = 1
+                };
+
+                Glslang.ProgramSpirvGenerate(program, input.stage, generateOptions);
 
                 var wc = Glslang.ProgramSpirvGetSize(program);
                 if (wc == 0) throw new Exception("SPIR-V generation produced 0 words");
@@ -131,6 +147,10 @@ public unsafe class HlslToGlslImporter(ILogger<HlslToGlslImporter> logger) : IAs
                 fixed (uint* pWords = spirv)
                 {
                     Glslang.ProgramSpirvGet(program, pWords);
+                    File.WriteAllBytes(
+                        $"/Users/yogurt/Developer/Projects/ApricotPress/Apricot/Source/Apricot.Essentials/Assets/Shaders/{stage}.spv",
+                        new Span<byte>(pWords, spirv.Length * sizeof(uint))
+                    );
                 }
 
                 return spirv;
