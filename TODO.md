@@ -2,6 +2,9 @@ This file holds more of "strategical" TODOs I wish to implement eventually.
 
 # Shaders
 
+- Implement HLSL to GLSL compilation
+  Tries to use GLSL -> spv -> HLSL with glslang and shader-cross but could no make it run 
+
 - Move away from DX compiler
 
   I prefer HLSL over GLSL because of very subjective reasons and wish to avoid using GLSL as main shading language.
