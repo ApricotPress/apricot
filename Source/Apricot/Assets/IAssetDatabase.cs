@@ -17,6 +17,10 @@ namespace Apricot.Assets;
 /// <seealso cref="IAssetsSource"/>
 public interface IAssetDatabase
 {
+    /// <summary>
+    /// Extension of filename containing meta information. Asset database should expect those files accessible by the
+    /// same local path in assets source with <i>.tag</i> appended. 
+    /// </summary>
     public const string TagFileExtension = "tag";
     
     /// <summary>
