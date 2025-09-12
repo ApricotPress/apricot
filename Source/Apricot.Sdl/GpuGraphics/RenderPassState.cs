@@ -189,7 +189,7 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
         }
     }
 
-    public void SetFragmentSamplers(BoundSampler[] samplers)
+    public void SetFragmentSamplers(ICollection<BoundSampler> samplers)
     {
         var sdlSamplers = BuildSamplers(samplers);
 
@@ -200,12 +200,12 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
                 _handle,
                 0,
                 sdlSamplers.Span,
-                (uint)samplers.Length
+                (uint)samplers.Count
             );
         }
     }
 
-    public void SetVertexSamplers(BoundSampler[] samplers)
+    public void SetVertexSamplers(ICollection<BoundSampler> samplers)
     {
         var sdlSamplers = BuildSamplers(samplers);
 
@@ -216,7 +216,7 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
             _handle,
             0,
             sdlSamplers.Span,
-            (uint)samplers.Length
+            (uint)samplers.Count
         );
     }
 
@@ -277,16 +277,16 @@ public struct RenderPassState(SdlGpuGraphics graphics, IntPtr commandBuffer, ILo
         return true;
     }
 
-    private StackList16<SDL.SDL_GPUTextureSamplerBinding> BuildSamplers(BoundSampler[] samplers)
+    private StackList16<SDL.SDL_GPUTextureSamplerBinding> BuildSamplers(ICollection<BoundSampler> samplers)
     {
         var newSamplers = new StackList16<SDL.SDL_GPUTextureSamplerBinding>();
         foreach (var sampler in samplers)
         {
-            newSamplers.Add(new SDL.SDL_GPUTextureSamplerBinding()
+            newSamplers.Add(new SDL.SDL_GPUTextureSamplerBinding
             {
                 texture = sampler.Texture is { IsDisposed: false } tex
                     ? tex.Handle
-                    : graphics.EmptyTexture.Handle,
+                    : 0,
                 sampler = graphics.GetSampler(sampler.Sampler)
             });
         }

@@ -59,10 +59,10 @@ public class LogoView : Game
             * Matrix4x4.CreateTranslation(mainTarget.Width / 2f, mainTarget.Height / 2f, 0)
             * Matrix4x4.CreateOrthographicOffCenter(0, mainTarget.Width, mainTarget.Height, 0, 0.1f, 1000.0f)
         );
-        mat.FragmentStage.Samplers[0] = new BoundSampler(
+        mat.FragmentStage.Samplers.Add(new BoundSampler(
             resources.Load<Texture>(EssentialsIds.Textures.ApricotLogo),
             new TextureSampler()
-        );
+        ));
         _drawLogoCommand = new DrawCommand(mainTarget, mat, vertices)
         {
             IndexBuffer = indices,

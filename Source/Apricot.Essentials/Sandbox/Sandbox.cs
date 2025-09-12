@@ -81,8 +81,13 @@ public class SandboxGame(
         _indices.UploadData([0, 1, 2]);
 
         _mat.VertexStage.SetUniformBuffer(mat);
+        if (_mat.FragmentStage.Samplers.Count == 0)
+        {
+            _mat.FragmentStage.Samplers.Add(new BoundSampler());
+        }
+        
         _mat.FragmentStage.Samplers[0] = new BoundSampler(
-            graphics.EmptyTexture,
+            defaultResources.GetEmptyTexture(),
             new TextureSampler()
         );
         _triangleVertices.UploadData([

@@ -1,12 +1,17 @@
 using Apricot.Graphics;
 using Apricot.Graphics.Materials;
 using Apricot.Graphics.Shaders;
+using Apricot.Graphics.Textures;
 using Apricot.Platform;
 using Apricot.Resources;
 
 namespace Apricot.Essentials.Assets;
 
-public class DefaultResourcesResolver(IPlatformInfo platform, IResourcesLoader resources) : IDefaultResourcesResolver
+public class DefaultResourcesResolver(
+    IPlatformInfo platform,
+    IResourcesLoader resources,
+    IGraphics graphics
+) : IDefaultResourcesResolver
 {
     public ShaderProgram GetStandardShader(ShaderStage stage)
     {
@@ -26,4 +31,12 @@ public class DefaultResourcesResolver(IPlatformInfo platform, IResourcesLoader r
         GetStandardShader(ShaderStage.Vertex),
         GetStandardShader(ShaderStage.Fragment)
     );
+
+    public Texture GetEmptyTexture()
+    {
+        var empty = graphics.CreateTexture("Empty", 1, 1);
+        empty.SetData([255, 0, 255, 0]);
+
+        return empty;
+    }
 }

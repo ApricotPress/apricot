@@ -29,10 +29,7 @@ public unsafe sealed class OpenGlGraphics(
     private readonly Dictionary<GL, uint> _tempVaos = new(); // used by MacOS
 
     private GlWindowTarget? _currentWindow;
-    private Texture? _emptyTexture;
-
-    public Texture EmptyTexture => _emptyTexture ?? throw new InvalidOperationException("Graphics is not initialized");
-
+    
     public GraphicDriver Driver => GraphicDriver.OpenGl;
 
     public void Initialize(GraphicDriver preferredDriver, bool enableDebug)
@@ -41,9 +38,6 @@ public unsafe sealed class OpenGlGraphics(
 
         GetWindowRenderTarget(mainWindow);
         _currentWindow = _windowTargets[mainWindow];
-
-        _emptyTexture = CreateTexture("Empty Texture", 1, 1);
-        _emptyTexture.SetData([255, 0, 255, 0]);
     }
 
     private void CheckErrors(GL gl, string context)
@@ -446,7 +440,7 @@ public unsafe sealed class OpenGlGraphics(
         CheckErrors(_currentWindow.Gl, nameof(gl.BindBuffer));
 
         var fragSamplers = command.Material.FragmentStage.Samplers;
-        for (int i = 0; i < fragSamplers.Length; i++)
+        for (int i = 0; i < fragSamplers.Count; i++)
         {
             var sampler = fragSamplers[i];
             if (sampler.Texture == null) continue; // todo: empty texture

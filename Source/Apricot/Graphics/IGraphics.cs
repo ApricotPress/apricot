@@ -19,8 +19,9 @@ namespace Apricot.Graphics;
 /// </summary>
 public interface IGraphics : IDisposable
 {
-    Texture EmptyTexture { get; }
-    
+    /// <summary>
+    /// Should return current actual graphical driver that graphics uses.
+    /// </summary>
     GraphicDriver Driver { get; }
 
     /// <summary>

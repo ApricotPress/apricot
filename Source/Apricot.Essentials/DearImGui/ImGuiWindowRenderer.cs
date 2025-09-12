@@ -153,10 +153,17 @@ public sealed unsafe class ImGuiWindowRenderer
 
                 var textureIndex = imCmd.TextureId.ToInt32();
                 if (textureIndex < _loadedTextures.Count)
+                {
+                    if (_material.FragmentStage.Samplers.Count == 0)
+                    {
+                        _material.FragmentStage.Samplers.Add(new BoundSampler());
+                    }
+                    
                     _material.FragmentStage.Samplers[0] = new BoundSampler(
                         _loadedTextures[textureIndex],
                         new TextureSampler()
                     );
+                }
 
                 cmd.VerticesOffset = (int)(imCmd.VtxOffset + globalVtxOffset);
                 cmd.IndicesOffset = (int)(imCmd.IdxOffset + globalIdxOffset);

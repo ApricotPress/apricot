@@ -35,12 +35,8 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
     private readonly HashSet<Texture> _loadedTextures = [];
     private readonly HashSet<GraphicBuffer> _loadedBuffers = [];
     private readonly HashSet<ShaderProgram> _loadedShaders = [];
-
-    private Texture? _emptyTexture;
-
+    
     public IntPtr GpuDeviceHandle { get; private set; }
-
-    public Texture EmptyTexture => _emptyTexture ?? throw new InvalidOperationException("Device is not initialized");
     
     public GraphicDriver Driver { get; private set; } = GraphicDriver.Unknown;
 
@@ -85,9 +81,6 @@ public sealed unsafe class SdlGpuGraphics(ILogger<SdlGpuGraphics> logger) : IGra
         };
 
         PrepareCommandBuffers();
-
-        _emptyTexture = CreateTexture("Fallback", 1, 1);
-        SetTextureData(_emptyTexture, [255, 0, 255, 255]); // magenta
     }
 
     public void SetVsync(IWindow window, bool vsync)

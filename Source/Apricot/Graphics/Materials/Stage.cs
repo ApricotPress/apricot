@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Apricot.Graphics.Shaders;
+using Apricot.Utils.Collections;
 
 namespace Apricot.Graphics.Materials;
 
@@ -7,7 +8,7 @@ public class Stage(ShaderProgram shaderProgram)
 {
     public ShaderProgram ShaderProgram = shaderProgram;
 
-    public BoundSampler[] Samplers = new BoundSampler[16];
+    public StackList16<BoundSampler> Samplers = new();
 
     public byte[] UniformBuffer = [];
 
