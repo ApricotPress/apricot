@@ -7,6 +7,7 @@ using Apricot.Assets.Importing;
 using Apricot.Assets.InMemory;
 using Apricot.Assets.Sources;
 using Apricot.Configuration;
+using Apricot.Essentials.Assets;
 using Apricot.Essentials.Bootstrap;
 using Apricot.Essentials.Importers;
 using Apricot.Graphics.Shaders;
@@ -78,6 +79,7 @@ public static class Injection
             null,
             s.GetRequiredService<ILogger<EmbeddedArtifactsCache>>()
         ))
+        .AddSingleton<IDefaultResourcesResolver, DefaultResourcesResolver>()
         .AddSingleton<IResourcesLoader, ResourcesLoader>()
         .AddSingleton<IResourceFactory<ShaderProgram, Uri>, ShadersFactory>()
         .AddSingleton<IResourceFactory<Texture, Uri>, TexturesFactory>()

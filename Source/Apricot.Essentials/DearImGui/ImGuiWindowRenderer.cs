@@ -49,7 +49,7 @@ public sealed unsafe class ImGuiWindowRenderer
         IGraphics graphics,
         IWindow window,
         ITime time,
-        IResourcesLoader resources
+        Material material
     )
     {
         _imGuiContext = ImGui.CreateContext();
@@ -59,10 +59,7 @@ public sealed unsafe class ImGuiWindowRenderer
         _time = time;
 
         _renderTarget = graphics.GetWindowRenderTarget(window);
-        _material = new Material(
-            resources.Load<ShaderProgram>(EssentialsIds.Shaders.StandardVertex),
-            resources.Load<ShaderProgram>(EssentialsIds.Shaders.StandardFragment)
-        );
+        _material = material;
 
         ResizeVertexBuffer(2048);
         ResizeIndexBuffer(1024);

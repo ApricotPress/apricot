@@ -25,7 +25,8 @@ public class LogoView : Game
     public LogoView(
         IGraphics graphics,
         IWindowsManager windows,
-        IResourcesLoader resources
+        IResourcesLoader resources,
+        IDefaultResourcesResolver defaultResources
     )
     {
         _graphics = graphics;
@@ -51,10 +52,7 @@ public class LogoView : Game
             );
         indices.UploadData([0, 1, 2, 0, 2, 3]);
 
-        var mat = new Material(
-            resources.Load<ShaderProgram>(EssentialsIds.Shaders.StandardVertex),
-            resources.Load<ShaderProgram>(EssentialsIds.Shaders.StandardFragment)
-        );
+        var mat = defaultResources.GetStandardMaterial();
 
         mat.VertexStage.SetUniformBuffer(
             Matrix4x4.CreateScale(300, 300, 1.0f)

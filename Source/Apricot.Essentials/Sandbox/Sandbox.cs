@@ -23,7 +23,7 @@ public class SandboxGame(
     ITime time,
     IGraphics graphics,
     IWindowsManager windows,
-    IResourcesLoader resources,
+    IDefaultResourcesResolver defaultResources,
     ILogger<SandboxGame> logger
 ) : Game
 {
@@ -40,7 +40,7 @@ public class SandboxGame(
         graphics,
         windows.GetOrCreateDefaultWindow(),
         time,
-        resources
+        defaultResources.GetStandardMaterial()
     );
 
     private readonly VertexBuffer<ImGuiVertex> _triangleVertices = graphics
@@ -56,10 +56,7 @@ public class SandboxGame(
             3
         );
 
-    private readonly Material _mat = new(
-        resources.Load<ShaderProgram>(EssentialsIds.Shaders.StandardVertex),
-        resources.Load<ShaderProgram>(EssentialsIds.Shaders.StandardFragment)
-    );
+    private readonly Material _mat = defaultResources.GetStandardMaterial();
 
     public override void Update()
     {
